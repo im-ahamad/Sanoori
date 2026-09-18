@@ -1,26 +1,176 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Sanoori Trading Design System
+ * Construction / Building Materials / Sanitary Ware / Tiles
+ *
+ * Palette: Navy + Gold on clean white
+ * Typography: Inter (body) + DM Sans (headings)
+ */
 
 @theme inline {
+  /* Semantic color mapping */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Business semantic colors */
+  --color-navy: var(--navy);
+  --color-navy-light: var(--navy-light);
+  --color-navy-dark: var(--navy-dark);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+
+  /* Chart colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-dm-sans);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Spacing scale (supplementary to Tailwind defaults) */
+  --spacing-section: 5rem;
+  --spacing-section-sm: 3rem;
+  --spacing-container: 1.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* === Core palette === */
+
+  /* Background: clean white */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0.01 260);
+
+  /* Card / Popover */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 260);
+
+  /* Primary: Deep Navy — trust, professionalism, construction */
+  --primary: oklch(0.22 0.05 250);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Secondary: Warm Gold — premium, quality, building materials */
+  --secondary: oklch(0.72 0.15 80);
+  --secondary-foreground: oklch(0.15 0.01 260);
+
+  /* Muted: Soft gray */
+  --muted: oklch(0.96 0.005 260);
+  --muted-foreground: oklch(0.50 0.01 260);
+
+  /* Accent: light gold tint */
+  --accent: oklch(0.95 0.03 85);
+  --accent-foreground: oklch(0.22 0.05 250);
+
+  /* Destructive */
+  --destructive: oklch(0.58 0.22 27);
+
+  /* Borders & Input */
+  --border: oklch(0.90 0.005 260);
+  --input: oklch(0.90 0.005 260);
+  --ring: oklch(0.22 0.05 250);
+
+  /* Business semantic colors */
+  --navy: oklch(0.22 0.05 250);
+  --navy-light: oklch(0.30 0.04 250);
+  --navy-dark: oklch(0.16 0.04 250);
+  --gold: oklch(0.72 0.15 80);
+  --gold-light: oklch(0.82 0.10 85);
+  --gold-dark: oklch(0.60 0.15 75);
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Charts */
+  --chart-1: oklch(0.22 0.05 250);
+  --chart-2: oklch(0.72 0.15 80);
+  --chart-3: oklch(0.45 0.03 250);
+  --chart-4: oklch(0.82 0.10 85);
+  --chart-5: oklch(0.35 0.04 250);
+
+  /* Sidebar */
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.15 0.01 260);
+  --sidebar-primary: oklch(0.22 0.05 250);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.95 0.03 85);
+  --sidebar-accent-foreground: oklch(0.22 0.05 250);
+  --sidebar-border: oklch(0.90 0.005 260);
+  --sidebar-ring: oklch(0.22 0.05 250);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans scroll-smooth motion-reduce:scroll-auto;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/*
+ * Utility classes for the design system
+ */
+@layer utilities {
+  /* Container utility */
+  .container-sanoori {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Section spacing */
+  .section-spacing {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .section-spacing-sm {
+    @apply py-10 sm:py-12 lg:py-16;
+  }
 }

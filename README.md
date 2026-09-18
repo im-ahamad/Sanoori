@@ -1,4 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), extended with a simple PostgreSQL + Prisma backend.
+
+## Backend & Database
+
+Stack: Next.js Route Handlers / Server code → Prisma ORM → PostgreSQL.
+
+Setup:
+
+```bash
+cp .env.example .env        # then set a real DATABASE_URL
+npm install
+```
+
+Database commands:
+
+```bash
+npm run db:validate   # validate the Prisma schema
+npm run db:generate   # generate the Prisma client (into src/generated/prisma)
+npm run db:migrate    # create & apply a dev migration (prisma migrate dev)
+npm run db:deploy     # apply pending migrations (production)
+npm run db:seed       # insert reference/demo data (categories, subcategories, [DEMO] products)
+npm run db:studio     # open Prisma Studio
+npm run db:create-admin -- --email admin@example.com --password 'your-password' [--name 'Name']
+```
+
+Admin area:
+
+- Login at `/admin/login`, dashboard at `/admin` (Auth.js v5 / credentials).
+- Create or reset the admin account with the `db:create-admin` script above. Passwords are bcrypt-hashed; plain text is never stored or printed.
+- Requires `AUTH_SECRET` (generate with `openssl rand -base64 32`) and, off localhost, `AUTH_TRUST_HOST=true`.
+
+Notes:
+
+- The generated client is written to `src/generated/prisma`, which is git-ignored. Run `npm run db:generate` after pulling or after schema changes.
+- Business contact details (phone, WhatsApp, social links) stay centralized in `src/config/site.ts` and are resolved through `src/lib/contact-channels.ts`.
 
 ## Getting Started
 

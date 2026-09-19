@@ -12,6 +12,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
  *
  * The password is hashed with bcrypt before it is stored. Plain-text passwords
  * are never persisted or printed.
+ * 
  */
 
 const BCRYPT_ROUNDS = 10;

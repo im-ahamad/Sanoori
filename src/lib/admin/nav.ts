@@ -17,13 +17,13 @@ export interface AdminNavItem {
 
 export const adminNavItems: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, status: "ready" },
-  { label: "Products", href: "/admin/products", icon: Package, status: "soon" },
+  { label: "Products", href: "/admin/products", icon: Package, status: "ready" },
   { label: "Categories", href: "/admin/categories", icon: Tags, status: "soon" },
   {
     label: "Inquiries",
     href: "/admin/inquiries",
     icon: MessagesSquare,
-    status: "soon",
+    status: "ready",
   },
   { label: "Settings", href: "/admin/settings", icon: Settings, status: "soon" },
 ];

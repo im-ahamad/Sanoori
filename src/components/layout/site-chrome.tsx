@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 
 const ADMIN_PREFIX = "/admin";
@@ -10,8 +9,18 @@ const ADMIN_PREFIX = "/admin";
 /**
  * Renders the public site chrome (header/footer/whatsapp) everywhere except
  * inside the private /admin area, which uses its own dashboard shell.
+ *
+ * `footer` arrives as a slot from the server root layout so it can be a
+ * data-fetching Server Component while the admin/non-admin switch below still
+ * lives in the client.
  */
-export function SiteChrome({ children }: { children: React.ReactNode }) {
+export function SiteChrome({
+  children,
+  footer,
+}: {
+  children: React.ReactNode;
+  footer: React.ReactNode;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname === ADMIN_PREFIX || pathname.startsWith(`${ADMIN_PREFIX}/`);
 
@@ -23,7 +32,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       </div>
       {isAdmin ? null : (
         <>
-          <Footer />
+          {footer}
           <WhatsAppButton />
         </>
       )}

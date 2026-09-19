@@ -11,26 +11,30 @@ interface QuickAction {
   description: string;
   href: string;
   icon: LucideIcon;
+  status: "ready" | "soon";
 }
 
 const actions: QuickAction[] = [
   {
     label: "Add Product",
     description: "Create a new product listing.",
-    href: "/admin/products",
+    href: "/admin/products/new",
     icon: PackagePlus,
+    status: "ready",
   },
   {
     label: "View Products",
-    description: "Browse and manage the catalogue.",
+    description: "Browse, search, and manage the catalogue.",
     href: "/admin/products",
     icon: Package,
+    status: "ready",
   },
   {
     label: "View Inquiries",
     description: "Review customer quote requests.",
     href: "/admin/inquiries",
     icon: MessagesSquare,
+    status: "ready",
   },
 ];
 
@@ -54,9 +58,15 @@ export function QuickActions() {
             >
               <div className="flex items-center justify-between">
                 <Icon className="size-5 text-primary" aria-hidden="true" />
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Soon
-                </span>
+                {action.status === "soon" ? (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Soon
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-gold-dark">
+                    Ready
+                  </span>
+                )}
               </div>
               <p className="mt-3 text-sm font-semibold text-foreground">
                 {action.label}
@@ -68,9 +78,6 @@ export function QuickActions() {
           );
         })}
       </div>
-      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        Product and inquiry management arrive in a later step of the build.
-      </p>
     </section>
   );
 }

@@ -1,0 +1,307 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, BadgeCheck, ListChecks, Ruler } from "lucide-react";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/shared/page-header";
+import { SectionHeader } from "@/components/shared/section-header";
+import { ButtonLink } from "@/components/ui/button-link";
+import { AvailabilityBadge } from "@/components/products/availability-badge";
+import {
+  ProductGallery,
+  type GalleryImage,
+} from "@/components/products/product-gallery";
+import { BuyPanel, type BuyContactChannel } from "@/components/products/buy-panel";
+import { siteConfig } from "@/config/site";
+import { getContactChannels } from "@/lib/contact-channels";
+import { productImageHero } from "@/lib/cloudinary-url";
+import {
+  generatePageMetadata,
+  generateProductSchema,
+  generateBreadcrumbSchema,
+} from "@/lib/seo";
+import { getPublicProductBySlug } from "@/lib/public/catalogue";
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/products/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getPublicProductBySlug(slug);
+  if (!product) return {};
+
+  return generatePageMetadata({
+    title: product.name,
+    description:
+      product.shortDescription ?? product.description ?? siteConfig.description,
+    path: `/products/${product.slug}`,
+    image: product.primaryImage
+      ? {
+          url: productImageHero(product.primaryImage.url, 1200),
+          alt: product.primaryImage.alt ?? product.name,
+        }
+      : undefined,
+  });
+}
+
+export default async function ProductDetailPage({
+  params,
+}: PageProps<"/products/[slug]">) {
+  const { slug } = await params;
+  const product = await getPublicProductBySlug(slug);
+
+  if (!product) {
+    notFound();
+  }
+
+  const galleryImages: GalleryImage[] = product.images.map((image) => ({
+    id: image.id,
+    url: image.url,
+    alt: image.alt,
+  }));
+
+  const detailUrl = `/products/${product.slug}`;
+  const productUrl = `${siteConfig.url}${detailUrl}`;
+
+  const channels: BuyContactChannel[] = getContactChannels()
+    .filter((channel) => channel.isConfigured && channel.id !== "whatsapp")
+    .map((channel) => ({
+      id: channel.id as BuyContactChannel["id"],
+      label: channel.label,
+      href: channel.href,
+    }));
+
+  const heroSchema = JSON.stringify(
+    generateProductSchema({
+      name: product.name,
+      description:
+        product.description ?? product.shortDescription ?? siteConfig.description,
+      slug: product.slug,
+      images: product.images.map((image) => productImageHero(image.url, 1200)),
+      productCode: product.productCode,
+      availability: product.availability,
+      category: product.categoryName,
+    })
+  );
+
+  const breadcrumbSchema = JSON.stringify(
+    generateBreadcrumbSchema([
+      { name: "Products", url: "/products" },
+      { name: product.name, url: detailUrl },
+    ])
+  );
+
+  const specificationsEntries = product.specifications
+    ? Object.entries(product.specifications)
+    : [];
+
+  return (
+    <main className="flex-1">
+      <PageHeader
+        title={product.name}
+        description={product.shortDescription ?? undefined}
+        breadcrumbs={[
+          { label: "Products", href: "/products" },
+          { label: product.name, href: detailUrl },
+        ]}
+      />
+
+      <Container>
+        <div className="section-spacing">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
+            {/* Gallery */}
+            <ProductGallery images={galleryImages} productName={product.name} />
+
+            {/* Buy rail */}
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <AvailabilityBadge availability={product.availability} />
+                <Link
+                  href={`/products?category=${product.categorySlug}`}
+                  className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                >
+                  {product.categoryName}
+                </Link>
+                {product.subcategorySlug && (
+                  <Link
+                    href={`/products?category=${product.categorySlug}&subcategory=${product.subcategorySlug}`}
+                    className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                  >
+                    {product.subcategoryName}
+                  </Link>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {product.description || product.shortDescription}
+                </p>
+                {product.productCode && (
+                  <p className="text-sm text-muted-foreground">
+                    Product Code:{" "}
+                    <span className="font-semibold text-foreground">
+                      {product.productCode}
+                    </span>
+                  </p>
+                )}
+              </div>
+
+              <BuyPanel
+                productName={product.name}
+                productId={product.id}
+                productCode={product.productCode}
+                productUrl={productUrl}
+                productSlug={product.slug}
+                channels={channels}
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          {product.description && (
+            <section aria-labelledby="description-heading" className="mt-14">
+              <SectionHeader
+                title="About this product"
+                description="Detailed information provided by Sanoori Trading."
+              />
+              <div className="mt-5 max-w-3xl whitespace-pre-line rounded-lg border border-border bg-card p-6 text-base leading-relaxed text-muted-foreground">
+                {product.description}
+              </div>
+            </section>
+          )}
+
+          {/* Features */}
+          {product.features.length > 0 && (
+            <section aria-labelledby="features-heading" className="mt-14">
+              <h2
+                id="features-heading"
+                className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
+              >
+                <BadgeCheck className="size-5 text-primary" aria-hidden="true" />
+                Key features
+              </h2>
+              <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {product.features.map((feature, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-foreground"
+                  >
+                    <BadgeCheck
+                      className="mt-0.5 size-4 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Specifications */}
+          {specificationsEntries.length > 0 && (
+            <section aria-labelledby="specs-heading" className="mt-14">
+              <h2
+                id="specs-heading"
+                className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
+              >
+                <Ruler className="size-5 text-primary" aria-hidden="true" />
+                Specifications
+              </h2>
+              <dl className="mt-5 max-w-3xl overflow-hidden rounded-lg border border-border">
+                {specificationsEntries.map(([key, value], index) => (
+                  <div
+                    key={key}
+                    className={
+                      index % 2 === 0
+                        ? "grid grid-cols-1 gap-1 bg-background p-4 sm:grid-cols-[220px_1fr] sm:gap-4"
+                        : "grid grid-cols-1 gap-1 bg-card p-4 sm:grid-cols-[220px_1fr] sm:gap-4"
+                    }
+                  >
+                    <dt className="text-sm font-semibold text-foreground">
+                      {key}
+                    </dt>
+                    <dd className="text-sm leading-relaxed text-muted-foreground">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          {/* Variants */}
+          {product.variants.length > 0 && (
+            <section aria-labelledby="variants-heading" className="mt-14">
+              <h2
+                id="variants-heading"
+                className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
+              >
+                <ListChecks className="size-5 text-primary" aria-hidden="true" />
+                Available variants
+              </h2>
+              <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {product.variants.map((variant, index) => (
+                  <li
+                    key={index}
+                    className="rounded-lg border border-border bg-card p-4"
+                  >
+                    <dl className="space-y-1.5">
+                      {Object.entries(variant).map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-baseline justify-between gap-3 text-sm"
+                        >
+                          <dt className="text-muted-foreground">{key}</dt>
+                          <dd className="text-right font-medium text-foreground">
+                            {value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Helpful actions */}
+          <div className="mt-14 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-muted/40 p-6 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="font-heading text-lg font-semibold text-foreground">
+                Need a different specification?
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                We source a wide range of sanitary ware, tiles and materials.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink
+                href={`/request-quote?product=${product.slug}`}
+                variant="outline"
+              >
+                Request a Quote
+              </ButtonLink>
+              <ButtonLink href="/products">Browse catalogue</ButtonLink>
+            </div>
+          </div>
+
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Back to all products
+          </Link>
+        </div>
+      </Container>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: heroSchema }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: breadcrumbSchema }}
+      />
+    </main>
+  );
+}

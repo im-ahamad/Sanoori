@@ -1,6 +1,7 @@
 import { Inter, DM_Sans } from "next/font/google";
 import { generateSiteMetadata } from "@/lib/seo";
 import { SiteChrome } from "@/components/layout/site-chrome";
+import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to main content
         </a>
-        <SiteChrome>{children}</SiteChrome>
+        <SiteChrome footer={<Footer />}>{children}</SiteChrome>
       </body>
     </html>
   );

@@ -4,9 +4,9 @@ import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
 import { Reveal } from "@/components/shared/reveal";
 import { ButtonLink } from "@/components/ui/button-link";
-import { generatePageMetadata } from "@/lib/seo";
+import { generatePageMetadata, generateOrganizationSchema } from "@/lib/seo";
 import { getCategoryIconElement } from "@/lib/category-icons";
-import { getActiveCategories } from "@/data/categories";
+import { getPublicCategories } from "@/lib/public/catalogue";
 
 export const metadata = generatePageMetadata({
   title: "About",
@@ -33,8 +33,9 @@ const valueProps = [
   },
 ];
 
-export default function AboutPage() {
-  const categories = getActiveCategories();
+export default async function AboutPage() {
+  const categories = await getPublicCategories();
+  const organizationSchema = JSON.stringify(generateOrganizationSchema());
 
   return (
     <main className="flex-1">
@@ -81,7 +82,7 @@ export default function AboutPage() {
                   return (
                     <li key={category.id}>
                       <Link
-                        href={`/products/${category.slug}`}
+                        href={`/products?category=${category.slug}`}
                         className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-md"
                       >
                         <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-accent text-primary">
@@ -150,6 +151,10 @@ export default function AboutPage() {
           </Reveal>
         </Container>
       </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: organizationSchema }}
+      />
     </main>
   );
 }

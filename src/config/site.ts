@@ -8,6 +8,11 @@ export const siteConfig = {
 
 export const businessConfig = {
   name: "Sanoori Trading",
+  /** Brand logo asset served from /public; alt text doubles as the fallback. */
+  logo: {
+    src: "/images/logo.png",
+    alt: "Sanoori Trading",
+  },
   phone: "[BUSINESS PHONE]",
   whatsapp: "[WHATSAPP NUMBER]",
   email: "[BUSINESS EMAIL]",

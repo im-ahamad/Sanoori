@@ -1,50 +1,16 @@
-import { Inbox } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Inbox } from "lucide-react";
 import type { RecentInquiry } from "@/lib/admin/dashboard";
 import { EmptyState } from "@/components/shared/empty-state";
-
-const statusLabels: Record<string, string> = {
-  NEW: "New",
-  CONTACTED: "Contacted",
-  PROCESSING: "Processing",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-};
-
-const statusStyles: Record<string, { dot: string; badge: string }> = {
-  NEW: {
-    dot: "bg-gold",
-    badge: "bg-accent text-gold-dark",
-  },
-  CONTACTED: {
-    dot: "bg-navy-light",
-    badge: "bg-muted text-foreground",
-  },
-  PROCESSING: {
-    dot: "bg-navy",
-    badge: "bg-muted text-foreground",
-  },
-  COMPLETED: {
-    dot: "bg-gold-dark",
-    badge: "bg-accent text-gold-dark",
-  },
-  CANCELLED: {
-    dot: "bg-muted-foreground",
-    badge: "bg-muted text-muted-foreground",
-  },
-};
+import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
+import { formatInquiryDate, inquirySourceLabel } from "@/lib/inquiries";
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+  return formatInquiryDate(date);
 }
 
 function formatSource(source: string): string {
-  return source
-    .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  return inquirySourceLabel(source);
 }
 
 export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
@@ -70,13 +36,20 @@ export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
 
   return (
     <section aria-labelledby="recent-inquiries-heading">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h2
           id="recent-inquiries-heading"
           className="font-heading text-base font-bold tracking-tight text-foreground"
         >
           Recent inquiries
         </h2>
+        <Link
+          href="/admin/inquiries"
+          className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+        >
+          View all
+          <ArrowRight className="size-3.5" aria-hidden="true" />
+        </Link>
       </div>
 
       {/* Desktop table */}
@@ -102,46 +75,38 @@ export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {inquiries.map((inquiry) => {
-              const status = statusStyles[inquiry.status];
-              return (
-                <tr
-                  key={inquiry.id}
-                  className="transition-colors hover:bg-muted/30"
-                >
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-foreground">
-                      {inquiry.customerName}
-                    </p>
-                    <p className="text-xs text-muted-foreground lg:hidden">
-                      {formatDate(inquiry.createdAt)}
-                    </p>
-                  </td>
-                  <td className="hidden max-w-56 px-4 py-3 text-muted-foreground md:table-cell">
-                    <span className="line-clamp-1">
-                      {inquiry.productName ?? "—"}
-                    </span>
-                  </td>
-                  <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
-                    {formatSource(inquiry.source)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${status.badge}`}
-                    >
-                      <span
-                        className={`size-1.5 rounded-full ${status.dot}`}
-                        aria-hidden="true"
-                      />
-                      {statusLabels[inquiry.status] ?? inquiry.status}
-                    </span>
-                  </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground lg:table-cell">
+            {inquiries.map((inquiry) => (
+              <tr
+                key={inquiry.id}
+                className="transition-colors hover:bg-muted/30"
+              >
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/admin/inquiries/${inquiry.id}`}
+                    className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    {inquiry.customerName}
+                  </Link>
+                  <p className="text-xs text-muted-foreground lg:hidden">
                     {formatDate(inquiry.createdAt)}
-                  </td>
-                </tr>
-              );
-            })}
+                  </p>
+                </td>
+                <td className="hidden max-w-56 px-4 py-3 text-muted-foreground md:table-cell">
+                  <span className="line-clamp-1">
+                    {inquiry.productName ?? "—"}
+                  </span>
+                </td>
+                <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
+                  {formatSource(inquiry.source)}
+                </td>
+                <td className="px-4 py-3">
+                  <InquiryStatusBadge status={inquiry.status} />
+                </td>
+                <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground lg:table-cell">
+                  {formatDate(inquiry.createdAt)}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

@@ -1,9 +1,17 @@
-import { siteConfig } from "@/config/site";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { siteConfig, businessConfig } from "@/config/site";
 
 export const ogImageSize = {
   width: 1200,
   height: 630,
 } as const;
+
+function logoDataUrl(): string {
+  const filePath = join(process.cwd(), "public", businessConfig.logo.src);
+  const buffer = readFileSync(filePath);
+  return `data:image/png;base64,${buffer.toString("base64")}`;
+}
 
 export function BrandImage() {
   return (
@@ -31,23 +39,18 @@ export function BrandImage() {
           background: "#d9a22b",
         }}
       />
-      <div
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={logoDataUrl()}
+        alt=""
+        width={120}
+        height={120}
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 96,
-          height: 96,
+          objectFit: "contain",
           borderRadius: 16,
-          background: "#d9a22b",
-          color: "#1d2a4f",
-          fontSize: 40,
-          fontWeight: 800,
           marginBottom: 32,
         }}
-      >
-        ST
-      </div>
+      />
       <div
         style={{
           fontSize: 72,

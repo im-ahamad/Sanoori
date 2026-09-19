@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "stop": "kill $(lsof -ti :3000)",
     "build": "next build",
     "start": "next start",
     "typegen": "next typegen",
@@ -24,6 +25,7 @@
     "@prisma/client": "^7.10.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.11.0",
     "cn": "^0.3.0",
     "lucide-react": "^1.47.0",
     "motion": "^13.4.0",

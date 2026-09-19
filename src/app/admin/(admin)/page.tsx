@@ -48,12 +48,14 @@ export default async function AdminDashboardPage() {
             value={statsResult.data.newInquiries}
             icon={Inbox}
             hint="Waiting for your reply"
+            href="/admin/inquiries?status=NEW"
           />
           <StatCard
             label="Total Inquiries"
             value={statsResult.data.inquiries}
             icon={MessagesSquare}
             hint="Received so far"
+            href="/admin/inquiries"
           />
         </div>
       ) : (

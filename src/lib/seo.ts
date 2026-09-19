@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig, businessConfig } from "@/config/site";
+import { isConfigPlaceholder } from "@/lib/config";
 
 type OpenGraphImage = {
   url: string;
@@ -92,40 +93,129 @@ export function generatePageMetadata({
   };
 }
 
+const PRODUCT_AVAILABILITY_SCHEMA: Record<string, string> = {
+  IN_STOCK: "https://schema.org/InStock",
+  OUT_OF_STOCK: "https://schema.org/OutOfStock",
+  ON_REQUEST: "https://schema.org/PreOrder",
+};
+
+/**
+ * schema.org Product structured data for a product detail page.
+ *
+ * Deliberately minimal: we sell on request so there is NO price/offers block.
+ * `availability` maps our enum to Schema.org, and `itemCondition` is always
+ * NewCondition (we do not sell used goods).
+ */
 export function generateProductSchema(product: {
   name: string;
   description: string;
-  images: string[];
+  slug: string;
+  images?: string[];
+  productCode?: string | null;
+  availability?: string;
+  category?: string;
 }) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
+    url: `${siteConfig.url}/products/${product.slug}`,
     brand: {
       "@type": "Brand",
       name: businessConfig.name,
     },
-    images: product.images,
+    ...(product.category ? { category: product.category } : {}),
+    ...(product.productCode ? { sku: product.productCode } : {}),
+    ...(product.images && product.images.length > 0
+      ? { image: product.images }
+      : {}),
+    ...(product.availability
+      ? {
+          availability: PRODUCT_AVAILABILITY_SCHEMA[product.availability],
+          itemCondition: "https://schema.org/NewCondition",
+        }
+      : {}),
   };
 }
 
+/**
+ * Version of `generatePageMetadata` tuned for the homepage, which uses the
+ * site-wide brand title/description (mirroring `generateSiteMetadata`) while
+ * adding an explicit canonical URL and Open Graph page URL.
+ */
+export function generateHomeMetadata(): Metadata {
+  const rootUrl = `${siteConfig.url}/`;
+  const title = `${siteConfig.name} — ${siteConfig.tagline}`;
+
+  return {
+    title,
+    description: siteConfig.description,
+    alternates: { canonical: rootUrl },
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: rootUrl,
+      siteName: siteConfig.name,
+      title,
+      description: siteConfig.description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: siteConfig.description,
+    },
+  };
+}
+
+const SOCIAL_PLACEHOLDERS: Array<[string, string]> = [
+  ["facebook", businessConfig.social.facebook],
+  ["instagram", businessConfig.social.instagram],
+  ["telegram", businessConfig.social.telegram],
+  ["tiktok", businessConfig.social.tiktok],
+  ["youtube", businessConfig.social.youtube],
+];
+
+/**
+ * schema.org Organization structured data for the homepage.
+ *
+ * Deliberately omits anything that is still a "[PLACEHOLDER]" value — address
+ * and contactPoint are only emitted once real business details are configured,
+ * and `sameAs` only lists real profile URLs. No invented business facts.
+ */
 export function generateOrganizationSchema() {
+  const hasCity = !isConfigPlaceholder(businessConfig.city);
+  const hasPhone = !isConfigPlaceholder(businessConfig.phone);
+
+  const sameAs = SOCIAL_PLACEHOLDERS.filter(
+    ([, value]) => !isConfigPlaceholder(value)
+  ).map(([, value]) => value);
+
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: businessConfig.name,
     url: siteConfig.url,
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: businessConfig.city,
-      addressCountry: businessConfig.country,
-    },
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: businessConfig.phone,
-      contactType: "customer service",
-    },
+    ...(hasCity
+      ? {
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: businessConfig.city,
+            addressCountry: businessConfig.country,
+          },
+        }
+      : {}),
+    ...(hasPhone
+      ? {
+          contactPoint: {
+            "@type": "ContactPoint",
+            telephone: businessConfig.phone,
+            contactType: "customer service",
+            availableLanguage: "English",
+          },
+        }
+      : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 }
 

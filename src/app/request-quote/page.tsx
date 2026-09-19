@@ -1,8 +1,9 @@
-import { Phone, Mail, MessageCircle, Check } from "lucide-react";
+import { Check, Clock, FileText, LineChart } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
-import { businessConfig } from "@/config/site";
-import { isConfigPlaceholder } from "@/lib/config";
+import { InquiryForm } from "@/components/contact/inquiry-form";
+import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
+import { getPublicProductOptions } from "@/lib/public/catalogue";
 import { generatePageMetadata } from "@/lib/seo";
 
 export const metadata = generatePageMetadata({
@@ -12,28 +13,43 @@ export const metadata = generatePageMetadata({
   path: "/request-quote",
 });
 
-const suggestionItems = [
+const helpfulDetails = [
   {
+    icon: FileText,
     title: "Products or categories",
     description:
       "Which items you are interested in — for example, wall tiles, commodes, or a full bathroom set.",
   },
   {
+    icon: LineChart,
     title: "Quantity",
     description:
-      "Approximate quantities help us quote accurate pricing and check availability.",
+      "Approximate quantities help us quote accurate pricing and check current availability.",
   },
   {
-    title: "Delivery location",
+    icon: Check,
+    title: "Specifications",
     description:
-      "Where the products should be delivered, so we can confirm delivery options.",
+      "Sizes, finishes, colours, or brand preferences you care about. Send what you know and we will fill the gaps.",
   },
 ];
 
-export default function RequestQuotePage() {
-  const showPhone = !isConfigPlaceholder(businessConfig.phone);
-  const showWhatsapp = !isConfigPlaceholder(businessConfig.whatsapp);
-  const showEmail = !isConfigPlaceholder(businessConfig.email);
+export default async function RequestQuotePage({
+  searchParams,
+}: PageProps<"/request-quote">) {
+  const { product } = await searchParams;
+  const requestedSlug = typeof product === "string" ? product.trim() : "";
+
+  const [productOptions, whatsappHref] = await Promise.all([
+    getPublicProductOptions(),
+    buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE),
+  ]);
+
+  const initialProductSlug =
+    requestedSlug &&
+    productOptions.some((option) => option.slug === requestedSlug)
+      ? requestedSlug
+      : "";
 
   return (
     <main className="flex-1">
@@ -45,15 +61,15 @@ export default function RequestQuotePage() {
 
       <Container>
         <div className="section-spacing grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-12">
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              What to include in your request
+              Helpful to include
             </h2>
             <ul className="mt-8 space-y-6">
-              {suggestionItems.map((item) => (
+              {helpfulDetails.map((item) => (
                 <li key={item.title} className="flex items-start gap-4">
                   <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
-                    <Check className="size-4" strokeWidth={2.25} />
+                    <item.icon className="size-4" strokeWidth={2} aria-hidden="true" />
                   </span>
                   <div>
                     <h3 className="font-heading text-base font-semibold text-foreground">
@@ -66,67 +82,64 @@ export default function RequestQuotePage() {
                 </li>
               ))}
             </ul>
+
             <p className="mt-8 max-w-xl text-sm leading-relaxed text-muted-foreground">
               No exact specification yet? Send what you know and we will help
               you identify suitable options.
             </p>
+
+            <div className="mt-10 rounded-lg border border-border bg-card p-6">
+              <h2 className="font-heading text-base font-semibold text-foreground">
+                What happens next
+              </h2>
+              <ul className="mt-4 space-y-4">
+                <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
+                    1
+                  </span>
+                  <span>
+                    We review your request and confirm the products are
+                    available.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
+                    2
+                  </span>
+                  <span>
+                    We follow up via phone or email with pricing and lead time.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
+                    3
+                  </span>
+                  <span>There is no obligation — explore options freely.</span>
+                </li>
+              </ul>
+              <p className="mt-6 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <Clock className="size-4" aria-hidden="true" />
+                We typically respond within one business day
+              </p>
+            </div>
           </div>
 
-          <div className="lg:col-span-2">
-            <div className="rounded-lg bg-navy-dark p-6 text-white sm:p-8">
-              <h2 className="font-heading text-xl font-bold tracking-tight">
+          <div className="lg:col-span-3">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
+              <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
                 Send your request
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-white/75">
-                A quote request form is coming soon. Until then, please send
-                your requirements by the channel below.
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Fill in the form below and our team will get back to you with
+                pricing and availability.
               </p>
-              <ul className="mt-6 space-y-3">
-                {showWhatsapp && (
-                  <li>
-                    <a
-                      href={`https://wa.me/${businessConfig.whatsapp.replace(
-                        /[^0-9]/g,
-                        ""
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-gold transition-colors hover:text-gold-light"
-                    >
-                      <MessageCircle className="size-4" />
-                      WhatsApp
-                    </a>
-                  </li>
-                )}
-                {showPhone && (
-                  <li>
-                    <a
-                      href={`tel:${businessConfig.phone}`}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-gold transition-colors hover:text-gold-light"
-                    >
-                      <Phone className="size-4" />
-                      {businessConfig.phone}
-                    </a>
-                  </li>
-                )}
-                {showEmail && (
-                  <li>
-                    <a
-                      href={`mailto:${businessConfig.email}`}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-gold transition-colors hover:text-gold-light"
-                    >
-                      <Mail className="size-4" />
-                      {businessConfig.email}
-                    </a>
-                  </li>
-                )}
-                {!showWhatsapp && !showPhone && !showEmail && (
-                  <li className="text-sm leading-relaxed text-white/75">
-                    Our contact channels are being finalised. Please check back
-                    shortly, or visit the contact page for updates.
-                  </li>
-                )}
-              </ul>
+              <div className="mt-6">
+                <InquiryForm
+                  productOptions={productOptions}
+                  initialProductSlug={initialProductSlug}
+                  whatsappHref={whatsappHref}
+                />
+              </div>
             </div>
           </div>
         </div>

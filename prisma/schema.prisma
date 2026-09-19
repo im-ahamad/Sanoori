@@ -117,6 +117,9 @@ model ProductImage {
   id        String   @id @default(cuid())
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Full Cloudinary public id (e.g. "SanooriTrading/products/<id>/<asset>").
+  // Nullable so pre-existing image rows remain valid; new rows always set it.
+  publicId  String?
   url       String
   alt       String?
   sortOrder Int      @default(0)

@@ -1,26 +1,31 @@
 import Link from "next/link";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { siteConfig, businessConfig, navigationConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
+import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
+import { Brand } from "@/components/shared/brand";
 import { Container } from "@/components/layout/container";
-import { getActiveCategories } from "@/data/categories";
+import { getPublicCategories } from "@/lib/public/catalogue";
 
 const socialLinks = [
   { label: "Facebook", href: businessConfig.social.facebook },
   { label: "Instagram", href: businessConfig.social.instagram },
+  { label: "Telegram", href: businessConfig.social.telegram },
   { label: "TikTok", href: businessConfig.social.tiktok },
   { label: "YouTube", href: businessConfig.social.youtube },
 ];
 
-export function Footer() {
-  const categories = getActiveCategories();
+export async function Footer() {
+  const categories = await getPublicCategories();
   const currentYear = new Date().getFullYear();
+  const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
 
+  const showWhatsApp = Boolean(whatsappHref);
   const showPhone = !isConfigPlaceholder(businessConfig.phone);
   const showEmail = !isConfigPlaceholder(businessConfig.email);
   const showAddress = !isConfigPlaceholder(businessConfig.address);
   const showCity = !isConfigPlaceholder(businessConfig.city);
-  const hasContactInfo = showPhone || showEmail || showAddress;
+  const hasContactInfo = showWhatsApp || showPhone || showEmail || showAddress;
 
   return (
     <footer className="border-t border-border bg-muted/30">
@@ -28,18 +33,12 @@ export function Footer() {
         <div className="section-spacing-sm grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded bg-primary text-primary-foreground font-heading text-sm font-bold">
-                ST
-              </div>
-              <div>
-                <span className="block font-heading text-lg font-bold leading-tight tracking-tight">
-                  Sanoori
-                </span>
-                <span className="block text-[0.65rem] font-medium uppercase tracking-widest text-muted-foreground">
-                  Trading
-                </span>
-              </div>
+            <Link
+              href="/"
+              aria-label={`${businessConfig.name} — Home`}
+              className="inline-flex items-center"
+            >
+              <Brand size="md" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               {siteConfig.description}
@@ -56,7 +55,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
                     {item.label}
                   </Link>
@@ -65,7 +64,7 @@ export function Footer() {
               <li>
                 <Link
                   href={navigationConfig.cta.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                 >
                   {navigationConfig.cta.label}
                 </Link>
@@ -82,8 +81,8 @@ export function Footer() {
               {categories.map((category) => (
                 <li key={category.id}>
                   <Link
-                    href={`/products/${category.slug}`}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    href={`/products?category=${category.slug}`}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
                     {category.name}
                   </Link>
@@ -98,13 +97,26 @@ export function Footer() {
               Contact Us
             </h3>
             <ul className="mt-4 space-y-3">
+              {showWhatsApp && (
+                <li>
+                  <a
+                    href={whatsappHref ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    <MessageCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    WhatsApp
+                  </a>
+                </li>
+              )}
               {showPhone && (
                 <li>
                   <a
                     href={`tel:${businessConfig.phone}`}
-                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
-                    <Phone className="mt-0.5 size-4 shrink-0" />
+                    <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                     {businessConfig.phone}
                   </a>
                 </li>
@@ -113,16 +125,16 @@ export function Footer() {
                 <li>
                   <a
                     href={`mailto:${businessConfig.email}`}
-                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
-                    <Mail className="mt-0.5 size-4 shrink-0" />
+                    <Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                     {businessConfig.email}
                   </a>
                 </li>
               )}
               {showAddress && (
                 <li className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                  <MapPin className="mt-0.5 size-4 shrink-0" />
+                  <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                   <span>{businessConfig.address}</span>
                 </li>
               )}

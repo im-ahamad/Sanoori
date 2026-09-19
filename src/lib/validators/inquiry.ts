@@ -1,54 +1,103 @@
 import { z } from "zod";
 
 /**
- * Validation strategy for future forms and API requests.
+ * Public inquiry (request-a-quote) validation.
  *
- * These schemas are prepared for the inquiry flow (POST /api/inquiries and the
- * contact/quote forms). They protect against invalid product IDs, invalid
- * quantities, malformed email, invalid phone values, oversized messages, and
- * unexpected input.
+ * The browser form is a convenience layer only — every inquiry is re-validated
+ * here on the server before it reaches the database. Source and status are NOT
+ * accepted from the client: the action always stores `source = WEBSITE` and the
+ * inquiry starts as `NEW`. Clients may choose a product by slug only; the
+ * server resolves that slug to a real, active product record.
  */
 
-export const phoneSchema = z
+export const INQUIRY_NAME_MAX = 200;
+export const INQUIRY_PHONE_MAX = 30;
+export const INQUIRY_EMAIL_MAX = 200;
+export const INQUIRY_PRODUCT_SLUG_MAX = 200;
+export const INQUIRY_QUANTITY_MAX = 100_000;
+export const INQUIRY_MESSAGE_MAX = 2000;
+export const HONEYPOT_MAX = 400;
+
+const nameSchema = z
   .string()
   .trim()
-  .min(7, "Phone number is too short")
-  .max(20, "Phone number is too long")
-  .regex(/^\+?[0-9][0-9\s().-]*$/, "Please enter a valid phone number");
+  .min(1, "Please enter your name.")
+  .max(
+    INQUIRY_NAME_MAX,
+    `Name can be at most ${INQUIRY_NAME_MAX} characters.`
+  );
 
-export const quantitySchema = z
-  .number()
-  .int("Quantity must be a whole number")
-  .min(1, "Quantity must be at least 1")
-  .max(100_000, "Quantity is too large");
-
-export const productIdSchema = z.string().trim().min(1).max(100);
-
-export const messageSchema = z
+/**
+ * Phone accepts digits with optional leading "+" after normalizing spaces,
+ * dashes, dots and parentheses. It tolerates Bangladesh formats (with or
+ * without +880) and other international numbers without one overly strict
+ * regex. 7–15 digits per the E.164 range.
+ */
+const phoneSchema = z
   .string()
   .trim()
-  .min(10, "Message should be at least 10 characters")
-  .max(2_000, "Message is too long (max 2000 characters)");
+  .min(1, "Please enter your phone number.")
+  .max(INQUIRY_PHONE_MAX, "Phone number is too long.")
+  .transform((value) => value.replace(/[\s\-().]/g, ""))
+  .refine(
+    (value) => /^\+?[0-9]{7,15}$/.test(value),
+    "Please enter a valid phone number (digits, optional country code)."
+  );
 
-export const emailSchema = z.union([z.literal(""), z.email()]);
+const emailSchema = z
+  .union([
+    z.literal(""),
+    z
+      .string()
+      .trim()
+      .max(INQUIRY_EMAIL_MAX, "Email is too long.")
+      .email("Please enter a valid email address."),
+  ])
+  .transform((value) => (value === "" ? null : value.toLowerCase()));
 
-export const inquirySourceSchema = z.enum([
-  "WEBSITE",
-  "WHATSAPP",
-  "FACEBOOK",
-  "INSTAGRAM",
-  "TELEGRAM",
-  "PHONE",
-]);
+const productSlugSchema = z
+  .string()
+  .trim()
+  .max(INQUIRY_PRODUCT_SLUG_MAX, "Product reference is invalid.")
+  .optional()
+  .default("")
+  .transform((value) => (value === "" ? null : value));
 
-export const inquirySchema = z.object({
-  customerName: z.string().trim().min(2, "Please enter your name").max(100),
+const quantitySchema = z
+  .string()
+  .trim()
+  .optional()
+  .default("")
+  .refine(
+    (value) =>
+      value === "" ||
+      (/^\d{1,9}$/.test(value) &&
+        Number(value) >= 1 &&
+        Number(value) <= INQUIRY_QUANTITY_MAX),
+    {
+      message: `Quantity must be a whole number between 1 and ${INQUIRY_QUANTITY_MAX.toLocaleString()}.`,
+    }
+  )
+  .transform((value) => (value === "" ? null : Number(value)));
+
+const messageSchema = z
+  .string()
+  .trim()
+  .min(1, "Please tell us a little about what you need.")
+  .max(
+    INQUIRY_MESSAGE_MAX,
+    `Message can be at most ${INQUIRY_MESSAGE_MAX} characters.`
+  );
+
+export const inquiryFormSchema = z.object({
+  customerName: nameSchema,
   phone: phoneSchema,
-  email: emailSchema.optional(),
-  productId: productIdSchema.optional(),
-  quantity: quantitySchema.optional(),
+  email: emailSchema,
+  productSlug: productSlugSchema,
+  quantity: quantitySchema,
   message: messageSchema,
-  source: inquirySourceSchema.default("WEBSITE"),
+  /** Honeypot — never stored, never accepted. */
+  company: z.string().max(HONEYPOT_MAX).default(""),
 });
 
-export type InquiryInput = z.infer<typeof inquirySchema>;
+export type InquiryFormInput = z.infer<typeof inquiryFormSchema>;

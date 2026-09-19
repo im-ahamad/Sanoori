@@ -3,17 +3,22 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, Phone } from "lucide-react";
+import { MessageCircle, Menu, Phone } from "lucide-react";
 import { navigationConfig, businessConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
+import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
+import { Brand } from "@/components/shared/brand";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { cn } from "@/lib/utils";
 
 export function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
+
+  const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -25,18 +30,12 @@ export function Header() {
       <Container>
         <div className="flex h-16 items-center justify-between lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded bg-primary text-primary-foreground font-heading text-sm font-bold lg:h-10 lg:w-10">
-              ST
-            </div>
-            <div className="hidden sm:block">
-              <span className="block font-heading text-lg font-bold leading-tight tracking-tight text-foreground">
-                Sanoori
-              </span>
-              <span className="block text-[0.65rem] font-medium uppercase tracking-widest text-muted-foreground">
-                Trading
-              </span>
-            </div>
+          <Link
+            href="/"
+            aria-label={`${businessConfig.name} — Home`}
+            className="flex items-center gap-2"
+          >
+            <Brand size="md" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -69,19 +68,32 @@ export function Header() {
                 href={`tel:${businessConfig.phone}`}
                 className="hidden items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground md:flex"
               >
-                <Phone className="size-4" />
+                <Phone className="size-4" aria-hidden="true" />
                 <span className="hidden lg:inline">{businessConfig.phone}</span>
               </a>
             )}
 
+            {/* WhatsApp - visible once the number is configured */}
+            {whatsappHref && (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chat on WhatsApp"
+                className="flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <MessageCircle className="size-4" aria-hidden="true" />
+              </a>
+            )}
+
             {/* CTA Button */}
-            <Button
-              render={<Link href={navigationConfig.cta.href} />}
+            <ButtonLink
+              href={navigationConfig.cta.href}
               className="hidden lg:inline-flex"
-              size="lg"
+              size="md"
             >
               {navigationConfig.cta.label}
-            </Button>
+            </ButtonLink>
 
             {/* Mobile menu toggle */}
             <Button
@@ -90,8 +102,11 @@ export function Header() {
               className="lg:hidden"
               onClick={() => setMobileNavOpen(true)}
               aria-label="Open menu"
+              aria-haspopup="dialog"
+              aria-expanded={mobileNavOpen}
+              aria-controls="mobile-nav-panel"
             >
-              <Menu className="size-5" />
+              <Menu className="size-5" aria-hidden="true" />
             </Button>
           </div>
         </div>

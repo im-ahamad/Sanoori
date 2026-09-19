@@ -1,18 +1,18 @@
-import { getActiveCategories } from "@/data/categories";
+import { getPublicCategories } from "@/lib/public/catalogue";
 import { CategoryCard } from "@/components/products/category-card";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Reveal } from "@/components/shared/reveal";
 
-export function CategoryGrid() {
-  const categories = getActiveCategories();
+export async function CategoryGrid() {
+  const categories = await getPublicCategories();
 
   return (
     <section className="section-spacing bg-background">
       <div className="container-sanoori">
         <Reveal>
           <SectionHeader
-            title="What we supply"
-            description="Three core product lines, sourced and supplied for builders, contractors, and homeowners."
+            title="Explore our products"
+            description="Sanitary ware, tiles, and building materials — organised into categories that link straight to the live catalogue."
           />
         </Reveal>
 

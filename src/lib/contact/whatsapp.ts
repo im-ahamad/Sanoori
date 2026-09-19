@@ -13,23 +13,32 @@ import { isConfigPlaceholder } from "@/lib/config";
 export const GENERAL_ENQUIRY_MESSAGE =
   "Hello Sanoori Trading, I'm interested in your products. Could you please provide more information?";
 
+/**
+ * Builds a wa.me deep link for a given phone number and pre-filled message.
+ * The number is normalised to its digit-only form; an empty result returns null.
+ */
+export function buildWhatsAppChatLink(
+  number: string,
+  message: string
+): string | null {
+  const digits = number.replace(/[^0-9]/g, "");
+  if (!digits) return null;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
 export function buildWhatsAppLink(message: string): string | null {
   if (isConfigPlaceholder(businessConfig.whatsapp)) {
     return null;
   }
 
-  const number = businessConfig.whatsapp.replace(/[^0-9]/g, "");
-
-  if (!number) {
-    return null;
-  }
-
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  return buildWhatsAppChatLink(businessConfig.whatsapp, message);
 }
 
 export interface WhatsAppProductLinkParams {
   productName: string;
   productId: string;
+  /** Product Code / SKU when the product has one (e.g. "WC-427"). */
+  productCode?: string | null;
   quantity: number;
   productUrl: string;
 }
@@ -42,21 +51,27 @@ export interface WhatsAppProductLink {
 export function createWhatsAppProductMessage({
   productName,
   productId,
+  productCode,
   quantity,
   productUrl,
 }: WhatsAppProductLinkParams): string {
-  return [
+  const lines = [
     "Hello Sanoori Trading,",
     "",
     "I am interested in this product.",
     "",
     `Product: ${productName}`,
-    `Product ID: ${productId}`,
-    `Quantity: ${quantity}`,
-    "",
-    "Product Link:",
-    productUrl,
-  ].join("\n");
+  ];
+
+  if (productCode) {
+    lines.push(`Product Code: ${productCode}`);
+  }
+
+  lines.push(`Product ID: ${productId}`);
+  lines.push(`Quantity: ${quantity}`);
+  lines.push("", "Product Link:", productUrl);
+
+  return lines.join("\n");
 }
 
 export function createWhatsAppProductLink(

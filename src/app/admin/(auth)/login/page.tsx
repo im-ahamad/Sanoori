@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { businessConfig } from "@/config/site";
 import { auth } from "@/lib/auth";
 import { LoginForm } from "@/components/admin/login-form";
 
@@ -23,8 +25,14 @@ export default async function AdminLoginPage() {
         <div className="rounded-xl border border-border bg-background p-6 shadow-sm sm:p-8">
           <div className="flex flex-col items-center text-center">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <div className="flex h-11 w-11 items-center justify-center rounded bg-primary font-heading text-base font-bold text-primary-foreground">
-                ST
+              <div className="relative h-11 w-11 overflow-hidden rounded-md">
+                <Image
+                  src={businessConfig.logo.src}
+                  alt={businessConfig.logo.alt}
+                  fill
+                  sizes="44px"
+                  className="object-contain"
+                />
               </div>
               <div className="text-left leading-tight">
                 <span className="block font-heading text-lg font-bold tracking-tight text-foreground">

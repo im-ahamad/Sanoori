@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ExternalLink, LogOut, Menu, X } from "lucide-react";
+import { businessConfig } from "@/config/site";
 import { logoutAction } from "@/lib/actions/auth";
 import { adminNavItems } from "@/lib/admin/nav";
 import { Button } from "@/components/ui/button";
@@ -17,8 +19,14 @@ interface AdminShellProps {
 function Brand() {
   return (
     <Link href="/admin" className="flex items-center gap-2.5">
-      <div className="flex h-9 w-9 items-center justify-center rounded bg-gold font-heading text-sm font-bold text-navy-dark">
-        ST
+      <div className="relative h-9 w-9 overflow-hidden rounded">
+        <Image
+          src={businessConfig.logo.src}
+          alt={businessConfig.logo.alt}
+          fill
+          sizes="36px"
+          className="object-contain"
+        />
       </div>
       <div className="leading-tight">
         <span className="block font-heading text-base font-bold tracking-tight">

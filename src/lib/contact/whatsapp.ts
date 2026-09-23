@@ -11,7 +11,7 @@ import { isConfigPlaceholder } from "@/lib/config";
  */
 
 export const GENERAL_ENQUIRY_MESSAGE =
-  "Hello Sanoori Trading, I'm interested in your products. Could you please provide more information?";
+  "Hello Sanoori Trading, I want to know the prices of your products. Can you help me?";
 
 /**
  * Builds a wa.me deep link for a given phone number and pre-filled message.
@@ -58,18 +58,19 @@ export function createWhatsAppProductMessage({
   const lines = [
     "Hello Sanoori Trading,",
     "",
-    "I am interested in this product.",
+    "I want to know the price of this product.",
     "",
     `Product: ${productName}`,
   ];
 
   if (productCode) {
-    lines.push(`Product Code: ${productCode}`);
+    lines.push(`Code: ${productCode}`);
+  } else {
+    lines.push(`Product ID: ${productId}`);
   }
 
-  lines.push(`Product ID: ${productId}`);
   lines.push(`Quantity: ${quantity}`);
-  lines.push("", "Product Link:", productUrl);
+  lines.push("", "Product link:", productUrl);
 
   return lines.join("\n");
 }

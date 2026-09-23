@@ -127,7 +127,11 @@ export interface PublicProductListData {
 
 function isUsableImageUrl(image: string | null | undefined): boolean {
   if (!image) return false;
-  return /^https?:\/\/.+/i.test(image.trim());
+  const value = image.trim();
+  // Absolute delivery URLs (Cloudinary) are served as-is. Root-relative
+  // `/images/...` paths point at locally-served files in /public, which this
+  // stack also supports through the same ProductImage model.
+  return /^https?:\/\/.+/i.test(value) || value.startsWith("/images/");
 }
 
 function cardImageUrl(url: string): string {
@@ -138,6 +142,44 @@ function cardImageUrl(url: string): string {
     format: "auto",
     quality: "auto",
   });
+}
+
+/**
+ * Normalizes a Product (with its category/subcategory/images included) into the
+ * serializable public card summary shared by the catalogue and the home page.
+ */
+function toProductSummary(product: {
+  id: string;
+  name: string;
+  slug: string;
+  productCode: string | null;
+  shortDescription: string | null;
+  availability: Availability;
+  featured: boolean;
+  category: { name: string; slug: string };
+  subcategory: { name: string; slug: string } | null;
+  images: { url: string; alt: string | null }[];
+}): PublicProductSummary {
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    productCode: product.productCode,
+    categoryName: product.category.name,
+    categorySlug: product.category.slug,
+    subcategoryName: product.subcategory?.name ?? null,
+    subcategorySlug: product.subcategory?.slug ?? null,
+    shortDescription: product.shortDescription,
+    availability: product.availability,
+    featured: product.featured,
+    image:
+      product.images.length > 0 && isUsableImageUrl(product.images[0].url)
+        ? {
+            url: cardImageUrl(product.images[0].url),
+            alt: product.images[0].alt,
+          }
+        : null,
+  };
 }
 
 const ACTIVE_AVAILABILITY = new Set<Availability>([
@@ -239,26 +281,7 @@ export const getPublicProducts = unstable_cache(
     ]);
 
     return {
-      items: products.map((product) => ({
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        productCode: product.productCode,
-        categoryName: product.category.name,
-        categorySlug: product.category.slug,
-        subcategoryName: product.subcategory?.name ?? null,
-        subcategorySlug: product.subcategory?.slug ?? null,
-        shortDescription: product.shortDescription,
-        availability: product.availability,
-        featured: product.featured,
-        image:
-          product.images.length > 0 && isUsableImageUrl(product.images[0].url)
-            ? {
-                url: cardImageUrl(product.images[0].url),
-                alt: product.images[0].alt,
-              }
-            : null,
-      })),
+      items: products.map(toProductSummary),
       total,
       page,
       pageSize,
@@ -266,6 +289,37 @@ export const getPublicProducts = unstable_cache(
     };
   },
   ["public-products"],
+  { tags: [PRODUCTS_CACHE_TAG], revalidate: 60 }
+);
+
+/**
+ * Curated selection for the home page product showcase.
+ *
+ * Unlike the "featured" concept (which requires an admin-set flag and is
+ * currently empty), this always returns real active products so the home page
+ * never shows an empty showcase. Selection prefers products that have a
+ * photograph, then most recently updated — no popularity/sales claims, no
+ * changes to any featured flags.
+ */
+export const getHomeShowcaseProducts = unstable_cache(
+  async (limit = 8): Promise<PublicProductSummary[]> => {
+    const products = await db.product.findMany({
+      where: { isActive: true },
+      orderBy: [{ updatedAt: "desc" }],
+      take: limit,
+      include: {
+        category: { select: { name: true, slug: true } },
+        subcategory: { select: { name: true, slug: true } },
+        images: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+      },
+    });
+
+    // Products with a photo first, then the rest preserve their recency order.
+    return products
+      .map(toProductSummary)
+      .sort((a, b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
+  },
+  ["public-home-products"],
   { tags: [PRODUCTS_CACHE_TAG], revalidate: 60 }
 );
 

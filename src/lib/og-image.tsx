@@ -10,7 +10,8 @@ export const ogImageSize = {
 function logoDataUrl(): string {
   const filePath = join(process.cwd(), "public", businessConfig.logo.src);
   const buffer = readFileSync(filePath);
-  return `data:image/png;base64,${buffer.toString("base64")}`;
+  const mime = filePath.endsWith(".svg") ? "image/svg+xml" : "image/png";
+  return `data:${mime};base64,${buffer.toString("base64")}`;
 }
 
 export function BrandImage() {
@@ -43,11 +44,10 @@ export function BrandImage() {
       <img
         src={logoDataUrl()}
         alt=""
-        width={120}
-        height={120}
+        width={140}
+        height={42}
         style={{
           objectFit: "contain",
-          borderRadius: 16,
           marginBottom: 32,
         }}
       />

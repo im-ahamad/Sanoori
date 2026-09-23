@@ -10,7 +10,7 @@ export const businessConfig = {
   name: "Sanoori Trading",
   /** Brand logo asset served from /public; alt text doubles as the fallback. */
   logo: {
-    src: "/images/logo.png",
+    src: "/images/logo.svg",
     alt: "Sanoori Trading",
   },
   phone: "[BUSINESS PHONE]",
@@ -43,11 +43,10 @@ export const navigationConfig = {
     { label: "Home", href: "/" },
     { label: "About", href: "/about" },
     { label: "Products", href: "/products" },
-    { label: "Projects", href: "/projects" },
     { label: "Contact", href: "/contact" },
   ] as const,
   cta: {
-    label: "Request a Quote",
+    label: "Get a Quote",
     href: "/request-quote",
   },
 } as const;

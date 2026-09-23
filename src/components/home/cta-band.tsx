@@ -1,110 +1,73 @@
 import { ArrowRight } from "lucide-react";
-import {
-  MessageCircle,
-  MessagesSquare,
-  Camera,
-  Send,
-  Phone,
-  type LucideIcon,
-} from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/ui/button-link";
-import { navigationConfig } from "@/config/site";
-import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
-import { getConfiguredContactChannels } from "@/lib/contact-channels";
-import type { ContactChannelId } from "@/lib/contact-channels";
 import { Reveal } from "@/components/shared/reveal";
-
-const gridOverlayStyle = {
-  backgroundImage:
-    "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-  backgroundSize: "48px 48px",
-};
-
-const CHANNEL_ICONS: Record<ContactChannelId, LucideIcon> = {
-  whatsapp: MessageCircle,
-  facebook: MessagesSquare,
-  instagram: Camera,
-  telegram: Send,
-  phone: Phone,
-};
+import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 
 export function CtaBand() {
-  const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
-  const channels = getConfiguredContactChannels();
-
   return (
     <section className="relative overflow-hidden bg-navy-dark text-white">
+      <VisualBackdrop variant="hero" objectPosition="object-center" />
+      {/* Editorial washes — keep image subtle while ensuring strong text contrast */}
       <div
         aria-hidden="true"
-        className="absolute inset-0"
-        style={gridOverlayStyle}
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-navy-dark/[0.93] via-navy-dark/85 to-navy-dark/55"
       />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-dark/35 via-transparent to-transparent"
+      />
+      {/* Restrained top hairline separates from DiscoveryCta (navy → navy-dark) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/10"
+      />
+
       <Container>
-        <div className="relative section-spacing flex flex-col items-center text-center">
+        <div className="relative py-16 sm:py-20 lg:py-28">
           <Reveal>
-            <h2 className="mx-auto max-w-2xl font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
-              Need help choosing the right products?
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-              Tell us your requirements and we will respond with pricing and
-              current availability for the items you need.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <ButtonLink
-                href={navigationConfig.cta.href}
-                variant="inverse"
-                size="lg"
-              >
-                Request a Quote
-                <ArrowRight className="size-4" />
-              </ButtonLink>
-              {whatsappHref && (
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+              <div className="max-w-2xl">
+                <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-gold-light">
+                  <span className="h-px w-8 bg-gold" aria-hidden="true" />
+                  Ready to get started?
+                </p>
+                <h2 className="mt-4 font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-[1.05]">
+                  Let&rsquo;s Find the Right Products for Your Project
+                </h2>
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
+                  Tell us what you need and we&rsquo;ll help you explore the
+                  right products for your project.
+                </p>
+              </div>
+
+              <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
                 <ButtonLink
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/request-quote"
+                  variant="inverse"
+                  size="lg"
+                  className="w-full sm:w-auto lg:w-full xl:w-auto min-w-[184px]"
+                >
+                  Get a Quote
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </ButtonLink>
+                <ButtonLink
+                  href="/products"
                   variant="outline-inverse"
                   size="lg"
+                  className="w-full sm:w-auto lg:w-full xl:w-auto min-w-[184px]"
                 >
-                  WhatsApp
+                  Browse Products
                 </ButtonLink>
-              )}
-              <ButtonLink href="/contact" variant="outline-inverse" size="lg">
-                Contact Us
-              </ButtonLink>
-            </div>
-
-            {channels.length > 0 && (
-              <div className="mt-10">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/60">
-                  Prefer another channel?
-                </p>
-                <ul className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                  {channels.map((channel) => {
-                    const Icon = CHANNEL_ICONS[channel.id];
-                    return (
-                      <li key={channel.id}>
-                        <a
-                          href={channel.href}
-                          target={channel.id === "phone" ? undefined : "_blank"}
-                          rel={
-                            channel.id === "phone"
-                              ? undefined
-                              : "noopener noreferrer"
-                          }
-                          className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-white/80 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                        >
-                          <Icon className="size-4" aria-hidden="true" />
-                          {channel.label}
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
               </div>
-            )}
+            </div>
           </Reveal>
+
+          {/* Subtle editorial rule — premium closing detail, desktop only */}
+          <div
+            aria-hidden="true"
+            className="mt-14 hidden h-px bg-gradient-to-r from-gold/35 via-white/10 to-transparent lg:block"
+          />
         </div>
       </Container>
     </section>

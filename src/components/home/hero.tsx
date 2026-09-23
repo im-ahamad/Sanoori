@@ -1,128 +1,79 @@
 "use client";
 
-import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/ui/button-link";
 import { siteConfig, navigationConfig } from "@/config/site";
-import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
-import { getCategoryIconElement } from "@/lib/category-icons";
-import type { PublicCategory } from "@/lib/public/catalogue";
+import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 
-const gridOverlayStyle = {
-  backgroundImage:
-    "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-  backgroundSize: "48px 48px",
-};
-
-export function Hero({ categories }: { categories: PublicCategory[] }) {
-  const reduceMotion = useReducedMotion();
-  const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
-  const browseCategories = categories.slice(0, 3);
-
+export function Hero() {
   return (
     <section className="relative overflow-hidden bg-navy-dark text-white">
+      {/* Full-bleed hero image with right-biased focal point (64% center) */}
+      <VisualBackdrop
+        variant="hero"
+        priority
+        src="/images/hero.jpg"
+        objectPosition="object-[64%_center]"
+        className="[&>div]:opacity-100"
+      />
+
+      {/* Custom left-to-right navy gradient overlay - stronger than VisualBackdrop default */}
       <div
         aria-hidden="true"
-        className="absolute inset-0"
-        style={gridOverlayStyle}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--navy-dark)_0%,color-mix(in_oklab,var(--navy-dark)_92%,transparent)_35%,color-mix(in_oklab,var(--navy-dark)_20%,transparent)_72%,transparent)]"
       />
-      <Container>
-        <div className="relative py-16 sm:py-20 lg:py-28">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_360px] lg:items-center">
-            {/* Copy + primary actions */}
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span className="inline-flex items-center rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gold">
-                {siteConfig.tagline}
-              </span>
-              <h1 className="mt-6 max-w-3xl font-heading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Sanoori Trading
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-                {siteConfig.description} Browse the catalogue, review product
-                details, and request a quote — we respond directly through
-                WhatsApp and other contact channels.
+
+      <div className="relative h-full w-full px-4 sm:px-6 lg:px-8">
+        <div
+          className="flex h-full items-center"
+          style={{ minHeight: "calc(100dvh - 4rem)" }}
+        >
+          <div className="w-full max-w-7xl mx-auto">
+            <div className="max-w-[48rem]">
+              {/* Gold eyebrow */}
+              <p className="hero-intro flex items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-gold">
+                <span className="h-px w-8 bg-gold/60" aria-hidden="true" />
+                {siteConfig.name}
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/products" variant="inverse" size="lg">
-                  Explore Products
-                  <ArrowRight className="size-4" />
-                </ButtonLink>
+
+              {/* Main heading - large editorial */}
+              <h1 className="hero-intro hero-intro-d1 mt-4 font-heading font-semibold leading-[0.98] tracking-tight text-white clamp-text-4xl-6xl">
+                Sanitary Ware, Tiles & Building Materials
+              </h1>
+
+              {/* Supporting tagline */}
+              <p className="hero-intro hero-intro-d2 mt-6 max-w-[32rem] text-base leading-[2rem] text-white/85 sm:text-lg">
+                Sanoori Trading supplies premium sanitary ware, tiles, and building
+                materials for homes and commercial projects across Bangladesh.
+              </p>
+
+              {/* CTA buttons */}
+              <div className="hero-intro hero-intro-d3 mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <ButtonLink
                   href={navigationConfig.cta.href}
+                  variant="inverse"
+                  size="lg"
+                >
+                  {navigationConfig.cta.label}
+                </ButtonLink>
+                <ButtonLink
+                  href="/products"
                   variant="outline-inverse"
                   size="lg"
                 >
-                  Request a Quote
+                  Browse Products
+                  <ArrowRight className="size-4" aria-hidden="true" />
                 </ButtonLink>
-                {whatsappHref && (
-                  <ButtonLink
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="outline-inverse"
-                    size="lg"
-                  >
-                    WhatsApp
-                  </ButtonLink>
-                )}
               </div>
-            </motion.div>
 
-            {/* Business-areas browse panel (real DB categories) */}
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/60">
-                  Browse by category
-                </p>
-                <ul className="mt-4 space-y-3">
-                  {browseCategories.map((category) => (
-                    <li key={category.id}>
-                      <Link
-                        href={`/products?category=${category.slug}`}
-                        className="group flex items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:border-gold/50 hover:bg-white/10"
-                      >
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-gold/15 text-gold">
-                          {getCategoryIconElement(category.slug, {
-                            className: "size-5",
-                            strokeWidth: 1.75,
-                          })}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-semibold text-white">
-                            {category.name}
-                          </span>
-                          {category.description && (
-                            <span className="mt-0.5 block truncate text-xs text-white/60">
-                              {category.description}
-                            </span>
-                          )}
-                        </span>
-                        <ArrowRight
-                          className="size-4 shrink-0 text-white/40 transition-colors group-hover:text-gold"
-                          aria-hidden="true"
-                        />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-4 text-xs leading-relaxed text-white/50">
-                  Every category links to the live product catalogue.
-                </p>
+              {/* Bottom-left corner caption (desktop only) */}
+              <div className="hidden md:block absolute bottom-0 left-0 border-t border-r border-white/10 bg-navy-dark/50 px-5 py-4 text-xs text-white/60">
+                Sanoori Trading &mdash; Since 2018
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

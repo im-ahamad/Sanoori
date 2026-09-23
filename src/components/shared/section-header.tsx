@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 
 interface SectionHeaderProps {
+  eyebrow?: string;
   title: string;
   description?: string;
   align?: "left" | "center";
@@ -8,6 +9,7 @@ interface SectionHeaderProps {
 }
 
 export function SectionHeader({
+  eyebrow,
   title,
   description,
   align = "left",
@@ -21,7 +23,21 @@ export function SectionHeader({
         className
       )}
     >
-      <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
+      {eyebrow && (
+        <p
+          className={cn(
+            "flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground",
+            align === "center" && "justify-center"
+          )}
+        >
+          <span className="h-px w-8 bg-gold-dark" aria-hidden="true" />
+          {eyebrow}
+          {align === "center" && (
+            <span className="h-px w-8 bg-gold-dark" aria-hidden="true" />
+          )}
+        </p>
+      )}
+      <h2 className="mt-3 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
         {title}
       </h2>
       {description && (

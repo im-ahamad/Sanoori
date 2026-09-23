@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="338" viewBox="0 0 1120 338" fill="none" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">SANOORI TRADING</title>
+  <defs>
+    <linearGradient id="roof-blue" x1="143" y1="59" x2="306" y2="224" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00A5E5"/>
+      <stop offset="0.52" stop-color="#0095DA"/>
+      <stop offset="1" stop-color="#0877BA"/>
+    </linearGradient>
+    <linearGradient id="diagonal-blue" x1="110" y1="154" x2="256" y2="284" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00A5E5"/>
+      <stop offset="1" stop-color="#007DC3"/>
+    </linearGradient>
+    <linearGradient id="accent-blue" x1="118" y1="19" x2="163" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00A5E5"/>
+      <stop offset="1" stop-color="#0084C9"/>
+    </linearGradient>
+    <style>
+      .navy { fill: #082D55; }
+      .wordmark { fill: #082B50; }
+      .subtitle { fill: #0789C6; }
+    </style>
+  </defs>
+
+  <g id="brand-symbol" transform="translate(16 8) scale(.9)">
+    <path id="upper-accent" fill="url(#accent-blue)" d="M115 43C117 25 132 13 149 14C158 14 166 18 172 24C157 20 144 25 138 35L133 43Z"/>
+
+    <g id="roof">
+      <path class="navy" d="M22 160 143 59V104L22 202Z"/>
+      <path fill="url(#roof-blue)" d="M143 59 306 182V224L143 104Z"/>
+    </g>
+
+    <g id="building">
+      <path class="navy" d="M57 191 102 154V284H57Z"/>
+      <path fill="url(#diagonal-blue)" d="M102 154 212 239V171L256 204V284H212L102 199Z"/>
+      <path id="base-and-window" class="navy" fill-rule="evenodd" d="M57 284H291V338H57ZM238 292V307H253V292ZM261 292V307H276V292ZM238 315V330H253V315ZM261 315V330H276V315Z"/>
+    </g>
+  </g>
+
+  <g id="sanoori-outlines" class="wordmark" transform="translate(328 87)">
+    <path id="letter-s" d="M90 10C78 2 64-2 48-2C20-2 3 12 3 33C3 53 18 61 40 66L55 70C65 72 69 75 69 80C69 87 62 90 51 90C36 90 21 84 11 75L0 96C13 107 31 112 50 112C80 112 98 99 98 77C98 59 85 50 61 44L46 40C35 37 31 34 31 29C31 23 37 20 47 20C59 20 70 24 80 31Z"/>
+
+    <path id="letter-a" fill-rule="evenodd" transform="translate(107)" d="M0 110 43 0H71L114 110H84L77 91H36L29 110ZM44 69H69L56.5 33Z"/>
+
+    <path id="letter-n" transform="translate(236)" d="M0 110V0H24L77 66V0H104V110H80L27 44V110Z"/>
+
+    <path id="first-letter-o" fill-rule="evenodd" transform="translate(354)" d="M57-2C23-2 0 21 0 55C0 89 23 112 57 112C91 112 114 89 114 55C114 21 91-2 57-2ZM57 23C75 23 87 36 87 55C87 74 75 87 57 87C39 87 27 74 27 55C27 36 39 23 57 23Z"/>
+
+    <path id="second-letter-o" fill-rule="evenodd" transform="translate(479)" d="M57-2C23-2 0 21 0 55C0 89 23 112 57 112C91 112 114 89 114 55C114 21 91-2 57-2ZM57 23C75 23 87 36 87 55C87 74 75 87 57 87C39 87 27 74 27 55C27 36 39 23 57 23Z"/>
+
+    <path id="letter-r" fill-rule="evenodd" transform="translate(609)" d="M0 110V0H48C80 0 99 15 99 40C99 57 90 70 75 76L103 110H70L46 80H28V110ZM28 23V57H46C62 57 71 51 71 40C71 29 62 23 46 23Z"/>
+
+    <path id="letter-i" transform="translate(728)" d="M0 0H27V110H0Z"/>
+  </g>
+
+  <g id="trading-outlines" class="subtitle" transform="translate(468 231)">
+    <path id="trading-t" d="M0 0H38V7H23V44H15V7H0Z"/>
+
+    <path id="trading-r" fill-rule="evenodd" transform="translate(75)" d="M0 44V0H19C31 0 37 6 37 15C37 22 33 27 27 29L39 44H29L18 30H8V44ZM8 7V23H18C25 23 29 20 29 15C29 10 25 7 18 7Z"/>
+
+    <path id="trading-a" fill-rule="evenodd" transform="translate(151)" d="M0 44 18 0H26L44 44H35L31 34H13L9 44ZM16 27H28L22 11Z"/>
+
+    <path id="trading-d" fill-rule="evenodd" transform="translate(232)" d="M0 44V0H17C32 0 41 9 41 22C41 35 32 44 17 44ZM8 7V37H16C26 37 33 31 33 22C33 13 26 7 16 7Z"/>
+
+    <path id="trading-i" transform="translate(310)" d="M0 0H8V44H0Z"/>
+
+    <path id="trading-n" transform="translate(355)" d="M0 44V0H8L31 30V0H39V44H31L8 14V44Z"/>
+
+    <path id="trading-g" transform="translate(431)" d="M43 7 37 13C34 9 29 7 23 7C14 7 8 13 8 22C8 31 14 37 23 37C28 37 32 36 36 33V26H23V19H44V37C38 42 31 45 23 45C9 45 0 35 0 22C0 9 10-1 23-1C31-1 38 2 43 7Z"/>
+  </g>
+</svg>

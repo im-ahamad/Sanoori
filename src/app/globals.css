@@ -79,6 +79,7 @@
 }
 
 :root {
+  color-scheme: light;
   /* === Core palette === */
 
   /* Background: clean white */
@@ -144,6 +145,47 @@
   --sidebar-ring: oklch(0.22 0.05 250);
 }
 
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.14 0.025 250);
+  --foreground: oklch(0.97 0.005 260);
+  --card: oklch(0.19 0.03 250);
+  --card-foreground: oklch(0.97 0.005 260);
+  --popover: oklch(0.19 0.03 250);
+  --popover-foreground: oklch(0.97 0.005 260);
+  --primary: oklch(0.26 0.05 250);
+  --primary-foreground: oklch(0.97 0 0);
+  --secondary: oklch(0.72 0.15 80);
+  --secondary-foreground: oklch(0.15 0.01 260);
+  --muted: oklch(0.21 0.025 250);
+  --muted-foreground: oklch(0.68 0.01 260);
+  --accent: oklch(0.24 0.04 250);
+  --accent-foreground: oklch(0.97 0.005 260);
+  --destructive: oklch(0.58 0.22 27);
+  --border: oklch(0.26 0.02 250);
+  --input: oklch(0.26 0.02 250);
+  --ring: oklch(0.72 0.15 80);
+  --navy: oklch(0.26 0.05 250);
+  --navy-light: oklch(0.32 0.045 250);
+  --navy-dark: oklch(0.12 0.025 250);
+  --gold: oklch(0.72 0.15 80);
+  --gold-light: oklch(0.82 0.10 85);
+  --gold-dark: oklch(0.60 0.15 75);
+  --chart-1: oklch(0.26 0.05 250);
+  --chart-2: oklch(0.72 0.15 80);
+  --chart-3: oklch(0.50 0.03 250);
+  --chart-4: oklch(0.82 0.10 85);
+  --chart-5: oklch(0.32 0.04 250);
+  --sidebar: oklch(0.17 0.025 250);
+  --sidebar-foreground: oklch(0.97 0.005 260);
+  --sidebar-primary: oklch(0.72 0.15 80);
+  --sidebar-primary-foreground: oklch(0.14 0.025 250);
+  --sidebar-accent: oklch(0.21 0.03 250);
+  --sidebar-accent-foreground: oklch(0.97 0.005 260);
+  --sidebar-border: oklch(0.26 0.02 250);
+  --sidebar-ring: oklch(0.72 0.15 80);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -156,13 +198,101 @@
   }
 }
 
+/* Subtle theme transition — respects prefers-reduced-motion */
+html {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    transition: none;
+  }
+}
+
 /*
  * Utility classes for the design system
  */
+@keyframes backdrop-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
 @layer utilities {
+  /* Slow ambient zoom for decorative full-bleed visuals */
+  .backdrop-zoom {
+    animation: backdrop-zoom 30s ease-in-out infinite;
+  }
+
+  /* Hero intro animation — fade up, staggered */
+  @keyframes hero-intro {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-intro {
+    animation: hero-intro 0.6s ease-out both;
+  }
+  .hero-intro-d1 { animation-delay: 0.08s; }
+  .hero-intro-d2 { animation-delay: 0.16s; }
+  .hero-intro-d3 { animation-delay: 0.24s; }
+
+  /* Reveal-on-scroll animation — fade up when entering viewport */
+  @keyframes reveal-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .reveal {
+    animation: reveal-up 0.6s ease-out both;
+  }
+  .reveal-d1 { animation-delay: 0.1s; }
+  .reveal-d2 { animation-delay: 0.2s; }
+  .reveal-d3 { animation-delay: 0.3s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .backdrop-zoom,
+    .hero-intro,
+    .reveal {
+      animation: none;
+    }
+  }
+
   /* Container utility */
   .container-sanoori {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Hero heading clamp utility */
+  .clamp-text-4xl-6xl {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+  }
+
+  /* Category section heading clamp utility */
+  .clamp-text-3xl-5xl {
+    font-size: clamp(2rem, 5vw, 4rem);
+  }
+
+  /* Category grid: force rows tall enough for featured card image */
+  .category-grid {
+    grid-template-rows: repeat(2, minmax(380px, auto));
   }
 
   /* Section spacing */

@@ -19,23 +19,19 @@ interface AdminShellProps {
 function Brand() {
   return (
     <Link href="/admin" className="flex items-center gap-2.5">
-      <div className="relative h-9 w-9 overflow-hidden rounded">
-        <Image
-          src={businessConfig.logo.src}
-          alt={businessConfig.logo.alt}
-          fill
-          sizes="36px"
-          className="object-contain"
-        />
-      </div>
-      <div className="leading-tight">
-        <span className="block font-heading text-base font-bold tracking-tight">
-          Sanoori
-        </span>
-        <span className="block text-[0.6rem] font-medium uppercase tracking-widest text-foreground/60">
-          Trading · Admin
-        </span>
-      </div>
+      <Image
+        src={businessConfig.logo.src}
+        alt={businessConfig.logo.alt}
+        width={1120}
+        height={338}
+        unoptimized
+        priority
+        sizes="132px"
+        className="h-8 w-auto max-w-full object-contain"
+      />
+      <span className="rounded-sm bg-muted px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-widest text-foreground/60">
+        Admin
+      </span>
     </Link>
   );
 }

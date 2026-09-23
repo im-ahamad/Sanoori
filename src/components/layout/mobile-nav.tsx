@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Phone, X } from "lucide-react";
-import { navigationConfig, businessConfig } from "@/config/site";
+import { navigationConfig, businessConfig, siteConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/shared/brand";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { LanguageToggle } from "@/components/language/language-toggle";
 import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
@@ -89,12 +91,13 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
   const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
   const showWhatsApp = Boolean(whatsappHref);
   const showPhone = !isConfigPlaceholder(businessConfig.phone);
+  const showContactLinks = showWhatsApp || showPhone;
 
   return (
     <>
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-50 bg-navy-dark/50 lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -105,7 +108,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         id="mobile-nav-panel"
         tabIndex={-1}
         className={cn(
-          "fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-background shadow-xl outline-none transition-[transform,visibility] duration-300 ease-in-out motion-reduce:transition-none lg:hidden",
+          "fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-background shadow-2xl outline-none transition-[transform,visibility] duration-300 ease-in-out motion-reduce:transition-none lg:hidden",
           open ? "visible translate-x-0" : "invisible translate-x-full"
         )}
         role="dialog"
@@ -113,84 +116,109 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         aria-label="Navigation menu"
         aria-hidden={!open}
       >
-        <div className="flex h-full flex-col overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-border px-6 py-4">
-            <Link
-              href="/"
-              onClick={onClose}
-              aria-label={`${businessConfig.name} — Home`}
-              className="flex items-center"
-            >
-              <Brand size="sm" />
-            </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              aria-label="Close menu"
-            >
-              <X className="size-5" aria-hidden="true" />
-            </Button>
-          </div>
+        {/* Brand accent line */}
+        <div className="h-0.5 shrink-0 bg-gold" aria-hidden="true" />
 
-          <nav className="flex-1 px-4 py-6" aria-label="Mobile navigation">
-            <ul className="space-y-1">
-              {navigationConfig.main.map((item) => {
-                const active = isActive(item.href);
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
-                      aria-current={active ? "page" : undefined}
+        {/* Top bar */}
+        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+          <Link
+            href="/"
+            onClick={onClose}
+            aria-label={`${businessConfig.name} — Home`}
+            className="flex items-center"
+          >
+            <Brand size="sm" />
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-10"
+            onClick={onClose}
+            aria-label="Close menu"
+          >
+            <X className="size-5" aria-hidden="true" />
+          </Button>
+        </div>
+
+        {/* Primary CTA — immediately visible */}
+        <div className="border-b border-border px-5 py-4">
+          <Button
+            render={<Link href={navigationConfig.cta.href} onClick={onClose} />}
+            variant="secondary"
+            className="h-11 w-full text-base"
+          >
+            {navigationConfig.cta.label}
+          </Button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Mobile navigation">
+          <ul className="space-y-1">
+            {navigationConfig.main.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={onClose}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "relative flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      active
+                        ? "bg-accent text-primary"
+                        : "text-foreground hover:bg-muted"
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
                       className={cn(
-                        "block rounded-lg px-4 py-3 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        active
-                          ? "bg-accent text-primary"
-                          : "text-foreground hover:bg-muted"
+                        "h-5 w-1 rounded-full bg-gold transition-opacity",
+                        active ? "opacity-100" : "opacity-0"
                       )}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+                    />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-          <div className="space-y-4 border-t border-border px-6 py-6">
-            <Button
-              render={<Link href={navigationConfig.cta.href} onClick={onClose} />}
-              className="w-full"
-              size="lg"
-            >
-              {navigationConfig.cta.label}
-            </Button>
-            {(showWhatsApp || showPhone) && (
-              <div className="flex items-center justify-center gap-5 text-sm text-muted-foreground">
-                {showWhatsApp && (
-                  <a
-                    href={whatsappHref ?? "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  >
-                    <MessageCircle className="size-4" aria-hidden="true" />
-                    WhatsApp
-                  </a>
-                )}
-                {showPhone && (
-                  <a
-                    href={`tel:${businessConfig.phone}`}
-                    className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  >
-                    <Phone className="size-4" aria-hidden="true" />
-                    {businessConfig.phone}
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
+        {/* Preferences — theme + language (mobile) */}
+        <div className="space-y-3 border-t border-border px-5 py-4">
+          <ThemeToggle variant="panel" />
+          <LanguageToggle variant="panel" />
+        </div>
+
+        {/* Contact footer */}
+        <div className="space-y-4 border-t border-border px-5 py-5">
+          {showContactLinks && (
+            <div className="flex items-center justify-center gap-5 text-sm text-muted-foreground">
+              {showWhatsApp && (
+                <a
+                  href={whatsappHref ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                >
+                  <MessageCircle className="size-4" aria-hidden="true" />
+                  WhatsApp
+                </a>
+              )}
+              {showPhone && (
+                <a
+                  href={`tel:${businessConfig.phone}`}
+                  className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                >
+                  <Phone className="size-4" aria-hidden="true" />
+                  {businessConfig.phone}
+                </a>
+              )}
+            </div>
+          )}
+          <p className="text-center text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            {siteConfig.tagline}
+          </p>
         </div>
       </div>
     </>

@@ -6,6 +6,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { businessConfig } from "@/config/site";
 import { getConfiguredContactChannels } from "@/lib/contact-channels";
 import { isConfigPlaceholder } from "@/lib/config";
+import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 import { generatePageMetadata } from "@/lib/seo";
 
 export const metadata = generatePageMetadata({
@@ -24,7 +25,7 @@ export default function ContactPage() {
     <main className="flex-1">
       <PageHeader
         title="Contact"
-        description="Get in touch for product availability, pricing, and support."
+        description="Message us on WhatsApp for prices and availability — or call us if that is easier for you."
         breadcrumbs={[{ label: "Contact", href: "/contact" }]}
       />
 
@@ -32,11 +33,11 @@ export default function ContactPage() {
         <div className="section-spacing grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-12">
           <div className="lg:col-span-3">
             <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Reach us directly
+              Contact us directly
             </h2>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
-              Message us on your preferred channel and we will get back to you
-              with pricing, availability, and delivery options.
+              Message us on your preferred channel and we will reply with the
+              price and delivery time.
             </p>
 
             <div className="mt-8">
@@ -44,9 +45,8 @@ export default function ContactPage() {
                 <ContactChannels channels={configuredChannels} />
               ) : (
                 <div className="rounded-lg border border-border bg-muted/40 p-6 text-sm leading-relaxed text-muted-foreground">
-                  Contact details are being finalised and will be published
-                  here shortly. In the meantime, you can send a quote request
-                  below.
+                  Contact details will be published here soon. In the meantime,
+                  you can send us your request below.
                 </div>
               )}
             </div>
@@ -54,7 +54,7 @@ export default function ContactPage() {
             {!channelsAvailable && (
               <div className="mt-6">
                 <ButtonLink href="/request-quote" variant="primary">
-                  Request a Quote
+                  Get a Price
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </ButtonLink>
               </div>
@@ -78,31 +78,34 @@ export default function ContactPage() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="rounded-lg bg-navy-dark p-6 text-white sm:p-8">
+            <div className="relative overflow-hidden rounded-lg bg-navy-dark p-6 text-white sm:p-8">
+              <VisualBackdrop variant="band" objectPosition="object-top" />
+              <div className="relative">
               <h2 className="font-heading text-xl font-bold tracking-tight">
-                Prefer a formal quote?
+                Getting prices for a project?
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-white/75">
-                Tell us which products and quantities you need. We will respond
-                with pricing and current availability.
+                Send us the list of products and quantities you need and we
+                will reply with prices for everything.
               </p>
               <ButtonLink
                 href="/request-quote"
                 variant="inverse"
                 className="mt-6 w-full sm:w-auto"
               >
-                Request a Quote
+                Get a Price
                 <ArrowRight className="size-4" aria-hidden="true" />
               </ButtonLink>
+              </div>
             </div>
 
             <div className="mt-6 rounded-lg border border-border bg-card p-6">
               <h2 className="font-heading text-base font-semibold text-foreground">
-                Ask us about anything
+                Ask us anything
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Whether you are planning a full bathroom fit-out or just need a
-                second opinion on materials, we are happy to help.
+                Planning a new bathroom or unsure which material to use? Just
+                message us and we are happy to help.
               </p>
               <p className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground">
                 <MessageCircle className="size-4 text-primary" aria-hidden="true" />

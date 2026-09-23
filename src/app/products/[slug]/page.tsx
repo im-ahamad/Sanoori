@@ -11,7 +11,7 @@ import {
   ProductGallery,
   type GalleryImage,
 } from "@/components/products/product-gallery";
-import { BuyPanel, type BuyContactChannel } from "@/components/products/buy-panel";
+import { BuyPanel } from "@/components/products/buy-panel";
 import { siteConfig } from "@/config/site";
 import { getContactChannels } from "@/lib/contact-channels";
 import { productImageHero } from "@/lib/cloudinary-url";
@@ -62,13 +62,12 @@ export default async function ProductDetailPage({
   const detailUrl = `/products/${product.slug}`;
   const productUrl = `${siteConfig.url}${detailUrl}`;
 
-  const channels: BuyContactChannel[] = getContactChannels()
-    .filter((channel) => channel.isConfigured && channel.id !== "whatsapp")
-    .map((channel) => ({
-      id: channel.id as BuyContactChannel["id"],
-      label: channel.label,
-      href: channel.href,
-    }));
+  const phoneChannelEntry = getContactChannels().find(
+    (channel) => channel.id === "phone" && channel.isConfigured
+  );
+  const phoneChannel = phoneChannelEntry
+    ? { id: "phone" as const, label: phoneChannelEntry.label, href: phoneChannelEntry.href }
+    : null;
 
   const heroSchema = JSON.stringify(
     generateProductSchema({
@@ -151,7 +150,7 @@ export default async function ProductDetailPage({
                 productCode={product.productCode}
                 productUrl={productUrl}
                 productSlug={product.slug}
-                channels={channels}
+                phoneChannel={phoneChannel}
               />
             </div>
           </div>
@@ -160,8 +159,8 @@ export default async function ProductDetailPage({
           {product.description && (
             <section aria-labelledby="description-heading" className="mt-14">
               <SectionHeader
-                title="About this product"
-                description="Detailed information provided by Sanoori Trading."
+                title="More about this product"
+                description="Information supplied by Sanoori Trading."
               />
               <div className="mt-5 max-w-3xl whitespace-pre-line rounded-lg border border-border bg-card p-6 text-base leading-relaxed text-muted-foreground">
                 {product.description}
@@ -236,7 +235,7 @@ export default async function ProductDetailPage({
                 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
               >
                 <ListChecks className="size-5 text-primary" aria-hidden="true" />
-                Available variants
+                Available options
               </h2>
               <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {product.variants.map((variant, index) => (
@@ -267,20 +266,21 @@ export default async function ProductDetailPage({
           <div className="mt-14 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-muted/40 p-6 sm:flex-row sm:items-center">
             <div>
               <h2 className="font-heading text-lg font-semibold text-foreground">
-                Need a different specification?
+                Need something different?
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                We source a wide range of sanitary ware, tiles and materials.
+                Tell us what you need and we will find it for you.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <ButtonLink
                 href={`/request-quote?product=${product.slug}`}
-                variant="outline"
               >
-                Request a Quote
+                Get a Price
               </ButtonLink>
-              <ButtonLink href="/products">Browse catalogue</ButtonLink>
+              <ButtonLink href="/products" variant="outline">
+                See all products
+              </ButtonLink>
             </div>
           </div>
 
@@ -291,6 +291,8 @@ export default async function ProductDetailPage({
             <ArrowLeft className="size-4" aria-hidden="true" />
             Back to all products
           </Link>
+
+          <div className="h-20 md:hidden" aria-hidden="true" />
         </div>
       </Container>
 

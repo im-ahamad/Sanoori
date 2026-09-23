@@ -81,7 +81,7 @@ export default async function ProductsPage({
     <main className="flex-1">
       <PageHeader
         title="Products"
-        description="Search our catalogue or browse by category. Availability is confirmed when you message us."
+        description="Search or browse by category. Message us on WhatsApp and we will confirm the price and availability."
         breadcrumbs={[{ label: "Products", href: "/products" }]}
       />
 
@@ -152,7 +152,7 @@ async function CatalogueView({
         <section aria-labelledby="featured-heading" className="mt-12">
           <SectionHeader
             title="Featured products"
-            description="Highlights from our current range."
+            description="Some products you can order today."
             className="[&>h2]:text-xl sm:[&>h2]:text-2xl"
           />
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
@@ -188,8 +188,8 @@ async function CatalogueView({
               title="No products found"
               description={
                 hasActiveFilters
-                  ? "Nothing matches your current search and filters. Try a different term or clear some filters."
-                  : "Products will appear here as we add them. Tell us what you need and we will source it for you."
+                  ? "Nothing matches your search and filters. Try a different search or clear some filters."
+                  : "Products will appear here as we add them. Tell us what you need and we will find it for you."
               }
               icon={<PackageSearch className="size-8 text-muted-foreground" />}
             />
@@ -200,7 +200,7 @@ async function CatalogueView({
                 </ButtonLink>
               )}
               <ButtonLink href="/request-quote">
-                Request a Quote
+                Get a Price
               </ButtonLink>
             </div>
           </div>

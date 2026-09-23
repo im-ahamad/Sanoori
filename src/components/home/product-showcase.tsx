@@ -1,0 +1,56 @@
+import { ArrowRight } from "lucide-react";
+import { Container } from "@/components/layout/container";
+import { getHomeShowcaseProducts } from "@/lib/public/catalogue";
+import { ProductCard } from "@/components/products/product-card";
+import { SectionHeader } from "@/components/shared/section-header";
+import { Reveal } from "@/components/shared/reveal";
+import { ButtonLink } from "@/components/ui/button-link";
+
+const SHOWCASE_PRODUCT_COUNT = 8;
+
+/**
+ * Home page product showcase.
+ *
+ * Always shows a curated selection of real active products (preferring ones
+ * with photographs) instead of depending on admin "featured" flags — so the
+ * section never disappears when no product happens to be featured. No fake
+ * prices, ratings, or popularity claims; the primary action flows through the
+ * existing request-quote (and WhatsApp-when-configured) pipeline.
+ */
+export async function ProductShowcase() {
+  const products = await getHomeShowcaseProducts(SHOWCASE_PRODUCT_COUNT);
+
+  return (
+    <section className="section-spacing bg-muted/40">
+      <Container>
+        <Reveal>
+          <SectionHeader
+            eyebrow="Explore our products"
+            title="A selection from our catalogue"
+            description="Browse a sample of what Sanoori Trading supplies — sanitary ware, tiles, and building materials you can actually order."
+          />
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          {products.map((product, index) => (
+            <Reveal key={product.id} delay={index * 0.06} className="h-full">
+              <ProductCard product={product} />
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal className="mt-12">
+          <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between">
+            <p className="text-sm text-muted-foreground">
+              See the full catalogue with search, filters, and every category.
+            </p>
+            <ButtonLink href="/products" variant="primary" size="lg">
+              Browse Products
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </ButtonLink>
+          </div>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}

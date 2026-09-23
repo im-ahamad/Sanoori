@@ -17,17 +17,17 @@ export const metadata = generatePageMetadata({
 
 const valueProps = [
   {
-    title: "Quality first",
+    title: "Good quality",
     description:
-      "We focus on products that are durable, dependable, and built to last.",
+      "We keep to products that are durable and made to last.",
   },
   {
-    title: "Honest guidance",
+    title: "Clear answers",
     description:
-      "Clear information on products, availability, and pricing — no ambiguity.",
+      "Clear information on products, availability, and prices — no confusion.",
   },
   {
-    title: "Reliable delivery",
+    title: "On-time delivery",
     description:
       "Orders prepared and delivered on the schedule we agree with you.",
   },
@@ -54,16 +54,14 @@ export default async function AboutPage() {
               </h2>
               <div className="mt-4 space-y-4 text-base leading-relaxed text-muted-foreground">
                 <p>
-                  Sanoori Trading is a Bangladesh-based supplier of sanitary
-                  ware, tiles, and building materials. We help builders,
-                  contractors, retailers, and homeowners source the products
-                  they need for residential and commercial projects.
+                  Sanoori Trading supplies sanitary ware, tiles, and building
+                  materials in Bangladesh. From a single item to a full
+                  project, we help you find the products you need.
                 </p>
                 <p>
-                  Trade is built on trust. Our focus is on supplying quality
-                  products, providing clear information, and delivering
-                  reliably — so our customers can count on us order after
-                  order.
+                  Our focus is simple: good products, clear information, and
+                  reliable delivery — so we are easy to buy from, again and
+                  again.
                 </p>
               </div>
             </div>
@@ -75,7 +73,7 @@ export default async function AboutPage() {
                 What we supply
               </h2>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                We organise our business around three core product lines:
+                Our products are organised into these categories:
               </p>
               <ul className="mt-6 space-y-4">
                 {categories.map((category) => {
@@ -119,7 +117,7 @@ export default async function AboutPage() {
                 {valueProps.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-lg border border-border bg-card p-5"
+                    className="rounded-lg border border-border bg-card p-5 shadow-sm"
                   >
                     <h3 className="font-heading text-base font-semibold text-foreground">
                       {item.title}
@@ -134,17 +132,17 @@ export default async function AboutPage() {
           </Reveal>
 
           <Reveal>
-            <div className="mx-auto mt-14 max-w-3xl rounded-lg border border-border bg-muted/40 p-6 text-center sm:p-8">
+            <div className="mx-auto mt-14 max-w-3xl rounded-lg border border-border bg-muted/40 p-6 text-center shadow-sm sm:p-8">
               <h2 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                Need products or pricing?
+                Need a product or a price?
               </h2>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                 Tell us what you are looking for and we will help you find it.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <ButtonLink href="/products">Browse Products</ButtonLink>
+                <ButtonLink href="/products">See Products</ButtonLink>
                 <ButtonLink href="/request-quote" variant="outline">
-                  Request a Quote
+                  Get a Price
                 </ButtonLink>
               </div>
             </div>

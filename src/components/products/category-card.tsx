@@ -1,84 +1,135 @@
 import Link from "next/link";
 import Image from "next/image";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { ArrowRight } from "lucide-react";
 import type { PublicCategory } from "@/lib/public/catalogue";
-import { getCategoryIconElement } from "@/lib/category-icons";
+import { cn } from "@/lib/utils";
 
-export function CategoryCard({ category }: { category: PublicCategory }) {
+/**
+ * Map category slugs to their specific local hero images in /public/images/
+ * These override any database-stored image for the three main categories.
+ */
+const CATEGORY_HERO_IMAGES: Record<string, string> = {
+  "sanitary-ware": "/images/category-sanitary.jpg",
+  tiles: "/images/category-tiles.jpg",
+  "building-materials": "/images/category-building.jpg",
+};
+
+/**
+ * The category records point at `/images/categories/*.jpg`, files that are not
+ * shipped in this repo. Root-relative paths are resolved against `/public` so
+ * a missing file degrades to the designed fallback instead of a broken image.
+ * Absolute URLs (Cloudinary etc.) are trusted as-is.
+ */
+function hasResolvableImage(image: string | null | undefined): boolean {
+  if (!image) return false;
+  if (/^https?:\/\//i.test(image)) return true;
+  if (image.startsWith("/images/")) {
+    try {
+      return existsSync(path.join(process.cwd(), "public", image));
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
+function getCategoryImage(category: PublicCategory): string | null {
+  if (CATEGORY_HERO_IMAGES[category.slug]) {
+    return CATEGORY_HERO_IMAGES[category.slug];
+  }
+  return category.image;
+}
+
+function hasCategoryImage(category: PublicCategory): boolean {
+  return hasResolvableImage(getCategoryImage(category));
+}
+
+function getCategoryNumber(index: number): string {
+  return String(index).padStart(2, "0");
+}
+
+export function CategoryCard({
+  category,
+  featured = false,
+  index = 1,
+  className,
+}: {
+  category: PublicCategory;
+  featured?: boolean;
+  index?: number;
+  className?: string;
+}) {
   const href = `/products?category=${category.slug}`;
+  const imageSrc = getCategoryImage(category);
+  const hasImage = hasCategoryImage(category);
+  const categoryNumber = getCategoryNumber(index);
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card transition-all hover:border-primary/30 hover:shadow-lg">
-      <Link
-        href={href}
-        tabIndex={-1}
-        className="relative block aspect-[16/9] overflow-hidden bg-muted/50 focus-visible:outline-none"
-        aria-label={`Browse the ${category.name} category`}
-      >
-        {category.image ? (
+    <Link
+      href={href}
+      aria-label={`Explore the ${category.name} category`}
+      className={cn(
+        "group relative block overflow-hidden border border-border bg-card",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+        featured ? "min-h-[320px] md:h-full md:min-h-0" : "min-h-[320px] md:h-full md:min-h-0",
+        className
+      )}
+    >
+      {/* Full-bleed image — absolute, fills entire card */}
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        {hasImage ? (
           <Image
-            src={category.image}
+            src={imageSrc!}
             alt=""
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes={
+              featured
+                ? "(max-width: 768px) 100vw, 50vw"
+                : "(max-width: 768px) 100vw, 50vw"
+            }
             unoptimized
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.03]"
           />
         ) : (
-          <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted/60 to-muted">
-            {getCategoryIconElement(category.slug, {
-              className:
-                "size-14 text-muted-foreground transition-colors group-hover:text-primary",
-              strokeWidth: 1.4,
-            })}
-          </span>
+          <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy-dark to-navy-dark" />
         )}
-      </Link>
 
-      <div className="flex flex-1 flex-col p-6">
-        <h3 className="font-heading text-lg font-semibold text-foreground">
-          <Link
-            href={href}
-            className="transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-          >
-            {category.name}
-          </Link>
+        {/* Bottom-to-top navy gradient — strong navy at bottom, transparent at top */}
+        <div
+          className="absolute inset-0 bg-[linear-gradient(0deg,var(--navy-dark)_0%,color-mix(in_oklab,var(--navy-dark)_70%,transparent)_35%,transparent_70%)]"
+        />
+      </div>
+
+      {/* Content — anchored to bottom of card, sits on top of image */}
+      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+        {/* Gold number */}
+        <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-gold">
+          {categoryNumber}
+        </span>
+
+        {/* Category title */}
+        <h3 className="mt-2 font-heading text-[1.875rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.25rem]">
+          {category.name}
         </h3>
+
+        {/* Description */}
         {category.description && (
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+          <p className="mt-3 max-w-[28rem] text-sm leading-6 text-white/80">
             {category.description}
           </p>
         )}
-        {category.subcategories.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5">
-            {category.subcategories.slice(0, 3).map((sub) => (
-              <li
-                key={sub.id}
-                className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
-              >
-                {sub.name}
-              </li>
-            ))}
-            {category.subcategories.length > 3 && (
-              <li className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
-                +{category.subcategories.length - 3} more
-              </li>
-            )}
-          </ul>
-        )}
-        <div className="mt-5 flex flex-1 items-end">
-          <Link
-            href={href}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-          >
-            Explore Products
-            <ArrowRight
-              className="size-4 transition-transform group-hover:translate-x-0.5"
-              aria-hidden="true"
-            />
-          </Link>
-        </div>
+
+        {/* Browse Products CTA */}
+        <span className="mt-5 inline-flex min-h-[2.75rem] items-center gap-2 text-sm font-semibold text-gold">
+          Browse Products
+          <ArrowRight
+            className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </span>
       </div>
-    </article>
+    </Link>
   );
 }

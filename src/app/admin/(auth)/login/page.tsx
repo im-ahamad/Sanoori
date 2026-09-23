@@ -24,24 +24,17 @@ export default async function AdminLoginPage() {
       <div className="w-full max-w-md">
         <div className="rounded-xl border border-border bg-background p-6 shadow-sm sm:p-8">
           <div className="flex flex-col items-center text-center">
-            <Link href="/" className="inline-flex items-center gap-2.5">
-              <div className="relative h-11 w-11 overflow-hidden rounded-md">
-                <Image
-                  src={businessConfig.logo.src}
-                  alt={businessConfig.logo.alt}
-                  fill
-                  sizes="44px"
-                  className="object-contain"
-                />
-              </div>
-              <div className="text-left leading-tight">
-                <span className="block font-heading text-lg font-bold tracking-tight text-foreground">
-                  Sanoori
-                </span>
-                <span className="block text-[0.65rem] font-medium uppercase tracking-widest text-muted-foreground">
-                  Trading
-                </span>
-              </div>
+            <Link href="/" className="inline-flex items-center">
+              <Image
+                src={businessConfig.logo.src}
+                alt={businessConfig.logo.alt}
+                width={1120}
+                height={338}
+                unoptimized
+                priority
+                sizes="168px"
+                className="h-9 w-auto max-w-full object-contain"
+              />
             </Link>
 
             <h1 className="mt-6 font-heading text-xl font-bold tracking-tight text-foreground">

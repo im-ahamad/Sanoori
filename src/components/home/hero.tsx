@@ -14,21 +14,17 @@ export function Hero() {
         priority
         src="/images/hero.jpg"
         objectPosition="object-[64%_center]"
-        className="[&>div]:opacity-100"
-      />
-
-      {/* Custom left-to-right navy gradient overlay - stronger than VisualBackdrop default */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--navy-dark)_0%,color-mix(in_oklab,var(--navy-dark)_92%,transparent)_35%,color-mix(in_oklab,var(--navy-dark)_20%,transparent)_72%,transparent)]"
+        unoptimized
+        noZoom
+        overlayClassName="bg-[linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_28%,transparent)_30%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_58%,transparent_80%)]"
       />
 
       <div className="relative h-full w-full px-4 sm:px-6 lg:px-8">
         <div
-          className="flex h-full items-center"
+          className="flex h-full items-start pt-10 sm:pt-14"
           style={{ minHeight: "calc(100dvh - 4rem)" }}
         >
-          <div className="w-full max-w-7xl mx-auto">
+          <div className="ml-10 w-full max-w-7xl sm:ml-20 lg:ml-24">
             <div className="max-w-[48rem]">
               {/* Gold eyebrow */}
               <p className="hero-intro flex items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-gold">

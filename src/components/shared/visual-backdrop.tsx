@@ -28,10 +28,24 @@ interface VisualBackdropProps {
   variant?: VisualBackdropVariant;
   /** Tailwind object-position class, e.g. "object-center" or "object-bottom". */
   objectPosition?: string;
+  /** Tailwind object-fit class, e.g. "object-cover" or "object-contain". */
+  objectFit?: string;
   /** Marks the hero/LCP instance so the browser preloads it eagerly. */
   priority?: boolean;
+  /** Skip the Next.js image optimizer and serve the source file verbatim. */
+  unoptimized?: boolean;
+  /** Drop the slow ambient zoom animation on this instance. */
+  noZoom?: boolean;
+  /** JPEG re-encode quality passed to the image optimizer. Defaults to 60. */
+  quality?: number;
   /** Override the source image. Defaults to the shared marquee visual. */
   src?: string;
+  /** Replace the variant's default wash overlay with a custom one. An empty
+   * string renders a transparent (fully removed) overlay. */
+  overlayClassName?: string;
+  /** Extra classes for the <img> element itself (e.g. to nudge the image
+   * layer's rendered position without touching the wrapper box). */
+  imageClassName?: string;
   className?: string;
 }
 
@@ -49,8 +63,14 @@ const zoomClass = "backdrop-zoom";
 export function VisualBackdrop({
   variant = "hero",
   objectPosition = "object-center",
+  objectFit = "object-cover",
   priority = false,
+  unoptimized = false,
+  noZoom = false,
+  quality = 60,
   src,
+  overlayClassName,
+  imageClassName,
   className,
 }: VisualBackdropProps) {
   return (
@@ -67,13 +87,24 @@ export function VisualBackdrop({
         alt=""
         fill
         sizes="100vw"
-        quality={60}
+        quality={quality}
         priority={priority}
-        placeholder={priority ? "blur" : "empty"}
+        unoptimized={unoptimized}
+        placeholder={priority && !unoptimized ? "blur" : "empty"}
         blurDataURL={WEBSITE_VISUAL_BLUR}
-        className={cn("object-cover", objectPosition, zoomClass)}
+        className={cn(
+          objectFit,
+          objectPosition,
+          imageClassName,
+          noZoom ? undefined : zoomClass
+        )}
       />
-      <div className={cn("absolute inset-0", overlayByVariant[variant])} />
+      <div
+        className={cn(
+          "absolute inset-0",
+          overlayClassName ?? overlayByVariant[variant]
+        )}
+      />
     </div>
   );
 }

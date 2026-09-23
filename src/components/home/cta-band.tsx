@@ -7,7 +7,11 @@ import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 export function CtaBand() {
   return (
     <section className="relative overflow-hidden bg-navy-dark text-white">
-      <VisualBackdrop variant="hero" objectPosition="object-center" />
+      <VisualBackdrop
+        variant="hero"
+        objectPosition="object-center"
+        src="/images/footer.png"
+      />
       {/* Editorial washes — keep image subtle while ensuring strong text contrast */}
       <div
         aria-hidden="true"

@@ -34,6 +34,12 @@ const AVAILABILITY_VALUES = [
   Availability.OUT_OF_STOCK,
 ] as const;
 
+const CATEGORY_HERO_IMAGES: Record<string, string> = {
+  "sanitary-ware": "/images/sanitary-hero.png",
+  tiles: "/images/tiles-hero.png",
+  "building-materials": "/images/building-hero.png",
+};
+
 function firstValue(
   value: string | string[] | undefined
 ): string | undefined {
@@ -83,6 +89,27 @@ export default async function ProductsPage({
         title="Products"
         description="Search or browse by category. Message us on WhatsApp and we will confirm the price and availability."
         breadcrumbs={[{ label: "Products", href: "/products" }]}
+        backgroundImage={
+          categorySlug
+            ? CATEGORY_HERO_IMAGES[categorySlug]
+            : "/images/product-hero.png"
+        }
+        backdropOverlay={
+          categorySlug
+            ? undefined
+            : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_88%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_76%,transparent)_22%,color-mix(in_oklab,var(--navy-dark)_56%,transparent)_46%,color-mix(in_oklab,var(--navy-dark)_32%,transparent)_66%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_84%,transparent_98%)]"
+        }
+        objectFit={categorySlug ? undefined : "object-cover"}
+        objectPosition={
+          categorySlug ? "object-center" : "object-[50%_0%]"
+        }
+        unoptimized={!categorySlug}
+        noZoom={!categorySlug}
+        textColor={categorySlug ? "white" : "pureWhite"}
+        exactCenter
+        className={
+          categorySlug ? undefined : "min-h-[calc(100vw/3)] pb-[4px]"
+        }
       />
 
       <Container>

@@ -27,6 +27,14 @@ export default function ContactPage() {
         title="Contact"
         description="Message us on WhatsApp for prices and availability — or call us if that is easier for you."
         breadcrumbs={[{ label: "Contact", href: "/contact" }]}
+        backgroundImage="/images/contact-hero.png"
+        backdropOverlay="bg-[radial-gradient(ellipse_120%_75%_at_50%_-15%,color-mix(in_oklab,var(--navy-dark)_74%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_30%,transparent_72%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_92%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_22%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_40%,transparent)_64%,color-mix(in_oklab,var(--navy-dark)_16%,transparent)_84%,transparent_98%)]"
+        objectFit="object-contain"
+        unoptimized
+        noZoom
+        textColor="pureWhite"
+        exactCenter
+        className="min-h-[calc(100vw/3)]"
       />
 
       <Container>

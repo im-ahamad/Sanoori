@@ -3,8 +3,11 @@ import { Container } from "@/components/layout/container";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Reveal } from "@/components/shared/reveal";
 import { VisualBackdrop } from "@/components/shared/visual-backdrop";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 export function DiscoveryCta() {
+  const t = getServerTranslations("bn");
+
   return (
     <section className="relative overflow-hidden bg-navy text-white">
       <VisualBackdrop variant="band" />
@@ -15,14 +18,13 @@ export function DiscoveryCta() {
               <div className="max-w-2xl lg:col-span-7">
                 <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-gold-light">
                   <span className="h-px w-8 bg-gold" aria-hidden="true" />
-                  Need something else?
+                  {t.discoveryCta.eyebrow}
                 </p>
                 <h2 className="mt-3 font-heading text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
-                  Can&rsquo;t Find What You Need?
+                  {t.discoveryCta.title}
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-white/70 sm:text-lg">
-                  Tell us what you&rsquo;re looking for. We&rsquo;ll help you
-                  find the right product or discuss your requirements.
+                  {t.discoveryCta.description}
                 </p>
               </div>
 
@@ -33,12 +35,12 @@ export function DiscoveryCta() {
                     aria-hidden="true"
                   />
                   <div className="flex flex-col gap-3">
-                    <ButtonLink href="/request-quote" variant="inverse" size="lg">
-                      Get a Quote
+                    <ButtonLink href="/products" variant="inverse" size="lg">
+                      {t.discoveryCta.ctaPrimary}
                       <ArrowRight className="size-4" aria-hidden="true" />
                     </ButtonLink>
                     <ButtonLink href="/products" variant="outline-inverse" size="lg">
-                      Browse Products
+                      {t.discoveryCta.ctaSecondary}
                     </ButtonLink>
                   </div>
                 </div>

@@ -46,7 +46,7 @@ export const navigationConfig = {
     { label: "Contact", href: "/contact" },
   ] as const,
   cta: {
-    label: "Get a Quote",
-    href: "/request-quote",
+    label: "Browse Products",
+    href: "/products",
   },
 } as const;

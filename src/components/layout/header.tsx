@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
-import { navigationConfig, businessConfig } from "@/config/site";
+import { businessConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
 import { Brand } from "@/components/shared/brand";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { HeaderSearch } from "@/components/layout/header-search";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LanguageToggle } from "@/components/language/language-toggle";
+import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 function DesktopNavLink({
@@ -57,6 +59,20 @@ export function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations();
+
+  const navigationConfig = {
+    main: [
+      { label: t.header.navigation.home, href: "/" },
+      { label: t.header.navigation.about, href: "/about" },
+      { label: t.header.navigation.products, href: "/products" },
+      { label: t.header.navigation.contact, href: "/contact" },
+    ] as const,
+    cta: {
+      label: t.header.cta,
+      href: "/products",
+    },
+  } as const;
 
   useEffect(() => {
     function onScroll() {
@@ -77,8 +93,8 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full border-b transition-all duration-300",
         scrolled
-          ? "border-border bg-background/95 shadow-[0_6px_24px_-12px_rgba(13,23,42,0.25)] backdrop-blur supports-[backdrop-filter]:bg-background/85"
-          : "border-border/80 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+          ? "border-border bg-[color-mix(in_oklab,var(--navy)_10%,white)] shadow-[0_6px_24px_-12px_rgba(13,23,42,0.25)] backdrop-blur supports-[backdrop-filter]:bg-[color-mix(in_oklab,var(--navy)_10%,white)]"
+          : "border-border/80 bg-[color-mix(in_oklab,var(--navy)_10%,white)] backdrop-blur supports-[backdrop-filter]:bg-[color-mix(in_oklab,var(--navy)_10%,white)]"
       )}
     >
       <Container>
@@ -86,7 +102,7 @@ export function Header() {
           {/* Logo */}
           <Link
             href="/"
-            aria-label={`${businessConfig.name} — Home`}
+            aria-label={t.header.ariaLabel.home}
             className="flex items-center"
           >
             <Brand size="md" className="lg:h-10" />
@@ -99,7 +115,7 @@ export function Header() {
           >
             {navigationConfig.main.map((item) => (
               <DesktopNavLink
-                key={item.href}
+                key={`header-${item.href}`}
                 href={item.href}
                 label={item.label}
                 active={isActive(item.href)}
@@ -108,8 +124,10 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Right side — Logo → Nav → Theme → Language → CTA */}
+          {/* Right side — Logo → Nav → Search → Theme → Language → CTA */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <HeaderSearch />
+
             {/* Desktop header controls — hidden on mobile to keep header uncluttered */}
             <div className="hidden items-center gap-2 sm:flex">
               <ThemeToggle />
@@ -135,7 +153,7 @@ export function Header() {
               size="icon"
               className="size-10 lg:hidden"
               onClick={() => setMobileNavOpen(true)}
-              aria-label="Open menu"
+              aria-label={t.header.ariaLabel.openMenu}
               aria-haspopup="dialog"
               aria-expanded={mobileNavOpen}
               aria-controls="mobile-nav-panel"

@@ -8,6 +8,7 @@ import {
   useLanguage,
   type SupportedLanguage,
 } from "@/lib/language";
+import { useTranslations } from "@/lib/i18n";
 
 interface LanguageToggleProps {
   variant?: "header" | "panel";
@@ -21,6 +22,7 @@ export function LanguageToggle({
   const { language, setLanguage } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -46,16 +48,16 @@ export function LanguageToggle({
         ref={menuRef}
         className={cn("flex items-center gap-2", className)}
         role="group"
-        aria-label="Language"
+        aria-label={t.languageToggle.label}
       >
         <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           <Languages className="size-3.5" aria-hidden="true" />
-          Language
+          {t.languageToggle.label}
         </span>
         <div
           className="ml-auto inline-flex items-center rounded-full border border-border bg-muted/40 p-1"
           role="group"
-          aria-label="Language selection"
+          aria-label={t.languageToggle.options}
         >
           {(["en", "bn"] as SupportedLanguage[]).map((lang) => {
             const active = language === lang;
@@ -64,7 +66,7 @@ export function LanguageToggle({
                 key={lang}
                 type="button"
                 onClick={() => setLanguage(lang)}
-                aria-label={`Switch language to ${languageMeta[lang].label}`}
+                aria-label={t.languageToggle.switchTo.replace("{language}", languageMeta[lang].label)}
                 aria-pressed={active}
                 title={languageMeta[lang].label}
                 className={cn(
@@ -95,7 +97,9 @@ export function LanguageToggle({
           e.preventDefault();
           setMenuOpen((o) => !o);
         }}
-        aria-label={`Language: ${languageMeta[language].label}. Click to switch to ${isEn ? "বাংলা" : "English"}. Right-click for options`}
+        aria-label={t.languageToggle.currentLanguage
+          .replace("{current}", languageMeta[language].label)
+          .replace("{target}", isEn ? "বাংলা" : "English")}
         title={`${languageMeta[language].label} — click to switch, right-click for options`}
         className={cn(
           "inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground",
@@ -113,18 +117,18 @@ export function LanguageToggle({
       <button
         type="button"
         onClick={() => setMenuOpen((o) => !o)}
-        aria-label="Open language options"
+        aria-label={t.languageToggle.options}
         aria-expanded={menuOpen}
         aria-haspopup="menu"
         className="sr-only focus:not-sr-only focus:absolute focus:left-1/2 focus:top-full focus:mt-2 focus:-translate-x-1/2 focus:rounded-md focus:bg-popover focus:px-3 focus:py-1.5 focus:text-xs focus:font-medium focus:text-popover-foreground focus:shadow-md"
       >
-        Language options
+        {t.languageToggle.options}
       </button>
 
       {menuOpen && (
         <div
           role="menu"
-          aria-label="Language options"
+          aria-label={t.languageToggle.options}
           className="absolute right-0 top-full z-50 mt-2 min-w-[160px] rounded-xl border border-border bg-popover p-1.5 shadow-lg"
         >
           {(["en", "bn"] as SupportedLanguage[]).map((lang) => {
@@ -167,7 +171,7 @@ export function LanguageToggle({
             );
           })}
           <p className="px-3 pb-1 pt-2 text-xs leading-relaxed text-muted-foreground">
-            বাংলা translations will be added next — selection is saved for when they go live.
+            {t.languageToggle.comingSoon}
           </p>
         </div>
       )}

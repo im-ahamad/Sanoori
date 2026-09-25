@@ -7,42 +7,27 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { generatePageMetadata, generateOrganizationSchema } from "@/lib/seo";
 import { getCategoryIconElement } from "@/lib/category-icons";
 import { getPublicCategories } from "@/lib/public/catalogue";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = generatePageMetadata({
-  title: "About",
+  title: "আমাদের সম্পর্কে",
   description:
-    "Sanoori Trading is a Bangladesh-based supplier of sanitary ware, tiles, and building materials.",
+    "সানুরি ট্রেডিং বাংলাদেশে স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস সরবরাহকারী প্রতিষ্ঠান।",
   path: "/about",
 });
 
-const valueProps = [
-  {
-    title: "Good quality",
-    description:
-      "We keep to products that are durable and made to last.",
-  },
-  {
-    title: "Clear answers",
-    description:
-      "Clear information on products, availability, and prices — no confusion.",
-  },
-  {
-    title: "On-time delivery",
-    description:
-      "Orders prepared and delivered on the schedule we agree with you.",
-  },
-];
-
 export default async function AboutPage() {
+  const t = getServerTranslations("bn");
   const categories = await getPublicCategories();
   const organizationSchema = JSON.stringify(generateOrganizationSchema());
 
   return (
     <main className="flex-1">
       <PageHeader
-        title="About Sanoori Trading"
-        description="A supplier of sanitary ware, tiles, and building materials in Bangladesh."
-        breadcrumbs={[{ label: "About", href: "/about" }]}
+        title={t.about.heroTitle}
+        description={t.about.heroDescription}
+        breadcrumbs={[{ label: t.about.breadcrumb, href: "/about" }]}
+        breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
         backgroundImage="/images/about-hero.png"
         unoptimized
         objectFit="object-contain"
@@ -57,18 +42,14 @@ export default async function AboutPage() {
           <Reveal>
             <div className="mx-auto max-w-3xl">
               <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                Who we are
+                {t.about.whoWeAre.title}
               </h2>
               <div className="mt-4 space-y-4 text-base leading-relaxed text-muted-foreground">
                 <p>
-                  Sanoori Trading supplies sanitary ware, tiles, and building
-                  materials in Bangladesh. From a single item to a full
-                  project, we help you find the products you need.
+                  {t.about.whoWeAre.p1}
                 </p>
                 <p>
-                  Our focus is simple: good products, clear information, and
-                  reliable delivery — so we are easy to buy from, again and
-                  again.
+                  {t.about.whoWeAre.p2}
                 </p>
               </div>
             </div>
@@ -77,13 +58,14 @@ export default async function AboutPage() {
           <Reveal>
             <div className="mx-auto mt-14 max-w-3xl">
               <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                What we supply
+                {t.about.whatWeSupply.title}
               </h2>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                Our products are organised into these categories:
+                {t.about.whatWeSupply.description}
               </p>
               <ul className="mt-6 space-y-4">
                 {categories.map((category) => {
+                  const translatedName = t.categories[category.slug as keyof typeof t.categories] ?? category.name;
                   return (
                     <li key={category.id}>
                       <Link
@@ -99,7 +81,7 @@ export default async function AboutPage() {
                         <div className="flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <h3 className="font-heading text-lg font-semibold text-foreground transition-colors group-hover:text-primary">
-                              {category.name}
+                              {translatedName}
                             </h3>
                             <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
                           </div>
@@ -118,10 +100,10 @@ export default async function AboutPage() {
           <Reveal>
             <div className="mx-auto mt-14 max-w-3xl">
               <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                How we work
+                {t.about.howWeWork.title}
               </h2>
               <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {valueProps.map((item) => (
+                {t.about.howWeWork.valueProps.map((item) => (
                   <div
                     key={item.title}
                     className="rounded-lg border border-border bg-card p-5 shadow-sm"
@@ -141,15 +123,15 @@ export default async function AboutPage() {
           <Reveal>
             <div className="mx-auto mt-14 max-w-3xl rounded-lg border border-border bg-muted/40 p-6 text-center shadow-sm sm:p-8">
               <h2 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                Need a product or a price?
+                {t.about.cta.title}
               </h2>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                Tell us what you are looking for and we will help you find it.
+                {t.about.cta.description}
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <ButtonLink href="/products">See Products</ButtonLink>
-                <ButtonLink href="/request-quote" variant="outline">
-                  Get a Price
+                <ButtonLink href="/products">{t.about.cta.seeProducts}</ButtonLink>
+                <ButtonLink href="/products" variant="outline">
+                  {t.about.cta.askForPrice}
                 </ButtonLink>
               </div>
             </div>

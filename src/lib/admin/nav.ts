@@ -2,8 +2,9 @@ import {
   LayoutDashboard,
   Package,
   Tags,
-  MessagesSquare,
+  Users,
   Settings,
+  FileText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -17,13 +18,9 @@ export interface AdminNavItem {
 
 export const adminNavItems: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard, status: "ready" },
+  { label: "Orders", href: "/admin/orders", icon: FileText, status: "ready" },
   { label: "Products", href: "/admin/products", icon: Package, status: "ready" },
-  { label: "Categories", href: "/admin/categories", icon: Tags, status: "soon" },
-  {
-    label: "Inquiries",
-    href: "/admin/inquiries",
-    icon: MessagesSquare,
-    status: "ready",
-  },
-  { label: "Settings", href: "/admin/settings", icon: Settings, status: "soon" },
+  { label: "Categories", href: "/admin/categories", icon: Tags, status: "ready" },
+  { label: "Customers", href: "/admin/customers", icon: Users, status: "ready" },
+  { label: "Settings", href: "/admin/settings", icon: Settings, status: "ready" },
 ];

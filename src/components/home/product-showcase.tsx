@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/products/product-card";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Reveal } from "@/components/shared/reveal";
 import { ButtonLink } from "@/components/ui/button-link";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 const SHOWCASE_PRODUCT_COUNT = 8;
 
@@ -19,15 +20,16 @@ const SHOWCASE_PRODUCT_COUNT = 8;
  */
 export async function ProductShowcase() {
   const products = await getHomeShowcaseProducts(SHOWCASE_PRODUCT_COUNT);
+  const t = getServerTranslations("bn");
 
   return (
     <section className="section-spacing bg-muted/40">
       <Container>
         <Reveal>
           <SectionHeader
-            eyebrow="Explore our products"
-            title="A selection from our catalogue"
-            description="Browse a sample of what Sanoori Trading supplies — sanitary ware, tiles, and building materials you can actually order."
+            eyebrow={t.productShowcase.eyebrow}
+            title={t.productShowcase.title}
+            description={t.productShowcase.description}
           />
         </Reveal>
 
@@ -42,10 +44,10 @@ export async function ProductShowcase() {
         <Reveal className="mt-12">
           <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between">
             <p className="text-sm text-muted-foreground">
-              See the full catalogue with search, filters, and every category.
+              {t.productShowcase.seeFullCatalogue}
             </p>
             <ButtonLink href="/products" variant="primary" size="lg">
-              Browse Products
+              {t.productShowcase.cta}
               <ArrowRight className="size-4" aria-hidden="true" />
             </ButtonLink>
           </div>

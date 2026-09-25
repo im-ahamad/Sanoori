@@ -1,11 +1,11 @@
-import { Package, Tags, MessagesSquare, Inbox } from "lucide-react";
+import { Package, Tags, Users, FileText, Inbox, MessageSquare, CheckCircle } from "lucide-react";
 import {
   getAdminDashboardStats,
-  getRecentInquiries,
+  getRecentOrders,
 } from "@/lib/admin/dashboard";
 import { StatCard } from "@/components/admin/stat-card";
 import { QuickActions } from "@/components/admin/quick-actions";
-import { RecentInquiries } from "@/components/admin/recent-inquiries";
+import { RecentOrders } from "@/components/admin/recent-orders";
 import { SectionError } from "@/components/admin/section-error";
 
 export const metadata = {
@@ -13,9 +13,9 @@ export const metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  const [statsResult, inquiriesResult] = await Promise.all([
+  const [statsResult, ordersResult] = await Promise.all([
     getAdminDashboardStats(),
-    getRecentInquiries(),
+    getRecentOrders(),
   ]);
 
   return (
@@ -25,12 +25,12 @@ export default async function AdminDashboardPage() {
           Dashboard
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          An overview of your catalogue and customer inquiries.
+          An overview of your catalogue and customer orders.
         </p>
       </div>
 
       {statsResult.ok ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-7">
           <StatCard
             label="Products"
             value={statsResult.data.products}
@@ -44,18 +44,37 @@ export default async function AdminDashboardPage() {
             hint="Active categories"
           />
           <StatCard
-            label="New Inquiries"
-            value={statsResult.data.newInquiries}
-            icon={Inbox}
-            hint="Waiting for your reply"
-            href="/admin/inquiries?status=NEW"
+            label="Customers"
+            value={statsResult.data.customers}
+            icon={Users}
+            hint="Unique customers"
           />
           <StatCard
-            label="Total Inquiries"
-            value={statsResult.data.inquiries}
-            icon={MessagesSquare}
-            hint="Received so far"
-            href="/admin/inquiries"
+            label="Total Orders"
+            value={statsResult.data.totalOrders}
+            icon={FileText}
+            hint="All orders received"
+          />
+          <StatCard
+            label="New Orders"
+            value={statsResult.data.newOrders}
+            icon={Inbox}
+            hint="Waiting for your reply"
+            href="/admin/orders?status=NEW"
+          />
+          <StatCard
+            label="Contacted"
+            value={statsResult.data.contactedOrders}
+            icon={MessageSquare}
+            hint="In progress"
+            href="/admin/orders?status=CONTACTED"
+          />
+          <StatCard
+            label="Completed"
+            value={statsResult.data.completedOrders}
+            icon={CheckCircle}
+            hint="Handled and closed"
+            href="/admin/orders?status=COMPLETED"
           />
         </div>
       ) : (
@@ -67,20 +86,20 @@ export default async function AdminDashboardPage() {
 
       <QuickActions />
 
-      {inquiriesResult.ok ? (
-        <RecentInquiries inquiries={inquiriesResult.data} />
+      {ordersResult.ok ? (
+        <RecentOrders orders={ordersResult.data} />
       ) : (
-        <section aria-labelledby="recent-inquiries-heading">
+        <section aria-labelledby="recent-orders-heading">
           <h2
-            id="recent-inquiries-heading"
+            id="recent-orders-heading"
             className="font-heading text-base font-bold tracking-tight text-foreground"
           >
-            Recent inquiries
+            Recent orders
           </h2>
           <div className="mt-4">
             <SectionError
-              title="Could not load inquiries"
-              description="We could not load the recent inquiries. Please try again in a moment."
+              title="Could not load orders"
+              description="We could not load the recent orders. Please try again in a moment."
             />
           </div>
         </section>

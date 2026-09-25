@@ -11,6 +11,7 @@ import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Reveal } from "@/components/shared/reveal";
 import { getConfiguredContactChannels } from "@/lib/contact-channels";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 interface JourneyStep {
   title: string;
@@ -27,40 +28,38 @@ interface JourneyStep {
  */
 export function CustomerJourney() {
   const talkChannel = getConfiguredContactChannels()[0];
+  const t = getServerTranslations("bn");
 
-  const steps: JourneyStep[] = [
+  const steps = [
     {
-      title: "Browse Products",
-      description:
-        "Explore the full catalogue and browse by category — sanitary ware, tiles, and building materials.",
+      title: t.customerJourney.steps.browse.title,
+      description: t.customerJourney.steps.browse.description,
       icon: Search,
       href: "/products",
-      cta: "Browse Products",
+      cta: t.customerJourney.steps.browse.cta,
     },
     {
-      title: "Choose Your Product",
-      description:
-        "Open any product to review its photos, description, specifications, and availability.",
+      title: t.customerJourney.steps.choose.title,
+      description: t.customerJourney.steps.choose.description,
       icon: Eye,
       href: "/products",
-      cta: "View the Catalogue",
+      cta: t.customerJourney.steps.choose.cta,
     },
     {
-      title: "Get a Quote",
-      description:
-        "Send the products you need through our quote form and we will confirm the price.",
+      title: t.customerJourney.steps.askPrice.title,
+      description: t.customerJourney.steps.askPrice.description,
       icon: MessageSquare,
-      href: "/request-quote",
-      cta: "Get a Quote",
+      href: "/products",
+      cta: t.customerJourney.steps.askPrice.cta,
     },
     {
-      title: "Talk With Us",
+      title: t.customerJourney.steps.talk.title,
       description: talkChannel
-        ? `After you send your inquiry, continue the conversation through ${talkChannel.label}.`
-        : "After you send your inquiry, take the next step by contacting us directly.",
+        ? t.customerJourney.steps.talk.description.replace("{channel}", talkChannel.label)
+        : t.customerJourney.steps.talk.description.replace("{channel}", t.common.contactUs),
       icon: MessageCircle,
       href: talkChannel?.href ?? "/contact",
-      cta: talkChannel?.label ?? "Contact Us",
+      cta: talkChannel?.label ?? t.customerJourney.steps.talk.cta,
     },
   ];
 
@@ -69,9 +68,9 @@ export function CustomerJourney() {
       <Container>
         <Reveal>
           <SectionHeader
-            eyebrow="How it works"
-            title="Simple Steps From Product to Quote"
-            description="Browse the catalogue, choose what you need, and get a quote — then talk with us to confirm the next step."
+            eyebrow={t.customerJourney.eyebrow}
+            title={t.customerJourney.title}
+            description={t.customerJourney.description}
           />
         </Reveal>
 

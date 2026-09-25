@@ -27,6 +27,7 @@ export default function ContactPage() {
         title="Contact"
         description="Message us on WhatsApp for prices and availability — or call us if that is easier for you."
         breadcrumbs={[{ label: "Contact", href: "/contact" }]}
+        breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
         backgroundImage="/images/contact-hero.png"
         backdropOverlay="bg-[radial-gradient(ellipse_120%_75%_at_50%_-15%,color-mix(in_oklab,var(--navy-dark)_74%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_30%,transparent_72%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_92%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_22%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_40%,transparent)_64%,color-mix(in_oklab,var(--navy-dark)_16%,transparent)_84%,transparent_98%)]"
         objectFit="object-contain"
@@ -61,8 +62,8 @@ export default function ContactPage() {
 
             {!channelsAvailable && (
               <div className="mt-6">
-                <ButtonLink href="/request-quote" variant="primary">
-                  Get a Price
+                <ButtonLink href="/products" variant="primary">
+                  Browse Products
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </ButtonLink>
               </div>
@@ -97,11 +98,11 @@ export default function ContactPage() {
                 will reply with prices for everything.
               </p>
               <ButtonLink
-                href="/request-quote"
+                href="/products"
                 variant="inverse"
                 className="mt-6 w-full sm:w-auto"
               >
-                Get a Price
+                Browse Products
                 <ArrowRight className="size-4" aria-hidden="true" />
               </ButtonLink>
               </div>

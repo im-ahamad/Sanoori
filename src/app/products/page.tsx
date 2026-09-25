@@ -20,11 +20,12 @@ import {
   type PublicCategory,
 } from "@/lib/public/catalogue";
 import { Availability } from "@/generated/prisma/enums";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = generatePageMetadata({
-  title: "Products",
+  title: "পণ্য",
   description:
-    "Browse the Sanoori Trading catalogue — sanitary ware, tiles, and building materials. Search, filter, and order on WhatsApp.",
+    "সানুরি ট্রেডিং ক্যাটালগ ব্রাউজ করুন — স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস। অনুসন্ধান, ফিল্টার করুন এবং ওয়াহটসঅ্যাপে অর্ডার দিন।",
   path: "/products",
 });
 
@@ -59,6 +60,7 @@ function isTruthy(raw: string | undefined): boolean {
 export default async function ProductsPage({
   searchParams,
 }: PageProps<"/products">) {
+  const t = getServerTranslations("bn");
   const params = await searchParams;
 
   const q = firstValue(params.q) || undefined;
@@ -77,7 +79,7 @@ export default async function ProductsPage({
   };
 
   const breadcrumbSchema = JSON.stringify(
-    generateBreadcrumbSchema([{ name: "Products", url: "/products" }])
+    generateBreadcrumbSchema([{ name: t.products.breadcrumb, url: "/products" }])
   );
 
   // Categories are needed for the filter bar before the (~streamed) results.
@@ -86,18 +88,21 @@ export default async function ProductsPage({
   return (
     <main className="flex-1">
       <PageHeader
-        title="Products"
-        description="Search or browse by category. Message us on WhatsApp and we will confirm the price and availability."
-        breadcrumbs={[{ label: "Products", href: "/products" }]}
+        title={t.products.heroTitle}
+        description={t.products.heroDescription}
+        breadcrumbs={[{ label: t.products.breadcrumb, href: "/products" }]}
+        breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
         backgroundImage={
           categorySlug
             ? CATEGORY_HERO_IMAGES[categorySlug]
             : "/images/product-hero.png"
         }
         backdropOverlay={
-          categorySlug
-            ? undefined
-            : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_88%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_76%,transparent)_22%,color-mix(in_oklab,var(--navy-dark)_56%,transparent)_46%,color-mix(in_oklab,var(--navy-dark)_32%,transparent)_66%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_84%,transparent_98%)]"
+          categorySlug === "sanitary-ware" || categorySlug === "tiles" || categorySlug === "building-materials"
+            ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_72%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_42%,transparent)_42%,transparent_88%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_76%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_42%,transparent)_45%,color-mix(in_oklab,var(--navy-dark)_8%,transparent)_70%,transparent_82%,transparent_100%)]"
+            : categorySlug
+            ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_42%,transparent_85%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_40%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_78%,transparent_100%)]"
+            : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_84%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_18%,color-mix(in_oklab,var(--navy-dark)_34%,transparent)_42%,color-mix(in_oklab,var(--navy-dark)_10%,transparent)_68%,transparent_84%,transparent_100%)]"
         }
         objectFit={categorySlug ? undefined : "object-cover"}
         objectPosition={
@@ -108,17 +113,18 @@ export default async function ProductsPage({
         textColor={categorySlug ? "white" : "pureWhite"}
         exactCenter
         className={
-          categorySlug ? undefined : "min-h-[calc(100vw/3)] pb-[4px]"
+          categorySlug ? "pb-24 lg:pb-28" : "min-h-[calc(100vw/3)] pb-[4px]"
         }
       />
 
       <Container>
         <div className="section-spacing">
-          <Suspense fallback={<CatalogueSkeleton />}>
+          <Suspense fallback={<CatalogueSkeleton t={t} />}>
             <CatalogueView
               filters={filters}
               categories={categories}
               page={page}
+              t={t}
             />
           </Suspense>
         </div>
@@ -142,10 +148,12 @@ async function CatalogueView({
   filters,
   categories,
   page,
+  t,
 }: {
   filters: CatalogueFilterValues;
   categories: PublicCategory[];
   page: number;
+  t: ReturnType<typeof getServerTranslations>;
 }) {
   const hasActiveFilters = Boolean(
     filters.q ||
@@ -173,13 +181,13 @@ async function CatalogueView({
 
   return (
     <>
-      <CatalogueFilters categories={categories} values={filters} />
+      <CatalogueFilters categories={categories} values={filters} t={t} />
 
       {showFeaturedSection && (
         <section aria-labelledby="featured-heading" className="mt-12">
           <SectionHeader
-            title="Featured products"
-            description="Some products you can order today."
+            title={t.products.featuredProductsTitle}
+            description={t.products.featuredProductsDescription}
             className="[&>h2]:text-xl sm:[&>h2]:text-2xl"
           />
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
@@ -206,29 +214,27 @@ async function CatalogueView({
                   total: catalogue.total,
                   queryParams: paginationQuery,
                 }}
+                t={t}
               />
             </div>
           </>
         ) : (
           <div className="mt-4 rounded-lg border border-dashed border-border py-16">
             <EmptyState
-              title="No products found"
+              title={t.products.noProductsTitle}
               description={
                 hasActiveFilters
-                  ? "Nothing matches your search and filters. Try a different search or clear some filters."
-                  : "Products will appear here as we add them. Tell us what you need and we will find it for you."
+                  ? t.products.noProductsWithFilters
+                  : t.products.noProductsEmpty
               }
               icon={<PackageSearch className="size-8 text-muted-foreground" />}
             />
             <div className="flex flex-col items-center gap-3 pb-6 sm:flex-row sm:justify-center">
               {hasActiveFilters && (
                 <ButtonLink href="/products" variant="outline">
-                  Clear all filters
+                  {t.products.clearFilters}
                 </ButtonLink>
               )}
-              <ButtonLink href="/request-quote">
-                Get a Price
-              </ButtonLink>
             </div>
           </div>
         )}
@@ -237,9 +243,9 @@ async function CatalogueView({
   );
 }
 
-function CatalogueSkeleton() {
+function CatalogueSkeleton({ t }: { t: ReturnType<typeof getServerTranslations> }) {
   return (
-    <div aria-busy="true" aria-label="Loading products">
+    <div aria-busy="true" aria-label={t.products.loadingProducts}>
       <Skeleton className="h-44 w-full rounded-lg" />
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
         {Array.from({ length: 6 }).map((_, index) => (

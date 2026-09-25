@@ -3,6 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme/theme-provider";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 interface ThemeToggleProps {
   variant?: "header" | "panel";
@@ -15,19 +16,20 @@ export function ThemeToggle({
 }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
+  const t = useTranslations();
 
-  const ariaLabel = isDark ? "Switch to light mode" : "Switch to dark mode";
-  const title = isDark ? "Light mode" : "Dark mode";
+  const ariaLabel = isDark ? t.themeToggle.switchToLight : t.themeToggle.switchToDark;
+  const title = isDark ? t.themeToggle.light : t.themeToggle.dark;
 
   if (variant === "panel") {
     return (
       <div
         className={cn("flex items-center gap-3", className)}
         role="group"
-        aria-label="Theme"
+        aria-label={t.themeToggle.label}
       >
         <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Theme
+          {t.themeToggle.label}
         </span>
         <button
           type="button"
@@ -48,7 +50,7 @@ export function ThemeToggle({
               <Moon className="size-4" aria-hidden="true" />
             )}
           </span>
-          {isDark ? "Dark" : "Light"}
+          {isDark ? t.themeToggle.dark : t.themeToggle.light}
         </button>
       </div>
     );

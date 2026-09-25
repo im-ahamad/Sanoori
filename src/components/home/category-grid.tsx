@@ -2,9 +2,11 @@ import { Container } from "@/components/layout/container";
 import { getPublicCategories } from "@/lib/public/catalogue";
 import { CategoryCard } from "@/components/products/category-card";
 import { Reveal } from "@/components/shared/reveal";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 export async function CategoryGrid() {
   const categories = await getPublicCategories();
+  const t = getServerTranslations("bn");
 
   return (
     <section className="bg-background py-20 sm:py-28">
@@ -15,19 +17,17 @@ export async function CategoryGrid() {
             <Reveal>
               <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-gold">
                 <span className="h-px w-8 bg-gold/60" aria-hidden="true" />
-                Explore Categories
+                {t.categoryGrid.eyebrow}
               </p>
-              <h2 className="mt-3 font-heading font-semibold tracking-tight text-foreground clamp-text-3xl-5xl">
-                Find What Your Space Needs
+              <h2 className="mt-3 font-heading font-bold leading-tight tracking-tight text-foreground clamp-text-3xl-5xl">
+                {t.categoryGrid.title}
               </h2>
             </Reveal>
           </div>
           <div className="lg:col-span-7 lg:pl-12">
             <Reveal delay={0.1}>
               <p className="max-w-[38rem] text-base leading-relaxed text-muted-foreground sm:text-lg">
-                From sanitary ware and tiles to core building materials, our
-                catalogue covers every surface and system. Browse by category to
-                discover products that match your project&apos;s requirements.
+                {t.categoryGrid.description}
               </p>
             </Reveal>
           </div>

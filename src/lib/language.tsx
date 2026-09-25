@@ -13,11 +13,8 @@ import {
 /**
  * Minimal extensible language state.
  *
- * - Default is English ("en") — current website language.
- * - "bn" (বাংলা) is a persisted selection state; actual Bengali
- *   translations are intentionally NOT shipped yet. The architecture
- *   is ready for dictionaries (e.g. src/lib/i18n/dictionaries/*) to
- *   be plugged in later without a second system.
+ * - Default is Bangla ("bn") — primary language for Bangladeshi users.
+ * - "en" (English) is a persisted selection state for international users.
  * - Persisted in localStorage; <html lang> is updated client-side.
  */
 
@@ -45,7 +42,7 @@ function isSupportedLanguage(value: string | null): value is SupportedLanguage {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<SupportedLanguage>("en");
+  const [language, setLanguageState] = useState<SupportedLanguage>("bn");
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -53,9 +50,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setLanguageState(stored);
       document.documentElement.lang = languageMeta[stored].htmlLang;
     } else {
-      // Respect existing <html lang> from server (en) on first load.
+      // Default to Bangla for Bangladeshi users on first load
       const current = document.documentElement.lang;
-      if (current === "bn") setLanguageState("bn");
+      if (current === "en") setLanguageState("en");
     }
   }, []);
 

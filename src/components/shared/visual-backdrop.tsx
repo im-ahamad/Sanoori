@@ -82,23 +82,25 @@ export function VisualBackdrop({
         className
       )}
     >
-      <Image
-        src={src ?? WEBSITE_VISUAL}
-        alt=""
-        fill
-        sizes="100vw"
-        quality={quality}
-        priority={priority}
-        unoptimized={unoptimized}
-        placeholder={priority && !unoptimized ? "blur" : "empty"}
-        blurDataURL={WEBSITE_VISUAL_BLUR}
-        className={cn(
-          objectFit,
-          objectPosition,
-          imageClassName,
-          noZoom ? undefined : zoomClass
-        )}
-      />
+      <div className="relative w-full h-full" style={{ overflow: "hidden" }}>
+        <Image
+          src={src ?? WEBSITE_VISUAL}
+          alt=""
+          fill
+          sizes="100vw"
+          quality={quality}
+          priority={priority}
+          unoptimized={unoptimized}
+          placeholder={priority && !unoptimized ? "blur" : "empty"}
+          blurDataURL={WEBSITE_VISUAL_BLUR}
+          className={cn(
+            objectFit,
+            objectPosition,
+            imageClassName,
+            noZoom ? undefined : zoomClass
+          )}
+        />
+      </div>
       <div
         className={cn(
           "absolute inset-0",

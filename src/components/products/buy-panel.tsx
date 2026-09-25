@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Minus, MessageCircle, Phone, Plus } from "lucide-react";
+import { ArrowRight, MessageCircle, Minus, Phone, Plus } from "lucide-react";
 import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
 
 export interface BuyContactChannel {
@@ -27,8 +27,9 @@ const QUANTITY_MAX = 9999;
 
 /**
  * The main buying action. Opens WhatsApp with the product name, code, quantity
- * and page link already in the message. Falls back to the short price-request
- * form when WhatsApp is not configured yet. No cart, no checkout.
+ * and page link already in the message when the business number is configured.
+ * Otherwise it links to the product-specific "Ask for Price" request page with
+ * this product pre-filled. No cart, no checkout.
  */
 export function BuyPanel({
   productName,
@@ -49,10 +50,6 @@ export function BuyPanel({
   });
 
   const requestHref = `/request-quote?product=${productSlug}`;
-  const primaryHref = whatsapp?.url ?? requestHref;
-  const primaryLabel = whatsapp
-    ? "Get Price on WhatsApp"
-    : "Get a Price";
 
   function clamp(value: number): number {
     if (Number.isNaN(value)) return QUANTITY_MIN;
@@ -65,21 +62,26 @@ export function BuyPanel({
     setQuantity(clamp(parsed));
   }
 
-  const primaryButton = (extraClassName: string, textClassName: string) => (
-    <a
-      href={primaryHref}
-      {...(whatsapp ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      aria-label={whatsapp ? `Get the price of ${productName} on WhatsApp` : `Get the price of ${productName}`}
-      className={
-        whatsapp
-          ? `inline-flex h-13 items-center justify-center gap-2 rounded-md bg-[#25D366] px-6 text-base font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 ${extraClassName}`
-          : `inline-flex h-13 items-center justify-center gap-2 rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${extraClassName}`
-      }
-    >
-      <MessageCircle className="size-5" aria-hidden="true" />
-      <span className={textClassName}>{primaryLabel}</span>
-    </a>
-  );
+  const primaryButton = (extraClassName: string) =>
+    whatsapp ? (
+      <a
+        href={whatsapp.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Get the price of ${productName} on WhatsApp`}
+        className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-[#25D366] px-6 text-base font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 ${extraClassName}`}
+      >
+        <MessageCircle className="size-5" aria-hidden="true" />
+        <span>Get Price on WhatsApp</span>
+      </a>
+    ) : (
+      <Link
+        href={requestHref}
+        className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${extraClassName}`}
+      >
+        <span>Ask for Price</span>
+      </Link>
+    );
 
   return (
     <>
@@ -138,7 +140,7 @@ export function BuyPanel({
         </div>
 
         {/* Primary action */}
-        {primaryButton("w-full", "")}
+        {primaryButton("w-full")}
 
         {whatsapp && (
           <p className="text-xs leading-relaxed text-muted-foreground">
@@ -179,7 +181,7 @@ export function BuyPanel({
       {/* Mobile sticky action bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur md:hidden">
         <div className="grid grid-cols-1 gap-2">
-          {primaryButton("w-full", "")}
+          {primaryButton("w-full")}
           {phoneChannel && (
             <a
               href={phoneChannel.href}

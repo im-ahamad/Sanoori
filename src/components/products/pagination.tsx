@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 export interface PaginationState {
   page: number;
@@ -23,15 +24,13 @@ function buildHref(queryParams: Record<string, string>, page: number): string {
  * Server-rendered pagination. Always carries the active search/filter query so
  * navigating pages never loses the user's context.
  */
-export function Pagination({ state }: { state: PaginationState }) {
+export function Pagination({ state, t }: { state: PaginationState; t: ReturnType<typeof getServerTranslations> }) {
   const { page, totalPages, total, queryParams } = state;
 
   if (totalPages <= 1) {
     return (
       <p className="text-center text-sm text-muted-foreground">
-        Showing{" "}
-        <span className="font-semibold text-foreground">{total}</span>{" "}
-        {total === 1 ? "product" : "products"}
+        {t.products.showingProducts.replace("{total}", total.toString()).replace("{product|products}", total === 1 ? t.products.product : t.products.products)}
       </p>
     );
   }
@@ -44,10 +43,10 @@ export function Pagination({ state }: { state: PaginationState }) {
         <PageButton
           href={buildHref(queryParams, page - 1)}
           disabled={page <= 1}
-          label="Previous page"
+          label={t.products.previousPage}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
-          <span className="hidden sm:inline">Previous</span>
+          <span className="hidden sm:inline">{t.products.previous}</span>
         </PageButton>
 
         {pages.map((item, index) =>
@@ -56,7 +55,7 @@ export function Pagination({ state }: { state: PaginationState }) {
               key={item.value}
               href={buildHref(queryParams, Number(item.value))}
               aria-current={item.value === page ? "page" : undefined}
-              aria-label={`Page ${item.value}`}
+              aria-label={`${t.products.pageOf.split("·")[0].trim().replace("{page}", String(item.value)).replace("{totalPages}", String(totalPages))} ${item.value}`}
               className={cn(
                 "inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 item.value === page
@@ -80,18 +79,19 @@ export function Pagination({ state }: { state: PaginationState }) {
         <PageButton
           href={buildHref(queryParams, page + 1)}
           disabled={page >= totalPages}
-          label="Next page"
+          label={t.products.nextPage}
         >
-          <span className="hidden sm:inline">Next</span>
+          <span className="hidden sm:inline">{t.products.next}</span>
           <ChevronRight className="size-4" aria-hidden="true" />
         </PageButton>
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Page{" "}
-        <span className="font-semibold text-foreground">{page}</span> of{" "}
-        <span className="font-semibold text-foreground">{totalPages}</span> ·{" "}
-        {total} {total === 1 ? "product" : "products"}
+        {t.products.pageOf
+          .replace("{page}", page.toString())
+          .replace("{totalPages}", totalPages.toString())
+          .replace("{total}", total.toString())
+          .replace("{product|products}", total === 1 ? t.products.product : t.products.products)}
       </p>
     </nav>
   );

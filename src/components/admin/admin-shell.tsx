@@ -62,7 +62,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
         const Icon = item.icon;
         return (
           <Link
-            key={item.href}
+            key={`admin-${item.href}`}
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}

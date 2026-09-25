@@ -1,23 +1,16 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
-import type { AdminInquiryList } from "@/lib/admin/inquiries";
-import { inquirySourceLabel } from "@/lib/inquiries";
+import type { CustomerList } from "@/lib/admin/customers";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
-import { InquiryContactActions } from "@/components/admin/inquiry-contact-actions";
-
-function buildWhatsAppMessage(customerName: string): string {
-  return `Hello ${customerName}, this is Sanoori Trading following up on your inquiry.`;
-}
 
 interface PaginationProps {
-  data: AdminInquiryList;
+  data: CustomerList;
   query: string;
 }
 
-function InquiryPagination({ data, query }: PaginationProps) {
+function CustomerPagination({ data, query }: PaginationProps) {
   const { page, totalPages, total, pageSize } = data;
   if (total === 0) return null;
 
@@ -32,16 +25,16 @@ function InquiryPagination({ data, query }: PaginationProps) {
       params.set("page", String(targetPage));
     }
     const search = params.toString();
-    return search ? `/admin/inquiries?${search}` : "/admin/inquiries";
+    return search ? `/admin/customers?${search}` : "/admin/customers";
   };
 
   return (
     <nav
-      aria-label="Inquiry pagination"
+      aria-label="Customer pagination"
       className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-xs text-muted-foreground">
-        Showing {start}–{end} of {total.toLocaleString()} inquiries
+        Showing {start}–{end} of {total.toLocaleString()} customers
       </p>
       <div className="flex items-center gap-3">
         <p className="text-xs text-muted-foreground">
@@ -78,12 +71,12 @@ function InquiryPagination({ data, query }: PaginationProps) {
   );
 }
 
-interface InquiryTableProps {
-  data: AdminInquiryList;
+interface CustomerTableProps {
+  data: CustomerList;
   query: string;
 }
 
-export function InquiryTable({ data, query }: InquiryTableProps) {
+export function CustomerTable({ data, query }: CustomerTableProps) {
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
@@ -97,22 +90,16 @@ export function InquiryTable({ data, query }: InquiryTableProps) {
                     Customer
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    Phone
+                    WhatsApp / IMO
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
-                    Product
+                    Email
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-right">
+                    Orders
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Qty
-                  </th>
-                  <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    Source
-                  </th>
-                  <th scope="col" className="px-4 py-3 font-semibold">
-                    Status
-                  </th>
-                  <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Received
+                    Last Order
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
                     Actions
@@ -120,56 +107,37 @@ export function InquiryTable({ data, query }: InquiryTableProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {data.items.map((inquiry) => (
+                {data.items.map((customer) => (
                   <tr
-                    key={inquiry.id}
+                    key={customer.phone}
                     className="align-middle transition-colors hover:bg-muted/30"
                   >
                     <td className="px-4 py-3">
                       <Link
-                        href={`/admin/inquiries/${inquiry.id}`}
+                        href={`/admin/customers/${encodeURIComponent(customer.phone)}`}
                         className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                       >
-                        {inquiry.customerName}
+                        {customer.name}
                       </Link>
-                      {inquiry.email ? (
-                        <p className="mt-0.5 max-w-56 truncate text-xs text-muted-foreground">
-                          {inquiry.email}
-                        </p>
-                      ) : null}
                     </td>
                     <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground md:table-cell">
-                      {inquiry.phone}
+                      {customer.phone}
                     </td>
                     <td className="hidden max-w-56 px-4 py-3 lg:table-cell">
                       <span className="line-clamp-1 text-muted-foreground">
-                        {inquiry.productName ?? "—"}
+                        {customer.email ?? "—"}
                       </span>
                     </td>
-                    <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground xl:table-cell">
-                      {inquiry.quantity?.toLocaleString() ?? "—"}
-                    </td>
-                    <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground md:table-cell">
-                      {inquirySourceLabel(inquiry.source)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <InquiryStatusBadge status={inquiry.status} />
+                    <td className="px-4 py-3 text-right font-medium">
+                      {customer.totalOrders}
                     </td>
                     <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground xl:table-cell">
-                      {formatDate(inquiry.createdAt)}
+                      {formatDate(customer.lastOrderAt)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <InquiryContactActions
-                          phone={inquiry.phone}
-                          email={inquiry.email}
-                          whatsappMessage={buildWhatsAppMessage(
-                            inquiry.customerName
-                          )}
-                          compact
-                        />
                         <Link
-                          href={`/admin/inquiries/${inquiry.id}`}
+                          href={`/admin/customers/${encodeURIComponent(customer.phone)}`}
                           className={buttonVariants({
                             variant: "ghost",
                             size: "sm",
@@ -188,62 +156,51 @@ export function InquiryTable({ data, query }: InquiryTableProps) {
 
           {/* Mobile/tablet cards */}
           <ul className="divide-y divide-border lg:hidden">
-            {data.items.map((inquiry) => (
-              <li key={inquiry.id} className="p-4">
+            {data.items.map((customer) => (
+              <li key={customer.phone} className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <Link
-                      href={`/admin/inquiries/${inquiry.id}`}
+                      href={`/admin/customers/${encodeURIComponent(customer.phone)}`}
                       className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                     >
-                      {inquiry.customerName}
+                      {customer.name}
                     </Link>
-                    {inquiry.email ? (
-                      <p className="mt-0.5 max-w-56 truncate text-xs text-muted-foreground">
-                        {inquiry.email}
-                      </p>
-                    ) : null}
                     <p className="mt-0.5 text-xs text-muted-foreground/80">
-                      {inquiry.phone}
+                      {customer.phone}
                     </p>
+                    {customer.email && (
+                      <p className="mt-0.5 max-w-56 truncate text-xs text-muted-foreground">
+                        {customer.email}
+                      </p>
+                    )}
                   </div>
-                  <InquiryStatusBadge status={inquiry.status} />
+                  <span className="font-medium text-foreground">{customer.totalOrders}</span>
                 </div>
 
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {inquiry.productName
-                    ? `Product: ${inquiry.productName}`
-                    : "No product selected"}
-                  {inquiry.quantity ? ` · Qty ${inquiry.quantity.toLocaleString()}` : ""}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground/80">
-                  {inquirySourceLabel(inquiry.source)} ·{" "}
-                  {formatDate(inquiry.createdAt)}
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Last order: {formatDate(customer.lastOrderAt)}
                 </p>
 
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <InquiryContactActions
-                    phone={inquiry.phone}
-                    email={inquiry.email}
-                    whatsappMessage={buildWhatsAppMessage(inquiry.customerName)}
-                    compact
-                  />
+                <div className="mt-3 flex items-center justify-end">
                   <Button
                     variant="outline"
                     size="sm"
                     render={
-                      <Link href={`/admin/inquiries/${inquiry.id}`} />
+                      <Link
+                        href={`/admin/customers/${encodeURIComponent(customer.phone)}`}
+                      />
                     }
                   >
                     <Eye className="size-3.5" aria-hidden="true" />
-                    View inquiry
+                    View customer
                   </Button>
                 </div>
               </li>
             ))}
           </ul>
 
-          <InquiryPagination data={data} query={query} />
+          <CustomerPagination data={data} query={query} />
         </>
       ) : null}
     </div>

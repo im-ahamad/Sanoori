@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Phone, X } from "lucide-react";
-import { navigationConfig, businessConfig, siteConfig } from "@/config/site";
+import { businessConfig, siteConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
 import { Button } from "@/components/ui/button";
 import { Brand } from "@/components/shared/brand";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LanguageToggle } from "@/components/language/language-toggle";
+import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface MobileNavProps {
@@ -21,6 +22,20 @@ interface MobileNavProps {
 export function MobileNav({ open, onClose }: MobileNavProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const t = useTranslations();
+
+  const navigationConfig = {
+    main: [
+      { label: t.mobileNav.navigation.home, href: "/" },
+      { label: t.mobileNav.navigation.about, href: "/about" },
+      { label: t.mobileNav.navigation.products, href: "/products" },
+      { label: t.mobileNav.navigation.contact, href: "/contact" },
+    ] as const,
+    cta: {
+      label: t.mobileNav.cta,
+      href: "/products",
+    },
+  } as const;
 
   useEffect(() => {
     if (open) {
@@ -113,7 +128,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         )}
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label={t.mobileNav.ariaLabel}
         aria-hidden={!open}
       >
         {/* Brand accent line */}
@@ -124,7 +139,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           <Link
             href="/"
             onClick={onClose}
-            aria-label={`${businessConfig.name} — Home`}
+            aria-label={t.mobileNav.brandHome.replace("{name}", businessConfig.name)}
             className="flex items-center"
           >
             <Brand size="sm" />
@@ -134,7 +149,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             size="icon"
             className="size-10"
             onClick={onClose}
-            aria-label="Close menu"
+            aria-label={t.mobileNav.closeMenu}
           >
             <X className="size-5" aria-hidden="true" />
           </Button>
@@ -152,12 +167,12 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Mobile navigation">
+        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label={t.mobileNav.ariaLabel}>
           <ul className="space-y-1">
             {navigationConfig.main.map((item) => {
               const active = isActive(item.href);
               return (
-                <li key={item.href}>
+                <li key={`mobile-${item.href}`}>
                   <Link
                     href={item.href}
                     onClick={onClose}
@@ -202,7 +217,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                   className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                 >
                   <MessageCircle className="size-4" aria-hidden="true" />
-                  WhatsApp
+                  {t.mobileNav.whatsapp}
                 </a>
               )}
               {showPhone && (
@@ -217,7 +232,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             </div>
           )}
           <p className="text-center text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            {siteConfig.tagline}
+            {t.mobileNav.tagline}
           </p>
         </div>
       </div>

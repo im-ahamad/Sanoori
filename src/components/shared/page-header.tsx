@@ -43,6 +43,9 @@ interface PageHeaderProps {
   /** Override the vertical top inset for the "top-left" placement. Defaults
    * to the standard "pt-16 sm:pt-20 lg:pt-24" padding (used by About). */
   topPadding?: string;
+  /** Extra classes for the breadcrumb link/crumb text (font size, etc.).
+   * Applied to the crumb text while keeping its existing color and spacing. */
+  breadcrumbLinkClassName?: string;
   className?: string;
 }
 
@@ -63,6 +66,7 @@ export function PageHeader({
   placement = "center",
   exactCenter = false,
   topPadding,
+  breadcrumbLinkClassName,
   textColor,
   className,
 }: PageHeaderProps) {
@@ -136,6 +140,7 @@ export function PageHeader({
         overlayClassName={backdropOverlay}
         objectFit={objectFit}
         objectPosition={objectPosition}
+        priority
         unoptimized={unoptimized}
         noZoom={noZoom}
         className={backdropClassName}
@@ -175,24 +180,26 @@ export function PageHeader({
                             ? toneClass.hover
                             : navyText
                               ? "hover:text-navy-dark"
-                              : "hover:text-gold-light"
+                              : "hover:text-gold-light",
+                          breadcrumbLinkClassName
                         )}
                       >
                         Home
                       </Link>
                     </li>
                     {breadcrumbs.map((crumb, index) => (
-                      <li key={crumb.href} className="flex items-center gap-1.5">
+                      <li key={`breadcrumb-${crumb.href}`} className="flex items-center gap-1.5">
                         <span aria-hidden="true">/</span>
                         {index === breadcrumbs.length - 1 ? (
                           <span
-                            className={
+                            className={cn(
                               textColor
                                 ? toneClass.current
                                 : navyText
                                   ? "text-navy-dark"
-                                  : "text-gold-light"
-                            }
+                                  : "text-gold-light",
+                              breadcrumbLinkClassName
+                            )}
                           >
                             {crumb.label}
                           </span>
@@ -203,7 +210,8 @@ export function PageHeader({
                               "transition-colors",
                               textColor
                                 ? toneClass.hover
-                                : "hover:text-gold-light"
+                                : "hover:text-gold-light",
+                              breadcrumbLinkClassName
                             )}
                           >
                             {crumb.label}
@@ -282,23 +290,33 @@ export function PageHeader({
                     href="/"
                     className={cn(
                       "transition-colors",
-                      toneClass.hover
+                      toneClass.hover,
+                      breadcrumbLinkClassName
                     )}
                   >
                     Home
                   </Link>
                 </li>
                 {breadcrumbs.map((crumb, index) => (
-                  <li key={crumb.href} className="flex items-center gap-1.5">
+                  <li key={`breadcrumb-${crumb.href}`} className="flex items-center gap-1.5">
                     <span aria-hidden="true">/</span>
                     {index === breadcrumbs.length - 1 ? (
-                      <span className={toneClass.current}>
+                      <span
+                        className={cn(
+                          toneClass.current,
+                          breadcrumbLinkClassName
+                        )}
+                      >
                         {crumb.label}
                       </span>
                     ) : (
                       <Link
                         href={crumb.href}
-                        className={cn("transition-colors", toneClass.hover)}
+                        className={cn(
+                          "transition-colors",
+                          toneClass.hover,
+                          breadcrumbLinkClassName
+                        )}
                       >
                         {crumb.label}
                       </Link>

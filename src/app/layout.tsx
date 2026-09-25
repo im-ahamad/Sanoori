@@ -4,6 +4,7 @@ import { SiteChrome } from "@/components/layout/site-chrome";
 import { Footer } from "@/components/layout/footer";
 import { Providers } from "@/components/providers";
 import { themeScript } from "@/components/theme/theme-script";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,10 +22,13 @@ const dmSans = DM_Sans({
 export const metadata = generateSiteMetadata();
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const t = getServerTranslations("bn");
+
   return (
     <html
-      lang="en"
+      lang="bn"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
@@ -44,7 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
         >
-          Skip to main content
+          {t.layout.skipToMainContent}
         </a>
         <Providers>
           <SiteChrome footer={<Footer />}>{children}</SiteChrome>

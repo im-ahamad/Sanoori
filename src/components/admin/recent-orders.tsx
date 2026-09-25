@@ -1,31 +1,27 @@
 import Link from "next/link";
 import { ArrowRight, Inbox } from "lucide-react";
-import type { RecentInquiry } from "@/lib/admin/dashboard";
+import type { RecentOrder } from "@/lib/admin/dashboard";
 import { EmptyState } from "@/components/shared/empty-state";
 import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
-import { formatInquiryDate, inquirySourceLabel } from "@/lib/inquiries";
+import { formatInquiryDate } from "@/lib/inquiries";
 
 function formatDate(date: Date): string {
   return formatInquiryDate(date);
 }
 
-function formatSource(source: string): string {
-  return inquirySourceLabel(source);
-}
-
-export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
-  if (inquiries.length === 0) {
+export function RecentOrders({ orders }: { orders: RecentOrder[] }) {
+  if (orders.length === 0) {
     return (
-      <section aria-labelledby="recent-inquiries-heading">
+      <section aria-labelledby="recent-orders-heading">
         <h2
-          id="recent-inquiries-heading"
+          id="recent-orders-heading"
           className="font-heading text-base font-bold tracking-tight text-foreground"
         >
-          Recent inquiries
+          Recent orders
         </h2>
         <div className="mt-4 rounded-lg border border-border bg-background">
           <EmptyState
-            title="No inquiries yet"
+            title="No orders yet"
             description="When customers submit a quote request, it will show up here."
             icon={<Inbox className="size-8 text-muted-foreground" />}
           />
@@ -35,16 +31,16 @@ export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
   }
 
   return (
-    <section aria-labelledby="recent-inquiries-heading">
+    <section aria-labelledby="recent-orders-heading">
       <div className="flex items-center justify-between gap-3">
         <h2
-          id="recent-inquiries-heading"
+          id="recent-orders-heading"
           className="font-heading text-base font-bold tracking-tight text-foreground"
         >
-          Recent inquiries
+          Recent orders
         </h2>
         <Link
-          href="/admin/inquiries"
+          href="/admin/orders"
           className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
         >
           View all
@@ -64,7 +60,7 @@ export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
                 Product
               </th>
               <th scope="col" className="hidden px-4 py-3 font-semibold sm:table-cell">
-                Source
+                Qty
               </th>
               <th scope="col" className="px-4 py-3 font-semibold">
                 Status
@@ -75,35 +71,35 @@ export function RecentInquiries({ inquiries }: { inquiries: RecentInquiry[] }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {inquiries.map((inquiry) => (
+            {orders.map((order) => (
               <tr
-                key={inquiry.id}
+                key={order.id}
                 className="transition-colors hover:bg-muted/30"
               >
                 <td className="px-4 py-3">
                   <Link
-                    href={`/admin/inquiries/${inquiry.id}`}
+                    href={`/admin/orders/${order.id}`}
                     className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
-                    {inquiry.customerName}
+                    {order.customerName}
                   </Link>
                   <p className="text-xs text-muted-foreground lg:hidden">
-                    {formatDate(inquiry.createdAt)}
+                    {formatDate(order.createdAt)}
                   </p>
                 </td>
                 <td className="hidden max-w-56 px-4 py-3 text-muted-foreground md:table-cell">
                   <span className="line-clamp-1">
-                    {inquiry.productName ?? "—"}
+                    {order.productName ?? "—"}
                   </span>
                 </td>
-                <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
-                  {formatSource(inquiry.source)}
+                <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground sm:table-cell">
+                  {order.quantity?.toLocaleString() ?? "—"}
                 </td>
                 <td className="px-4 py-3">
-                  <InquiryStatusBadge status={inquiry.status} />
+                  <InquiryStatusBadge status={order.status} />
                 </td>
                 <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground lg:table-cell">
-                  {formatDate(inquiry.createdAt)}
+                  {formatDate(order.createdAt)}
                 </td>
               </tr>
             ))}

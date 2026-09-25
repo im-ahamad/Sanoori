@@ -37,7 +37,7 @@ export default function ProductsError({
             <ButtonLink href="/products" variant="primary">
               Try again
             </ButtonLink>
-            <ButtonLink href="/request-quote" variant="outline">
+            <ButtonLink href="/contact" variant="outline">
               Contact us instead
             </ButtonLink>
           </div>

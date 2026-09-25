@@ -1,10 +1,17 @@
-import { Check, Clock, FileText, LineChart, MessageCircle } from "lucide-react";
+import { ArrowRight, Check, Clock, MessageCircle, Package } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
-import { InquiryForm } from "@/components/contact/inquiry-form";
+import { ProductRequestForm } from "@/components/products/product-request-form";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
-import { getPublicProductOptions } from "@/lib/public/catalogue";
+import {
+  getPublicProductBySlug,
+  getPublicProductOptions,
+  heroImageUrl,
+} from "@/lib/public/catalogue";
 import { generatePageMetadata } from "@/lib/seo";
+import { notFound, redirect } from "next/navigation";
 
 export const metadata = generatePageMetadata({
   title: "Get a Price",
@@ -13,43 +20,28 @@ export const metadata = generatePageMetadata({
   path: "/request-quote",
 });
 
-const helpfulDetails = [
-  {
-    icon: FileText,
-    title: "Which products you need",
-    description:
-      "For example: wall tiles, a commode, or a full bathroom set.",
-  },
-  {
-    icon: LineChart,
-    title: "Quantity",
-    description:
-      "An approximate quantity helps us give you an accurate price.",
-  },
-  {
-    icon: Check,
-    title: "Sizes or colours",
-    description:
-      "Sizes, finishes, or colours you want. Send what you know and we will fill the gaps.",
-  },
-];
-
 export default async function RequestQuotePage({
   searchParams,
 }: PageProps<"/request-quote">) {
   const { product } = await searchParams;
   const requestedSlug = typeof product === "string" ? product.trim() : "";
 
+  if (!requestedSlug) {
+    redirect("/products");
+  }
+
   const [productOptions, whatsappHref] = await Promise.all([
     getPublicProductOptions(),
     buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE),
   ]);
 
-  const initialProductSlug =
-    requestedSlug &&
-    productOptions.some((option) => option.slug === requestedSlug)
-      ? requestedSlug
-      : "";
+  const productDetail = productOptions.some((option) => option.slug === requestedSlug)
+    ? await getPublicProductBySlug(requestedSlug)
+    : null;
+
+  if (!productDetail) {
+    notFound();
+  }
 
   return (
     <main className="flex-1">
@@ -61,6 +53,50 @@ export default async function RequestQuotePage({
 
       <Container>
         <div className="section-spacing grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-12">
+          <div className="lg:col-span-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex flex-col gap-6 p-6 sm:p-8 md:flex-row md:items-center">
+              {productDetail.primaryImage ? (
+                <Image
+                  src={heroImageUrl(productDetail.primaryImage.url)}
+                  alt={productDetail.primaryImage.alt ?? productDetail.name}
+                  width={320}
+                  height={240}
+                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 320px"
+                  className="h-48 w-full flex-shrink-0 rounded-lg bg-muted object-cover md:h-40 md:w-72"
+                />
+              ) : (
+                <span className="flex h-48 w-full flex-shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground md:h-40 md:w-72">
+                  <Package className="size-10" aria-hidden="true" />
+                </span>
+              )}
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-dark">
+                  You are requesting a price for
+                </p>
+                <h1
+                  id="request-quote-product-title"
+                  className="mt-2 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+                >
+                  {productDetail.name}
+                </h1>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  {productDetail.categoryName}
+                  {productDetail.productCode
+                    ? ` · Model: ${productDetail.productCode}`
+                    : ""}
+                </p>
+                <Link
+                  href={`/products/${productDetail.slug}`}
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  View product details
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <div className="lg:col-span-2">
             {whatsappHref && (
               <a
@@ -87,7 +123,20 @@ export default async function RequestQuotePage({
               Helpful to include
             </h2>
             <ul className="mt-6 space-y-6">
-              {helpfulDetails.map((item) => (
+              {[
+                {
+                  icon: Package,
+                  title: "Quantity",
+                  description:
+                    "An approximate quantity helps us give you an accurate price.",
+                },
+                {
+                  icon: Check,
+                  title: "Sizes or colours",
+                  description:
+                    "Sizes, finishes, or colours you want. Send what you know and we will fill the gaps.",
+                },
+              ].map((item) => (
                 <li key={item.title} className="flex items-start gap-4">
                   <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
                     <item.icon className="size-4" strokeWidth={2} aria-hidden="true" />
@@ -103,11 +152,6 @@ export default async function RequestQuotePage({
                 </li>
               ))}
             </ul>
-
-            <p className="mt-8 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Not sure which product you need? Send what you know and we will
-              help you choose.
-            </p>
 
             <div className="mt-10 rounded-lg border border-border bg-card p-6">
               <h2 className="font-heading text-base font-semibold text-foreground">
@@ -149,9 +193,19 @@ export default async function RequestQuotePage({
                 Fill in the short form and we will send you the prices.
               </p>
               <div className="mt-6">
-                <InquiryForm
-                  productOptions={productOptions}
-                  initialProductSlug={initialProductSlug}
+                <ProductRequestForm
+                  product={{
+                    slug: productDetail.slug,
+                    name: productDetail.name,
+                    model: productDetail.productCode,
+                    categoryName: productDetail.categoryName,
+                    image: productDetail.primaryImage
+                      ? {
+                          url: heroImageUrl(productDetail.primaryImage.url),
+                          alt: productDetail.primaryImage.alt,
+                        }
+                      : null,
+                  }}
                   whatsappHref={whatsappHref}
                 />
               </div>

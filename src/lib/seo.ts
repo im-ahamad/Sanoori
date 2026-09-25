@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { siteConfig, businessConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 type OpenGraphImage = {
   url: string;
@@ -145,25 +146,26 @@ export function generateProductSchema(product: {
  * adding an explicit canonical URL and Open Graph page URL.
  */
 export function generateHomeMetadata(): Metadata {
+  const t = getServerTranslations("bn");
   const rootUrl = `${siteConfig.url}/`;
-  const title = `${siteConfig.name} — ${siteConfig.tagline}`;
+  const title = t.seo.homeTitle;
 
   return {
     title,
-    description: siteConfig.description,
+    description: t.seo.homeDescription,
     alternates: { canonical: rootUrl },
     openGraph: {
       type: "website",
-      locale: "en_US",
+      locale: "bn_BD",
       url: rootUrl,
       siteName: siteConfig.name,
       title,
-      description: siteConfig.description,
+      description: t.seo.homeDescription,
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: siteConfig.description,
+      description: t.seo.homeDescription,
     },
   };
 }
@@ -211,7 +213,7 @@ export function generateOrganizationSchema() {
             "@type": "ContactPoint",
             telephone: businessConfig.phone,
             contactType: "customer service",
-            availableLanguage: "English",
+            availableLanguage: ["English", "Bengali"],
           },
         }
       : {}),

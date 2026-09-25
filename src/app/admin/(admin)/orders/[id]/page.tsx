@@ -7,7 +7,7 @@ import {
   ChevronLeft,
   PackageSearch,
 } from "lucide-react";
-import { getAdminInquiryDetail } from "@/lib/admin/inquiries";
+import { getAdminOrderDetail } from "@/lib/admin/order-detail";
 import {
   formatInquiryDate,
   inquirySourceLabel,
@@ -23,21 +23,19 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
-  title: "Inquiry",
+  title: "Order",
 };
 
 function buildWhatsAppMessage(
   customerName: string,
   productName: string | null
 ): string {
-  const productPart = productName
-    ? ` for ${productName}`
-    : "";
+  const productPart = productName ? ` for ${productName}` : "";
   return `Hello ${customerName}, this is Sanoori Trading regarding your inquiry${productPart}. Could we discuss your requirements?`;
 }
 
-export default async function AdminInquiryDetailPage(
-  props: PageProps<"/admin/inquiries/[id]">
+export default async function AdminOrderDetailPage(
+  props: PageProps<"/admin/orders/[id]">
 ) {
   const [params, searchParams] = await Promise.all([
     props.params,
@@ -45,25 +43,25 @@ export default async function AdminInquiryDetailPage(
   ]);
   const justUpdated = searchParams.updated === "1";
 
-  const detailResult = await getAdminInquiryDetail(params.id);
+  const detailResult = await getAdminOrderDetail(params.id);
 
   if (!detailResult.ok) {
     if (detailResult.error === "not-found") notFound();
     return (
       <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6 lg:p-8">
         <Link
-          href="/admin/inquiries"
+          href="/admin/orders"
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
             "-ml-2 text-muted-foreground"
           )}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
-          Back to inquiries
+          Back to orders
         </Link>
         <SectionError
-          title="Could not load this inquiry"
-          description="We could not load this inquiry. It may have been deleted, or something went wrong. Please try again."
+          title="Could not load this order"
+          description="We could not load this order. It may have been deleted, or something went wrong. Please try again."
         />
       </div>
     );
@@ -77,14 +75,14 @@ export default async function AdminInquiryDetailPage(
       <div>
         {justUpdated ? <FlashBanner kind="inquiryUpdated" /> : null}
         <Link
-          href="/admin/inquiries"
+          href="/admin/orders"
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
             "-ml-2 text-muted-foreground"
           )}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
-          Back to inquiries
+          Back to orders
         </Link>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -93,7 +91,7 @@ export default async function AdminInquiryDetailPage(
           <InquiryStatusBadge status={inquiry.status} />
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Quote request received {formatInquiryDate(inquiry.createdAt)} ·{" "}
+          Order received {formatInquiryDate(inquiry.createdAt)} ·{" "}
           {inquirySourceLabel(inquiry.source)}
         </p>
       </div>
@@ -102,14 +100,14 @@ export default async function AdminInquiryDetailPage(
         {/* ===== Main column ===== */}
         <div className="space-y-6 lg:col-span-3">
           <section
-            aria-labelledby="inquiry-details-heading"
+            aria-labelledby="order-details-heading"
             className="rounded-lg border border-border bg-background p-4 sm:p-6"
           >
             <h2
-              id="inquiry-details-heading"
+              id="order-details-heading"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Inquiry details
+              Order details
             </h2>
 
             <div className="mt-4 rounded-md bg-muted/60 px-4 py-3">
@@ -125,6 +123,14 @@ export default async function AdminInquiryDetailPage(
                 </dt>
                 <dd className="mt-0.5 text-sm text-foreground">
                   {product ? product.name : "No product selected"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Model / Code
+                </dt>
+                <dd className="mt-0.5 text-sm text-foreground">
+                  {product?.productCode ?? "—"}
                 </dd>
               </div>
               <div>
@@ -171,11 +177,11 @@ export default async function AdminInquiryDetailPage(
           </section>
 
           <section
-            aria-labelledby="inquiry-customer-heading"
+            aria-labelledby="order-customer-heading"
             className="rounded-lg border border-border bg-background p-4 sm:p-6"
           >
             <h2
-              id="inquiry-customer-heading"
+              id="order-customer-heading"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
               Customer
@@ -191,7 +197,7 @@ export default async function AdminInquiryDetailPage(
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Phone
+                  WhatsApp / IMO Number
                 </dt>
                 <dd className="mt-0.5 text-sm text-foreground">
                   <a
@@ -226,11 +232,11 @@ export default async function AdminInquiryDetailPage(
         {/* ===== Side column ===== */}
         <div className="space-y-6 lg:col-span-2">
           <section
-            aria-labelledby="inquiry-product-heading"
+            aria-labelledby="order-product-heading"
             className="rounded-lg border border-border bg-background p-4 sm:p-6"
           >
             <h2
-              id="inquiry-product-heading"
+              id="order-product-heading"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
               Product
@@ -284,23 +290,23 @@ export default async function AdminInquiryDetailPage(
               </p>
             ) : (
               <p className="mt-3 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-                The customer did not select a product for this inquiry.
+                The customer did not select a product for this order.
               </p>
             )}
           </section>
 
           <section
-            aria-labelledby="inquiry-contact-heading"
+            aria-labelledby="order-contact-heading"
             className="rounded-lg border border-border bg-background p-4 sm:p-6"
           >
             <h2
-              id="inquiry-contact-heading"
+              id="order-contact-heading"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
               Contact
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Reach the customer directly from their inquiry details.
+              Reach the customer directly from their order details.
             </p>
             <div className="mt-4">
               <InquiryContactActions
@@ -315,12 +321,12 @@ export default async function AdminInquiryDetailPage(
           </section>
 
           <section
-            aria-labelledby="inquiry-status-heading"
+            aria-labelledby="order-status-heading"
             className="rounded-lg border border-border bg-background p-4 sm:p-6"
           >
             <div className="flex items-center justify-between gap-2">
               <h2
-                id="inquiry-status-heading"
+                id="order-status-heading"
                 className="font-heading text-base font-bold tracking-tight text-foreground"
               >
                 Update status

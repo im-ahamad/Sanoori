@@ -5,6 +5,7 @@ import path from "node:path";
 import { ArrowRight } from "lucide-react";
 import type { PublicCategory } from "@/lib/public/catalogue";
 import { cn } from "@/lib/utils";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
 
 /**
  * Map category slugs to their specific local hero images in /public/images/
@@ -61,15 +62,18 @@ export function CategoryCard({
   index?: number;
   className?: string;
 }) {
+  const t = getServerTranslations("bn");
   const href = `/products?category=${category.slug}`;
   const imageSrc = getCategoryImage(category);
   const hasImage = hasCategoryImage(category);
   const categoryNumber = getCategoryNumber(index);
+  const translatedName = t.categories[category.slug as keyof typeof t.categories] ?? category.name;
+  const translatedDescription = category.description; // Keep original description from DB
 
   return (
     <Link
       href={href}
-      aria-label={`Explore the ${category.name} category`}
+      aria-label={t.categoryCard.ariaLabel.replace("{category}", translatedName)}
       className={cn(
         "group relative block overflow-hidden border border-border bg-card",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
@@ -77,24 +81,27 @@ export function CategoryCard({
         className
       )}
     >
-      {/* Full-bleed image — absolute, fills entire card */}
+{/* Full-bleed image — absolute, fills entire card */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        {hasImage ? (
-          <Image
-            src={imageSrc!}
-            alt=""
-            fill
-            sizes={
-              featured
-                ? "(max-width: 768px) 100vw, 50vw"
-                : "(max-width: 768px) 100vw, 50vw"
-            }
-            unoptimized
-            className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy-dark to-navy-dark" />
-        )}
+        <div className="relative w-full h-full">
+          {hasImage ? (
+            <Image
+              src={imageSrc!}
+              alt=""
+              fill
+              sizes={
+                featured
+                  ? "(max-width: 768px) 100vw, 50vw"
+                  : "(max-width: 768px) 100vw, 50vw"
+              }
+              unoptimized
+              priority={featured}
+              className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy-dark to-navy-dark" />
+          )}
+        </div>
 
         {/* Bottom-to-top navy gradient — strong navy at bottom, transparent at top */}
         <div
@@ -111,19 +118,19 @@ export function CategoryCard({
 
         {/* Category title */}
         <h3 className="mt-2 font-heading text-[1.875rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.25rem]">
-          {category.name}
+          {translatedName}
         </h3>
 
         {/* Description */}
-        {category.description && (
+        {translatedDescription && (
           <p className="mt-3 max-w-[28rem] text-sm leading-6 text-white/80">
-            {category.description}
+            {translatedDescription}
           </p>
         )}
 
         {/* Browse Products CTA */}
         <span className="mt-5 inline-flex min-h-[2.75rem] items-center gap-2 text-sm font-semibold text-gold">
-          Browse Products
+          {t.categoryCard.browseProducts}
           <ArrowRight
             className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
             aria-hidden="true"

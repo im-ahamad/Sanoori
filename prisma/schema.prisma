@@ -1,0 +1,157 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(ADMIN)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  description   String?
+  image         String?
+  displayOrder  Int           @default(0)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  products      Product[]
+  subcategories Subcategory[]
+
+  @@map("categories")
+}
+
+model Subcategory {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  categoryId String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  products   Product[]
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("subcategories")
+}
+
+model Product {
+  id               String         @id @default(cuid())
+  name             String
+  slug             String         @unique
+  productCode      String?        @unique
+  categoryId       String
+  subcategoryId    String?
+  shortDescription String?
+  description      String?
+  features         String[]
+  specifications   Json?
+  variants         Json?
+  availability     Availability   @default(ON_REQUEST)
+  featured         Boolean        @default(false)
+  isActive         Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  inquiries        Inquiry[]
+  images           ProductImage[]
+  category         Category       @relation(fields: [categoryId], references: [id])
+  subcategory      Subcategory?   @relation(fields: [subcategoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  publicId  String?
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Inquiry {
+  id           String        @id @default(cuid())
+  customerName String
+  phone        String
+  email        String?
+  productId    String?
+  quantity     Int?
+  message      String
+  source       InquirySource @default(WEBSITE)
+  status       InquiryStatus @default(NEW)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  product      Product?      @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([status])
+  @@map("inquiries")
+}
+
+model BusinessSettings {
+  id        String    @id @default(dbgenerated("(gen_random_uuid())::text")) @db.VarChar(255)
+  name      String    @db.VarChar(255)
+  phone     String?   @db.VarChar(255)
+  whatsapp  String?   @db.VarChar(255)
+  email     String?   @db.VarChar(255)
+  address   String?   @db.VarChar(255)
+  city      String?   @db.VarChar(255)
+  country   String?   @db.VarChar(255)
+  facebook  String?   @db.VarChar(255)
+  instagram String?   @db.VarChar(255)
+  tiktok    String?   @db.VarChar(255)
+  youtube   String?   @db.VarChar(255)
+  telegram  String?   @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@map("business_settings")
+}
+
+enum UserRole {
+  ADMIN
+}
+
+enum Availability {
+  IN_STOCK
+  ON_REQUEST
+  OUT_OF_STOCK
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum InquirySource {
+  WEBSITE
+  WHATSAPP
+  FACEBOOK
+  INSTAGRAM
+  TELEGRAM
+  PHONE
+}

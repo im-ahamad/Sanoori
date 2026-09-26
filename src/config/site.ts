@@ -14,9 +14,9 @@ export const businessConfig = {
     alt: "Sanoori Trading",
   },
   phone: "[BUSINESS PHONE]",
-  whatsapp: "[WHATSAPP NUMBER]",
+  whatsapp: "01933323522",
   email: "[BUSINESS EMAIL]",
-  address: "[BUSINESS ADDRESS]",
+  address: "Abu Taher Super Market, Dhanikhola Road, Sanoori Trading",
   city: "[BUSINESS CITY]",
   country: "Bangladesh",
 

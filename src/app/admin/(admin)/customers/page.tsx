@@ -6,7 +6,6 @@ import { CustomerFilters } from "@/components/admin/customer-filters";
 import { CustomerTable } from "@/components/admin/customer-table";
 import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
-import { FlashBanner } from "@/components/admin/flash-banner";
 
 export const metadata = {
   title: "Customers",

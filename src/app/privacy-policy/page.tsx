@@ -5,12 +5,14 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { siteConfig } from "@/config/site";
 import { generatePageMetadata } from "@/lib/seo";
 
-export const metadata = generatePageMetadata({
-  title: "Privacy Policy",
-  description:
-    "How Sanoori Trading collects, uses, and protects the information you share with us when you visit our website or contact us.",
-  path: "/privacy-policy",
-});
+export async function generateMetadata(): Promise<ReturnType<typeof generatePageMetadata>> {
+  return generatePageMetadata({
+    title: "Privacy Policy", // Not translated in dict yet
+    description:
+      "How Sanoori Trading collects, uses, and protects the information you share with us when you visit our website or contact us.",
+    path: "/privacy-policy",
+  });
+}
 
 const policies = [
   {

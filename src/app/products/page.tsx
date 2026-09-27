@@ -19,15 +19,25 @@ import {
   getFeaturedProducts,
   type PublicCategory,
 } from "@/lib/public/catalogue";
-import { Availability } from "@/generated/prisma/enums";
+import { Availability } from "@/generated/prisma";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
-export const metadata = generatePageMetadata({
-  title: "পণ্য",
-  description:
-    "সানুরি ট্রেডিং ক্যাটালগ ব্রাউজ করুন — স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস। অনুসন্ধান, ফিল্টার করুন এবং ওয়াহটসঅ্যাপে অর্ডার দিন।",
-  path: "/products",
-});
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export async function generateMetadata(): Promise<ReturnType<typeof generatePageMetadata>> {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
+  return generatePageMetadata({
+    title: t.products.heroTitle,
+    description: t.products.heroDescription,
+    path: "/products",
+  });
+}
 
 const AVAILABILITY_VALUES = [
   Availability.IN_STOCK,
@@ -60,7 +70,8 @@ function isTruthy(raw: string | undefined): boolean {
 export default async function ProductsPage({
   searchParams,
 }: PageProps<"/products">) {
-  const t = getServerTranslations("bn");
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
   const params = await searchParams;
 
   const q = firstValue(params.q) || undefined;
@@ -108,7 +119,6 @@ export default async function ProductsPage({
         objectPosition={
           categorySlug ? "object-center" : "object-[50%_0%]"
         }
-        unoptimized={!categorySlug}
         noZoom={!categorySlug}
         textColor={categorySlug ? "white" : "pureWhite"}
         exactCenter

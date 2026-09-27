@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable react-hooks/set-state-in-effect -- hydration from localStorage requires sync state init in effect */
 import {
   createContext,
   useCallback,
@@ -13,14 +12,14 @@ import {
 /**
  * Minimal extensible language state.
  *
- * - Default is Bangla ("bn") — primary language for Bangladeshi users.
- * - "en" (English) is a persisted selection state for international users.
- * - Persisted in localStorage; <html lang> is updated client-side.
+ * - Default is English ("en") — fallback language for international users.
+ * - "bn" (Bangla) is a persisted selection state for Bangladeshi users.
+ * - Persisted in a cookie (readable by server and client); <html lang> is updated client-side.
  */
 
 export type SupportedLanguage = "en" | "bn";
 
-const STORAGE_KEY = "sanoori-lang";
+const COOKIE_NAME = "sanoori-lang";
 
 export const languageMeta: Record<
   SupportedLanguage,
@@ -41,25 +40,48 @@ function isSupportedLanguage(value: string | null): value is SupportedLanguage {
   return value === "en" || value === "bn";
 }
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<SupportedLanguage>("bn");
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() ?? null;
+  return null;
+}
+
+function setCookie(name: string, value: string, days = 365) {
+  if (typeof document === "undefined") return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+export function LanguageProvider({
+  children,
+  initialLanguage,
+}: {
+  children: React.ReactNode;
+  initialLanguage: SupportedLanguage;
+}) {
+  const [language, setLanguageState] = useState<SupportedLanguage>(initialLanguage);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = getCookie(COOKIE_NAME);
     if (isSupportedLanguage(stored)) {
-      setLanguageState(stored);
-      document.documentElement.lang = languageMeta[stored].htmlLang;
+      const id = setTimeout(() => {
+        setLanguageState(stored);
+        document.documentElement.lang = languageMeta[stored].htmlLang;
+      }, 0);
+      return () => clearTimeout(id);
     } else {
-      // Default to Bangla for Bangladeshi users on first load
-      const current = document.documentElement.lang;
-      if (current === "en") setLanguageState("en");
+      document.documentElement.lang = languageMeta.en.htmlLang;
     }
   }, []);
 
   const setLanguage = useCallback((next: SupportedLanguage) => {
     setLanguageState(next);
-    localStorage.setItem(STORAGE_KEY, next);
+    setCookie(COOKIE_NAME, next);
     document.documentElement.lang = languageMeta[next].htmlLang;
+    // Trigger a custom event to notify components to refresh server data
+    window.dispatchEvent(new CustomEvent("sanoori-language-change"));
   }, []);
 
   const value = useMemo<LanguageContextValue>(

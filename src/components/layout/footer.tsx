@@ -1,34 +1,46 @@
 import Link from "next/link";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { businessConfig, siteConfig } from "@/config/site";
+import { getPublicBusinessSettings } from "@/lib/public/settings";
 import { isConfigPlaceholder } from "@/lib/config";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
 import { Brand } from "@/components/shared/brand";
 import { Container } from "@/components/layout/container";
 import { getPublicCategories } from "@/lib/public/catalogue";
 import { getServerTranslations, getNavigationConfig } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
-const socialLinks = [
-  { label: "Facebook", href: businessConfig.social.facebook },
-  { label: "Instagram", href: businessConfig.social.instagram },
-  { label: "Telegram", href: businessConfig.social.telegram },
-  { label: "TikTok", href: businessConfig.social.tiktok },
-  { label: "YouTube", href: businessConfig.social.youtube },
-];
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 export async function Footer() {
-  const categories = await getPublicCategories();
+  const [lang, categories, businessSettings] = await Promise.all([
+    getLang(),
+    getPublicCategories(),
+    getPublicBusinessSettings(),
+  ]);
+
   const currentYear = new Date().getFullYear();
-  const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
-  const t = getServerTranslations("bn"); // Default to Bangla for homepage
-  const navigationConfig = getNavigationConfig("bn");
+  const whatsappHref = buildWhatsAppLink(businessSettings, GENERAL_ENQUIRY_MESSAGE);
+  const t = getServerTranslations(lang);
+  const navigationConfig = getNavigationConfig(lang);
 
   const showWhatsApp = Boolean(whatsappHref);
-  const showPhone = !isConfigPlaceholder(businessConfig.phone);
-  const showEmail = !isConfigPlaceholder(businessConfig.email);
-  const showAddress = !isConfigPlaceholder(businessConfig.address);
-  const showCity = !isConfigPlaceholder(businessConfig.city);
+  const showPhone = !isConfigPlaceholder(businessSettings.phone);
+  const showEmail = !isConfigPlaceholder(businessSettings.email);
+  const showAddress = !isConfigPlaceholder(businessSettings.address);
+  const showCity = !isConfigPlaceholder(businessSettings.city);
   const hasContactInfo = showWhatsApp || showPhone || showEmail || showAddress;
+
+  const socialLinks = [
+    { key: "facebook" as const, href: businessSettings.facebook },
+    { key: "instagram" as const, href: businessSettings.instagram },
+    { key: "telegram" as const, href: businessSettings.telegram },
+    { key: "tiktok" as const, href: businessSettings.tiktok },
+    { key: "youtube" as const, href: businessSettings.youtube },
+  ];
 
   const quickLinks = [
     navigationConfig.main.find((item) => item.href === "/") ??
@@ -45,159 +57,159 @@ export async function Footer() {
   ];
 
   return (
-    <footer className="border-t border-border bg-[color-mix(in_oklab,var(--navy)_10%,white)]">
+    <footer className="border-t border-border bg-background/95">
       <Container>
         <div className="section-spacing-sm grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-<Link
-            href="/"
-            aria-label={`${businessConfig.name} — Home`}
-            className="inline-flex items-center"
-          >
-            <Brand size="md" />
-          </Link>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            {t.footer.description}
-          </p>
-        </div>
+            <Link
+              href="/"
+              aria-label={`${businessSettings.name} — Home`}
+              className="inline-flex items-center"
+            >
+              <Brand size="md" />
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              {t.footer.description}
+            </p>
+          </div>
 
-        {/* Quick Links */}
-        <div>
-          <div className="w-fit">
-            <h3 className="-translate-x-[16px] text-center font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
-              {t.footer.quickLinks}
+          {/* Quick Links */}
+          <div>
+            <div className="w-fit">
+              <h3 className="-translate-x-[16px] text-center font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
+                {t.footer.quickLinks}
+              </h3>
+              <ul className="mt-2 grid w-fit grid-cols-2 gap-x-1 gap-y-2">
+                {quickLinks.map((item) => (
+                  <li key={`footer-${item.href}`}>
+                    <Link
+                      href={item.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Products */}
+          <div>
+            <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
+              {t.footer.products}
             </h3>
-            <ul className="mt-2 grid w-fit grid-cols-2 gap-x-1 gap-y-2">
-              {quickLinks.map((item) => (
-                <li key={`footer-${item.href}`}>
+            <ul className="mt-4 space-y-2.5">
+              {categories.map((category) => (
+                <li key={category.id}>
                   <Link
-                    href={item.href}
+                    href={`/products?category=${category.slug}`}
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                   >
-                    {item.label}
+                    {t.categories[category.slug as keyof typeof t.categories] ?? category.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
 
-        {/* Products */}
-        <div>
-          <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
-            {t.footer.products}
-          </h3>
-          <ul className="mt-4 space-y-2.5">
-            {categories.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/products?category=${category.slug}`}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  {t.categories[category.slug as keyof typeof t.categories] ?? category.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Contact */}
-        <div>
-          <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
-            {t.footer.contactUs}
-          </h3>
-          <ul className="mt-4 space-y-3">
-            {showWhatsApp && (
-              <li>
-                <a
-                  href={whatsappHref ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  <MessageCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  {t.common.whatsapp}
-                </a>
-              </li>
-            )}
-            {showPhone && (
-              <li>
-                <a
-                  href={`tel:${businessConfig.phone}`}
-                  className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  {businessConfig.phone}
-                </a>
-              </li>
-            )}
-            {showEmail && (
-              <li>
-                <a
-                  href={`mailto:${businessConfig.email}`}
-                  className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  <Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  {businessConfig.email}
-                </a>
-              </li>
-            )}
-            {showAddress && (
-              <li className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                <span>{businessConfig.address}</span>
-              </li>
-            )}
-            {!hasContactInfo && (
-              <li className="text-sm text-muted-foreground">
-                {t.footer.contactDetailsComing}
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-border py-6">
-        <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-3">
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:col-start-2">
-            <p className="text-xs text-muted-foreground">
-              {t.footer.copyright.replace("{year}", currentYear.toString())}
-            </p>
-            <Link
-              href="/privacy-policy"
-              className="text-xs text-gold transition-colors hover:text-gold-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-            >
-              {t.footer.privacyPolicy}
-            </Link>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:col-start-3 sm:justify-end">
-            {showCity && (
-              <span className="text-xs text-muted-foreground">
-                {t.footer.cityCountry.replace("{city}", businessConfig.city).replace("{country}", businessConfig.country)}
-              </span>
-            )}
-            <ul className="flex items-center gap-4">
-              {socialLinks.map((social) =>
-                !isConfigPlaceholder(social.href) ? (
-                  <li key={social.label}>
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                    >
-                      {t.footer.social[social.label.toLowerCase() as keyof typeof t.footer.social]}
-                    </a>
-                  </li>
-                ) : null
+          {/* Contact */}
+          <div>
+            <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
+              {t.footer.contactUs}
+            </h3>
+            <ul className="mt-4 space-y-3">
+              {showWhatsApp && (
+                <li>
+                  <a
+                    href={whatsappHref ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    <MessageCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    {t.common.whatsapp}
+                  </a>
+                </li>
+              )}
+              {showPhone && (
+                <li>
+                  <a
+                    href={`tel:${businessSettings.phone}`}
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    {businessSettings.phone}
+                  </a>
+                </li>
+              )}
+              {showEmail && (
+                <li>
+                  <a
+                    href={`mailto:${businessSettings.email}`}
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    <Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    {businessSettings.email}
+                  </a>
+                </li>
+              )}
+              {showAddress && (
+                <li className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                  <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <span>{businessSettings.address}</span>
+                </li>
+              )}
+              {!hasContactInfo && (
+                <li className="text-sm text-muted-foreground">
+                  {t.footer.contactDetailsComing}
+                </li>
               )}
             </ul>
           </div>
         </div>
-      </div>
-    </Container>
-  </footer>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-border py-6">
+          <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-3">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:col-start-2">
+              <p className="text-xs text-muted-foreground">
+                {t.footer.copyright.replace("{year}", currentYear.toString())}
+              </p>
+              <Link
+                href="/privacy-policy"
+                className="text-xs text-gold-text transition-colors hover:text-gold-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+              >
+                {t.footer.privacyPolicy}
+              </Link>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:col-start-3 sm:justify-end">
+              {showCity && (
+                <span className="text-xs text-muted-foreground">
+                  {t.footer.cityCountry.replace("{city}", businessSettings.city || "").replace("{country}", businessSettings.country || "")}
+                </span>
+              )}
+              <ul className="flex items-center gap-4">
+                {socialLinks.map((social) =>
+                  !isConfigPlaceholder(social.href) ? (
+                    <li key={social.key}>
+                      <a
+                        href={social.href || ""}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                      >
+                        {t.footer.social[social.key]}
+                      </a>
+                    </li>
+                  ) : null
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </footer>
   );
 }

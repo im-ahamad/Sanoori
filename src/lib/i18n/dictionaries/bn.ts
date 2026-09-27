@@ -244,4 +244,126 @@ export const bn = {
     tiles: "টাইলস",
     "building-materials": "বিল্ডিং ম্যাটেরিয়ালস",
   },
+  contact: {
+    pageTitle: "যোগাযোগ",
+    pageDescription:
+      "দাম ও উপলব্ধতা জানতে ওয়াহটসঅ্যাপে মেসেজ করুন — বা সহজ হলে আমাদের কল করুন।",
+    breadcrumb: "যোগাযোগ",
+    contactDirectly: {
+      title: "সরাসরি যোগাযোগ করুন",
+      description:
+        "আপনার পছন্দের চ্যানেলে মেসেজ দিন, আমরা দাম ও ডেলিভারি টাইম জানিয়ে দেব।",
+      comingSoon:
+        "যোগাযোগের বিবরণ শীঘ্রই এখানে প্রকাশ করা হবে। মেনে-team আপনার অনুরোধ নিচে পাঠাতে পারেন।",
+      browseProducts: "পণ্য দেখুন",
+      visitUs: "আমাদের সফরে যান",
+    },
+    projectPrices: {
+      title: "প্রজেক্টের জন্য দাম জানতে চান?",
+      description:
+        "দরকারি পণ্য ও পরিমাণের তালিকা পাঠান, আমরা সবকিছুর দাম জানিয়ে দেব।",
+      browseProducts: "পণ্য দেখুন",
+    },
+    askAnything: {
+      title: "আমাদের থেকে যেকোনো কিছু জেনে নিন",
+      description:
+        "নতুন বাথরুম প্ল্যান করছেন বা কোন ম্যাটেরিয়াল বেছে নেবেন সেটি জানতে চাইছেন? কেইল করুন, আমরা সাহায্য করতে খুশি হব।",
+      responseTime: "প্রতিক্রিয়া সময়: সাধারণত এক কার্যকর দিনের মধ্যে",
+    },
+    channels: {
+      whatsapp: {
+        fastestWay: "আমাদের সাথে যোগাযোগের দ্রুততম উপায়",
+        action: "ওয়াহটসঅ্যাপে চ্যাট করুন — অ্যাকাউন্ট দরকার নেই",
+        label: "ওয়াহটসঅ্যাপ",
+      },
+      facebook: {
+        action: "আমাদের মেসেজ করুন",
+        label: "ফেসবুক মেসেন্জার",
+      },
+      instagram: {
+        action: "আমাদের মেসেজ করুন",
+        label: "ইনস্টাগ্রাম",
+      },
+      telegram: {
+        action: "আমাদের মেসেজ করুন",
+        label: "টেলিগ্রাম",
+      },
+      phone: {
+        action: "এখনই কল করুন",
+        label: "কল",
+      },
+    },
+  },
+  requestQuote: {
+    pageTitle: "মূল্য জানুন",
+    pageDescription:
+      "সবচেয়ে দ্রুত? ওয়াহটসঅ্যাপে মেসেজ করুন। অন্যথায়, নিচে সংক্ষিপ্ত অনুরোধ পাঠান।",
+    breadcrumb: "মূল্য জানুন",
+    productInfoLabel: "আপনি অনুরোধ করছেন এ পণ্যের দামের জন্য",
+    viewProductDetails: "পণ্যের বিবরণ দেখুন",
+    whatsappCTA: {
+      title: "ওয়াহটসঅ্যাপে মেসেজ করুন",
+      description: "আপনার প্রয়োজন আমাদের জানান এবং দ্রুত উত্তর পান।",
+    },
+    helpfulToInclude: {
+      title: "শামিল করলে সুবিধা হবে",
+      quantity: {
+        title: "পরিমাণ",
+        description: "আনুমানিক পরিমাণ জানালে আমরা সঠিক দাম দিতে পারব।",
+      },
+      sizesOrColours: {
+        title: "আকার বা রং",
+        description:
+          "আপনি যে আকার, ফিনিশ বা রং চান সেগুলো জানান। যা জানেন সেটি পাঠান, বাকি আমরা পূরণ করব।",
+      },
+    },
+    whatHappensNext: {
+      title: "এরপর কী হবে",
+      steps: [
+        "আমরা আপনার জন্য দাম ও উপলব্ধতা যাচাই করব।",
+        "আমরা ওয়াহটসঅ্যাপ, ফোন বা ইমেইলে উত্তর দিব।",
+        "কোনো বাধ্যতা নেই — কেবল সহজে জিজ্ঞেস করার উপায়।",
+      ],
+      responseTime: "সাধারণত এক কার্যকর দিনের মধ্যে উত্তর দিই",
+    },
+    sendRequest: {
+      title: "আপনার অনুরোধ পাঠান",
+      description: "সংক্ষিপ্ত ফর্মটি পূরণ করুন, আমরা আপনাকে দাম পাঠাব।",
+    },
+    productSummary: {
+      requestingPriceFor: "আপনি অনুরোধ করছেন এ পণ্যের দামের জন্য",
+      modelLabel: "মডেল:",
+    },
+    form: {
+      nameLabel: "আপনার নাম",
+      namePlaceholder: "যেমন: रहीম আহমেদ",
+      contactLabel: "ওয়াহটসঅ্যাপ বা আইএমও নম্বর",
+      contactPlaceholder: "যেমন: +880 1XXX-XXXXXX",
+      contactHint: "আমরা ওয়াহটসঅ্যাপ বা আইএমও-তে উত্তর দিই।",
+      quantityLabel: "পরিমাণ",
+      quantityPlaceholder: "যেমন: ৫০",
+      quantityHint: "কতগুলো ইউনিট দরকার?",
+      messageLabel: "মেসেজ",
+      messageOptional: "(ঐচ্ছিক)",
+      messagePlaceholder: "কোনো আকার, ফিনিশ, ডেলিভারি এলাকা বা অন্যান্য প্রয়োজনীয়তা…",
+      messageHint: "আপনি আমাদের জানাতে চান এমন আর কিছু।",
+      submitButton: "মূল্য জিজ্ঞাসা করুন",
+      submittingButton: "অনুরোধ পাঠানো হচ্ছে…",
+      noObligation: "কোনো বাধ্যতা নেই — সাধারণত এক কার্যকর দিনের মধ্যে উত্তর দিই।",
+    },
+    success: {
+      thankYou: "ধন্যবাদ, {name}!",
+      requestReady:
+        "আপনার মূল্য অনুরোধ পাওয়া গেছে। আমরা {product}-এর দাম যত দ্রুত সম্ভব জানিয়ে দিব।",
+      productLabel: "পণ্য",
+      quantityLabel: "পরিমাণ",
+      contactLabel: "যোগাযোগ",
+      doneButton: "শেষ",
+      continueBrowsing: "পণ্য ব্রাউজ করুন",
+      chatOnWhatsApp: "ওয়াহটসঅ্যাপে চ্যাট করুন",
+    },
+    error: {
+      default: "কিছু ভুল হয়েছে। দয়া করে আবার চেষ্টা করুন।",
+    },
+  },
 } as const;

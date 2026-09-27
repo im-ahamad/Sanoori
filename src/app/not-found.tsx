@@ -9,7 +9,7 @@ export default function NotFound() {
       <div className="section-spacing relative overflow-hidden flex flex-col items-center text-center">
         <VisualBackdrop variant="faint" />
         <Container className="relative">
-          <span className="font-heading text-sm font-bold uppercase tracking-widest text-gold">
+          <span className="font-heading text-sm font-bold uppercase tracking-widest text-gold-text">
             404
           </span>
           <h1 className="mt-4 max-w-xl font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">

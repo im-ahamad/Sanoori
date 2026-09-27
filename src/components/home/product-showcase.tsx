@@ -6,8 +6,15 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { Reveal } from "@/components/shared/reveal";
 import { ButtonLink } from "@/components/ui/button-link";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
 const SHOWCASE_PRODUCT_COUNT = 8;
+
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 /**
  * Home page product showcase.
@@ -19,8 +26,9 @@ const SHOWCASE_PRODUCT_COUNT = 8;
  * existing request-quote (and WhatsApp-when-configured) pipeline.
  */
 export async function ProductShowcase() {
+  const lang = await getLang();
   const products = await getHomeShowcaseProducts(SHOWCASE_PRODUCT_COUNT);
-  const t = getServerTranslations("bn");
+  const t = getServerTranslations(lang);
 
   return (
     <section className="section-spacing bg-muted/40">

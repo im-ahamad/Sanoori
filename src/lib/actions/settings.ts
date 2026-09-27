@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -10,9 +10,9 @@ export type UpdatePasswordActionResult =
   | { ok: false; message: string };
 
 const updatePasswordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(8, "New password must be at least 8 characters"),
+  confirmPassword: z.string().min(8, "Confirm password must be at least 8 characters"),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "New passwords do not match",
   path: ["confirmPassword"],
@@ -40,15 +40,34 @@ export async function updatePasswordAction(
   try {
     const user = await db.user.findUnique({
       where: { id: session.user.id },
+      select: { id: true, passwordHash: true, isActive: true, role: true },
     });
 
     if (!user) {
       return { ok: false, message: "User not found" };
     }
 
-    // In a real implementation, you'd use bcrypt here
-    // For now, we'll just return not implemented
-    return { ok: false, message: "Password change not yet implemented" };
+    if (!user.isActive || user.role !== "ADMIN") {
+      return { ok: false, message: "Unauthorized" };
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(
+      parsed.data.currentPassword,
+      user.passwordHash
+    );
+
+    if (!currentPasswordMatches) {
+      return { ok: false, message: "Current password is incorrect" };
+    }
+
+    const newPasswordHash = await bcrypt.hash(parsed.data.newPassword, 12);
+
+    await db.user.update({
+      where: { id: user.id },
+      data: { passwordHash: newPasswordHash },
+    });
+
+    return { ok: true, message: "Password updated successfully" };
   } catch (error) {
     console.error("Failed to update password", error);
     return { ok: false, message: "Something went wrong while updating the password" };

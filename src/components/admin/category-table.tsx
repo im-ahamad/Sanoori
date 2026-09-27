@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { ChevronRight, Edit, Tag, Trash2 } from "lucide-react";
+import { ChevronRight, Edit, SquareKanban, Tag, Trash2 } from "lucide-react";
 import type { AdminCategoryList } from "@/lib/admin/categories";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   deleteCategoryAction,
   type DeleteCategoryActionResult,
@@ -210,43 +209,172 @@ export function CategoryTable({ data }: CategoryTableProps) {
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
         <>
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th scope="col" className="px-4 py-3 font-semibold">
-                  Category
-                </th>
-                <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                  Slug
-                </th>
-                <th scope="col" className="hidden max-w-56 px-4 py-3 font-semibold lg:table-cell">
-                  Description
-                </th>
-                <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                  Products
-                </th>
-                <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                  Subcategories
-                </th>
-                <th scope="col" className="px-4 py-3 font-semibold">
-                  Status
-                </th>
-                <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                  Created
-                </th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {data.items.map((category) => (
-                <CategoryRow key={category.id} category={category} />
-              ))}
-            </tbody>
-          </table>
+          {/* Desktop table */}
+          <div className="hidden lg:block">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th scope="col" className="px-4 py-3 font-semibold">
+                    Category
+                  </th>
+                  <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
+                    Slug
+                  </th>
+                  <th scope="col" className="hidden max-w-56 px-4 py-3 font-semibold lg:table-cell">
+                    Description
+                  </th>
+                  <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
+                    Products
+                  </th>
+                  <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
+                    Subcategories
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-semibold">
+                    Status
+                  </th>
+                  <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
+                    Created
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right font-semibold">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.items.map((category) => (
+                  <CategoryRow key={category.id} category={category} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile/tablet cards */}
+          <ul className="divide-y divide-border lg:hidden">
+            {data.items.map((category) => (
+              <li key={category.id} className="p-4">
+                <CategoryCard category={category} />
+                {category.subcategories && category.subcategories.length > 0 && (
+                  <ul className="mt-3 space-y-3 border-l-2 border-border pl-4 ml-6">
+                    {category.subcategories.map((sub) => (
+                      <li key={sub.id}>
+                        <SubcategoryCard subcategory={sub} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
         </>
       ) : null}
+    </div>
+  );
+}
+
+function CategoryCard({
+  category,
+}: {
+  category: AdminCategoryList["items"][0];
+}) {
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <Link
+            href={`/admin/categories/${category.id}/edit`}
+            className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            <Tag className="size-4 text-gold shrink-0 inline-block mr-2" aria-hidden="true" />
+            {category.name}
+          </Link>
+          <p className="mt-0.5 text-xs text-muted-foreground">{category.slug}</p>
+          {category.description && (
+            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
+              {category.description}
+            </p>
+          )}
+        </div>
+        <span
+          className={`inline-flex items-center shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+            category.isActive
+              ? "bg-green/10 text-green"
+              : "bg-muted-foreground/10 text-muted-foreground"
+          }`}
+        >
+          {category.isActive ? "Active" : "Inactive"}
+        </span>
+      </div>
+
+      <p className="mt-2 text-xs text-muted-foreground">
+        {category._count.products} product{category._count.products !== 1 ? "s" : ""}{" "}
+        ·{" "}
+        {category._count.subcategories} subcategory{category._count.subcategories !== 1 ? "s" : ""}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground/80">
+        Created{" "}
+        {new Intl.DateTimeFormat("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(category.createdAt)}
+      </p>
+
+      <div className="mt-3 flex items-center justify-end gap-1">
+        <Link
+          href={`/admin/categories/${category.id}/edit`}
+          className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+          aria-label={`Edit ${category.name}`}
+        >
+          <Edit className="size-4" aria-hidden="true" />
+        </Link>
+        <CategoryDeleteButton categoryId={category.id} categoryName={category.name} />
+      </div>
+    </div>
+  );
+}
+
+function SubcategoryCard({
+  subcategory,
+}: {
+  subcategory: SubcategoryItem;
+}) {
+  return (
+    <div className="pt-2">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <Link
+            href={`/admin/categories/${subcategory.id}/edit`}
+            className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            <SquareKanban className="size-4 text-gold shrink-0 inline-block mr-2" aria-hidden="true" />
+            {subcategory.name}
+          </Link>
+          <p className="mt-0.5 text-xs text-muted-foreground">{subcategory.slug}</p>
+        </div>
+        <span className="inline-flex items-center shrink-0 rounded-full px-2 py-0.5 text-xs font-medium bg-muted-foreground/10 text-muted-foreground">
+          Inactive
+        </span>
+      </div>
+
+      <p className="mt-1 text-xs text-muted-foreground">
+        {subcategory._count.products} product{subcategory._count.products !== 1 ? "s" : ""}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground/80">
+        Created{" "}
+        {new Intl.DateTimeFormat("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(subcategory.createdAt)}
+      </p>
+
+      <div className="mt-2 flex items-center justify-end">
+        <Link
+          href={`/admin/categories/${subcategory.id}/edit`}
+          className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+          aria-label={`Edit ${subcategory.name}`}
+        >
+          <Edit className="size-4" aria-hidden="true" />
+        </Link>
+      </div>
     </div>
   );
 }

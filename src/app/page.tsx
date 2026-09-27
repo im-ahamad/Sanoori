@@ -4,9 +4,42 @@ import { CategoryGrid } from "@/components/home/category-grid";
 import { ProductShowcase } from "@/components/home/product-showcase";
 import { CustomerJourney } from "@/components/home/customer-journey";
 import { CtaBand } from "@/components/home/cta-band";
-import { generateHomeMetadata, generateOrganizationSchema } from "@/lib/seo";
+import { generateOrganizationSchema } from "@/lib/seo";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
+import { siteConfig } from "@/config/site";
 
-export const metadata: Metadata = generateHomeMetadata();
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
+  const rootUrl = `${siteConfig.url}/`;
+  const title = t.seo.homeTitle;
+
+  return {
+    title,
+    description: t.seo.homeDescription,
+    alternates: { canonical: rootUrl },
+    openGraph: {
+      type: "website",
+      locale: lang === "bn" ? "bn_BD" : "en_US",
+      url: rootUrl,
+      siteName: siteConfig.name,
+      title,
+      description: t.seo.homeDescription,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: t.seo.homeDescription,
+    },
+  };
+}
 
 export default async function Home() {
   const organizationSchema = JSON.stringify(generateOrganizationSchema());

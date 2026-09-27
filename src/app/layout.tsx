@@ -3,8 +3,10 @@ import { generateSiteMetadata } from "@/lib/seo";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { Footer } from "@/components/layout/footer";
 import { Providers } from "@/components/providers";
-import { themeScript } from "@/components/theme/theme-script";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
+import { HeadScripts } from "@/components/scripts/head-scripts";
+import { getPublicBusinessSettings } from "@/lib/public/settings";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,27 +23,28 @@ const dmSans = DM_Sans({
 
 export const metadata = generateSiteMetadata();
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
-  const t = getServerTranslations("bn");
+async function getLanguageFromCookie(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const [lang, businessSettings] = await Promise.all([
+    getLanguageFromCookie(),
+    getPublicBusinessSettings(),
+  ]);
+  const t = getServerTranslations(lang);
 
   return (
     <html
-      lang="bn"
+      lang={lang}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${inter.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
-        <script
-          dangerouslySetInnerHTML={{ __html: themeScript }}
-          suppressHydrationWarning
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{const l=localStorage.getItem("sanoori-lang");if(l==="en"||l==="bn")document.documentElement.lang=l;}catch(_){}`,
-          }}
-          suppressHydrationWarning
-        />
+        <HeadScripts />
       </head>
       <body className="min-h-full flex flex-col">
         <a
@@ -50,8 +53,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           {t.layout.skipToMainContent}
         </a>
-        <Providers>
-          <SiteChrome footer={<Footer />}>{children}</SiteChrome>
+        <Providers initialLanguage={lang}>
+          <SiteChrome footer={<Footer />} settings={businessSettings}>{children}</SiteChrome>
         </Providers>
       </body>
     </html>

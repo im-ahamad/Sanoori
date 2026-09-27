@@ -1,4 +1,4 @@
-import { businessConfig } from "@/config/site";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
 import { isConfigPlaceholder } from "@/lib/config";
 
 /**
@@ -26,12 +26,16 @@ export function buildWhatsAppChatLink(
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
-export function buildWhatsAppLink(message: string): string | null {
-  if (isConfigPlaceholder(businessConfig.whatsapp)) {
+export function buildWhatsAppLink(
+  settings: PublicBusinessSettings | { whatsapp: string | null },
+  message: string
+): string | null {
+  const whatsapp = "whatsapp" in settings ? settings.whatsapp : null;
+  if (!whatsapp || isConfigPlaceholder(whatsapp)) {
     return null;
   }
 
-  return buildWhatsAppChatLink(businessConfig.whatsapp, message);
+  return buildWhatsAppChatLink(whatsapp, message);
 }
 
 export interface WhatsAppProductLinkParams {
@@ -76,10 +80,11 @@ export function createWhatsAppProductMessage({
 }
 
 export function createWhatsAppProductLink(
+  settings: PublicBusinessSettings | { whatsapp: string | null },
   params: WhatsAppProductLinkParams
 ): WhatsAppProductLink | null {
   const message = createWhatsAppProductMessage(params);
-  const url = buildWhatsAppLink(message);
+  const url = buildWhatsAppLink(settings, message);
 
   if (!url) {
     return null;

@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
-import { businessConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
@@ -15,6 +14,11 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LanguageToggle } from "@/components/language/language-toggle";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
+
+interface HeaderProps {
+  settings: PublicBusinessSettings;
+}
 
 function DesktopNavLink({
   href,
@@ -43,19 +47,19 @@ function DesktopNavLink({
       <span
         aria-hidden="true"
         className={cn(
-          "absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-gold transition-all duration-300 ease-out",
+          "absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-gold transition-[transform,opacity] duration-300 ease-out",
           active
             ? "scale-x-100 opacity-100"
             : emphasize
-              ? "scale-x-100 opacity-40 group-hover:opacity-100"
-              : "scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100"
+            ? "scale-x-100 opacity-40 group-hover:opacity-100"
+            : "scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100"
         )}
       />
     </Link>
   );
 }
 
-export function Header() {
+export function Header({ settings }: HeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -74,7 +78,7 @@ export function Header() {
     },
   } as const;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 8);
     }
@@ -91,10 +95,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full border-b transition-all duration-300",
+        "sticky top-0 z-50 w-full border-b transition-[box-shadow,background-color,border-color,backdrop-filter] duration-300",
         scrolled
-          ? "border-border bg-[color-mix(in_oklab,var(--navy)_10%,white)] shadow-[0_6px_24px_-12px_rgba(13,23,42,0.25)] backdrop-blur supports-[backdrop-filter]:bg-[color-mix(in_oklab,var(--navy)_10%,white)]"
-          : "border-border/80 bg-[color-mix(in_oklab,var(--navy)_10%,white)] backdrop-blur supports-[backdrop-filter]:bg-[color-mix(in_oklab,var(--navy)_10%,white)]"
+          ? "border-border bg-background/95 shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-background/90"
+          : "border-border/80 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80"
       )}
     >
       <Container>
@@ -142,7 +146,7 @@ export function Header() {
               href={navigationConfig.cta.href}
               variant="inverse"
               size="md"
-              className="focus-visible:ring-offset-background"
+              className="focus-visible:ring-offset-background min-w-[160px]"
             >
               {navigationConfig.cta.label}
             </ButtonLink>
@@ -168,6 +172,7 @@ export function Header() {
       <MobileNav
         open={mobileNavOpen}
         onClose={() => setMobileNavOpen(false)}
+        settings={settings}
       />
     </header>
   );

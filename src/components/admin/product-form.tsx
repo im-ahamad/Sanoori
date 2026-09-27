@@ -10,7 +10,7 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
-import type { Availability } from "@/generated/prisma/enums";
+import type { Availability } from "@/generated/prisma";
 import { slugify } from "@/lib/slug";
 import { availabilityLabels, availabilityValues } from "@/lib/validators/product";
 import type { ProductActionState } from "@/lib/actions/products";

@@ -244,4 +244,126 @@ export const en = {
     tiles: "Tiles",
     "building-materials": "Building Materials",
   },
+  contact: {
+    pageTitle: "Contact",
+    pageDescription:
+      "Message us on WhatsApp for prices and availability — or call us if that is easier for you.",
+    breadcrumb: "Contact",
+    contactDirectly: {
+      title: "Contact us directly",
+      description:
+        "Message us on your preferred channel and we will reply with the price and delivery time.",
+      comingSoon:
+        "Contact details will be published here soon. In the meantime, you can send us your request below.",
+      browseProducts: "Browse Products",
+      visitUs: "Visit us",
+    },
+    projectPrices: {
+      title: "Getting prices for a project?",
+      description:
+        "Send us the list of products and quantities you need and we will reply with prices for everything.",
+      browseProducts: "Browse Products",
+    },
+    askAnything: {
+      title: "Ask us anything",
+      description:
+        "Planning a new bathroom or unsure which material to use? Just message us and we are happy to help.",
+      responseTime: "Response time: usually within one business day",
+    },
+    channels: {
+      whatsapp: {
+        fastestWay: "The fastest way to reach us",
+        action: "Chat on WhatsApp — no account needed",
+        label: "WhatsApp",
+      },
+      facebook: {
+        action: "Message us",
+        label: "Facebook Messenger",
+      },
+      instagram: {
+        action: "Message us",
+        label: "Instagram",
+      },
+      telegram: {
+        action: "Message us",
+        label: "Telegram",
+      },
+      phone: {
+        action: "Call now",
+        label: "Call",
+      },
+    },
+  },
+  requestQuote: {
+    pageTitle: "Get a Price",
+    pageDescription:
+      "Fastest? Message us on WhatsApp. Otherwise, send a short request below.",
+    breadcrumb: "Get a Price",
+    productInfoLabel: "You are requesting a price for",
+    viewProductDetails: "View product details",
+    whatsappCTA: {
+      title: "Message us on WhatsApp",
+      description: "Tell us what you need and get a reply fast.",
+    },
+    helpfulToInclude: {
+      title: "Helpful to include",
+      quantity: {
+        title: "Quantity",
+        description: "An approximate quantity helps us give you an accurate price.",
+      },
+      sizesOrColours: {
+        title: "Sizes or colours",
+        description:
+          "Sizes, finishes, or colours you want. Send what you know and we will fill the gaps.",
+      },
+    },
+    whatHappensNext: {
+      title: "What happens next",
+      steps: [
+        "We check the price and availability for you.",
+        "We reply on WhatsApp, phone, or email.",
+        "No obligation — just an easy way to ask.",
+      ],
+      responseTime: "We typically respond within one business day",
+    },
+    sendRequest: {
+      title: "Send your request",
+      description: "Fill in the short form and we will send you the prices.",
+    },
+    productSummary: {
+      requestingPriceFor: "You are requesting a price for",
+      modelLabel: "Model:",
+    },
+    form: {
+      nameLabel: "Your name",
+      namePlaceholder: "e.g. Rahim Ahmed",
+      contactLabel: "WhatsApp or IMO Number",
+      contactPlaceholder: "e.g. +880 1XXX-XXXXXX",
+      contactHint: "We reply on WhatsApp or IMO.",
+      quantityLabel: "Quantity",
+      quantityPlaceholder: "e.g. 50",
+      quantityHint: "How many units do you need?",
+      messageLabel: "Message",
+      messageOptional: "(optional)",
+      messagePlaceholder: "Any sizes, finishes, delivery area, or other requirements…",
+      messageHint: "Anything else you would like us to know.",
+      submitButton: "Ask for Price",
+      submittingButton: "Sending request…",
+      noObligation: "No obligation — we typically reply within one business day.",
+    },
+    success: {
+      thankYou: "Thank you, {name}!",
+      requestReady:
+        "Your price request is ready. We will get back to you with the price of {product} as quickly as possible.",
+      productLabel: "Product",
+      quantityLabel: "Quantity",
+      contactLabel: "Contact",
+      doneButton: "Done",
+      continueBrowsing: "Continue browsing products",
+      chatOnWhatsApp: "Chat on WhatsApp",
+    },
+    error: {
+      default: "Something went wrong. Please try again.",
+    },
+  },
 } as const;

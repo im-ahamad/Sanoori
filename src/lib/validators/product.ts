@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Availability } from "@/generated/prisma/enums";
+import { Availability } from "@/generated/prisma";
 import { isSafeSlug, normalizeSlug } from "@/lib/slug";
 
 /**

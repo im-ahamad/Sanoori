@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
-  CalendarClock,
   ChevronLeft,
   MessageSquare,
 } from "lucide-react";
 import { getAdminCustomerDetail } from "@/lib/admin/customers";
-import { formatInquiryDate, inquiryStatusLabel } from "@/lib/inquiries";
+import { formatInquiryDate } from "@/lib/inquiries";
 import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
 import { SectionError } from "@/components/admin/section-error";
 import { buttonVariants } from "@/components/ui/button";
@@ -19,9 +18,8 @@ export const metadata = {
 export default async function AdminCustomerDetailPage(
   props: PageProps<"/admin/customers/[id]">
 ) {
-  const [params, searchParams] = await Promise.all([
+  const [params] = await Promise.all([
     props.params,
-    props.searchParams,
   ]);
   const phone = decodeURIComponent(params.id);
 

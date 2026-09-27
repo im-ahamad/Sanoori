@@ -109,7 +109,7 @@ export function HeaderSearch() {
           aria-label={open ? t.common.search + " products" : t.common.search}
           className={cn(
             "group relative inline-flex items-center gap-1.5 rounded-sm px-3 py-2 text-[15px] font-medium transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            open ? "text-foreground" : "text-muted-foreground hover:text-gold"
+            open ? "text-foreground" : "text-muted-foreground hover:text-gold-text"
           )}
         >
           <Search className="size-4" aria-hidden="true" />

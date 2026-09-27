@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@/lib/db";
 import { Prisma } from "@/generated/prisma/client";
-import type { InquiryStatus, InquirySource } from "@/generated/prisma/enums";
+import type { InquiryStatus, InquirySource } from "@/generated/prisma";
 import {
   isInquirySource,
   isInquiryStatus,

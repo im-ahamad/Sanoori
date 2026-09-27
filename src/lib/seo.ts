@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig, businessConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
 type OpenGraphImage = {
   url: string;
@@ -145,8 +146,10 @@ export function generateProductSchema(product: {
  * site-wide brand title/description (mirroring `generateSiteMetadata`) while
  * adding an explicit canonical URL and Open Graph page URL.
  */
-export function generateHomeMetadata(): Metadata {
-  const t = getServerTranslations("bn");
+export async function generateHomeMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value === "bn" ? "bn" : "en";
+  const t = getServerTranslations(lang);
   const rootUrl = `${siteConfig.url}/`;
   const title = t.seo.homeTitle;
 
@@ -156,7 +159,7 @@ export function generateHomeMetadata(): Metadata {
     alternates: { canonical: rootUrl },
     openGraph: {
       type: "website",
-      locale: "bn_BD",
+      locale: lang === "bn" ? "bn_BD" : "en_US",
       url: rootUrl,
       siteName: siteConfig.name,
       title,

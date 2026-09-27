@@ -3,14 +3,16 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { generatePageMetadata } from "@/lib/seo";
 
-export const metadata = generatePageMetadata({
-  title: "Projects",
-  description:
-    "Completed projects and installations supplied by Sanoori Trading.",
-  path: "/projects",
-});
+export async function generateMetadata(): Promise<ReturnType<typeof generatePageMetadata>> {
+  return generatePageMetadata({
+    title: "Projects", // Not in translation dict yet
+    description:
+      "Completed projects and installations supplied by Sanoori Trading.",
+    path: "/projects",
+  });
+}
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
   return (
     <main className="flex-1">
       <PageHeader

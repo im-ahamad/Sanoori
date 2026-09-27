@@ -39,7 +39,7 @@ export function FeaturedToggle({ productId, featured }: FeaturedToggleProps) {
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
           featured
-            ? "border-accent bg-accent text-gold-dark hover:bg-gold-light/40"
+            ? "border-accent bg-accent text-gold-text hover:bg-gold-light/40"
             : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"
         )}
       >
@@ -49,7 +49,7 @@ export function FeaturedToggle({ productId, featured }: FeaturedToggleProps) {
           <Star
             className={cn(
               "size-3",
-              featured ? "fill-current text-gold-dark" : "text-muted-foreground"
+              featured ? "fill-current text-gold-text" : "text-muted-foreground"
             )}
             aria-hidden="true"
           />

@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PRODUCTS_CACHE_TAG } from "@/lib/cache";
 import { Prisma } from "@/generated/prisma/client";
-import type { Availability } from "@/generated/prisma/enums";
+import type { Availability } from "@/generated/prisma";
 import {
   productDeleteSchema,
   productFormSchema,

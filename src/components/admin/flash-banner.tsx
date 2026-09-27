@@ -9,6 +9,9 @@ const flashMessages = {
   updated: "Product updated successfully.",
   deleted: "Product deleted.",
   inquiryUpdated: "Inquiry status updated.",
+  subcategoryCreated: "Subcategory created successfully.",
+  subcategoryUpdated: "Subcategory updated successfully.",
+  subcategoryDeleted: "Subcategory deleted.",
 } as const;
 
 export type FlashKind = keyof typeof flashMessages;

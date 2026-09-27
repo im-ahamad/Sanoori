@@ -3,19 +3,27 @@ import { getPublicCategories } from "@/lib/public/catalogue";
 import { CategoryCard } from "@/components/products/category-card";
 import { Reveal } from "@/components/shared/reveal";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
+
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 export async function CategoryGrid() {
+  const lang = await getLang();
   const categories = await getPublicCategories();
-  const t = getServerTranslations("bn");
+  const t = getServerTranslations(lang);
 
   return (
-    <section className="bg-background py-20 sm:py-28">
+    <section className="section-spacing bg-background">
       <Container>
         {/* Editorial intro header - desktop: 2-col grid, mobile: stacked */}
         <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-5">
             <Reveal>
-              <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-gold">
+              <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.14em] text-gold-text">
                 <span className="h-px w-8 bg-gold/60" aria-hidden="true" />
                 {t.categoryGrid.eyebrow}
               </p>

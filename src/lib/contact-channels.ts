@@ -1,5 +1,5 @@
-import { businessConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
 
 /**
  * Centralized contact channel registry.
@@ -27,62 +27,54 @@ export interface ContactChannel {
   isConfigured: boolean;
 }
 
-function resolveChannelHref(id: ContactChannelId): string {
+function resolveChannelHref(settings: PublicBusinessSettings, id: ContactChannelId): string {
   switch (id) {
     case "whatsapp": {
-      const digits = businessConfig.whatsapp.replace(/[^0-9]/g, "");
+      const digits = (settings.whatsapp || "").replace(/[^0-9]/g, "");
       return `https://wa.me/${digits}`;
     }
     case "facebook":
-      return businessConfig.social.facebook;
+      return settings.facebook || "";
     case "instagram":
-      return businessConfig.social.instagram;
+      return settings.instagram || "";
     case "telegram":
-      return businessConfig.social.telegram;
+      return settings.telegram || "";
     case "phone":
-      return `tel:${businessConfig.phone}`;
+      return `tel:${settings.phone || ""}`;
   }
 }
 
-function resolveRawValue(id: ContactChannelId): string {
+function resolveRawValue(settings: PublicBusinessSettings, id: ContactChannelId): string {
   switch (id) {
     case "whatsapp":
-      return businessConfig.whatsapp;
+      return settings.whatsapp || "";
     case "facebook":
-      return businessConfig.social.facebook;
+      return settings.facebook || "";
     case "instagram":
-      return businessConfig.social.instagram;
+      return settings.instagram || "";
     case "telegram":
-      return businessConfig.social.telegram;
+      return settings.telegram || "";
     case "phone":
-      return businessConfig.phone;
+      return settings.phone || "";
   }
 }
 
-const CHANNEL_LABELS: Record<ContactChannelId, string> = {
-  whatsapp: "WhatsApp",
-  facebook: "Facebook Messenger",
-  instagram: "Instagram",
-  telegram: "Telegram",
-  phone: "Call",
-};
-
-export function getContactChannels(): ContactChannel[] {
+export function getContactChannels(settings: PublicBusinessSettings): ContactChannel[] {
   return CONTACT_CHANNEL_IDS.map((id) => {
-    const raw = resolveRawValue(id);
+    const raw = resolveRawValue(settings, id);
     return {
       id,
-      label: CHANNEL_LABELS[id],
-      href: resolveChannelHref(id),
+      label: id,
+      href: resolveChannelHref(settings, id),
       isConfigured: !isConfigPlaceholder(raw),
     };
   });
 }
 
-export function getContactChannel(id: ContactChannelId): ContactChannel | undefined {
-  return getContactChannels().find((channel) => channel.id === id);
+export function getContactChannel(settings: PublicBusinessSettings, id: ContactChannelId): ContactChannel | undefined {
+  return getContactChannels(settings).find((channel) => channel.id === id);
 }
 
-export function getConfiguredContactChannels(): ContactChannel[] {
-  return getContactChannels().filter((channel) => channel.isConfigured);
+export function getConfiguredContactChannels(settings: PublicBusinessSettings): ContactChannel[] {
+  return getContactChannels(settings).filter((channel) => channel.isConfigured);
 }

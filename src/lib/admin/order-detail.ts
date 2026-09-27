@@ -1,12 +1,7 @@
 import "server-only";
 
 import { db } from "@/lib/db";
-import { Prisma } from "@/generated/prisma/client";
-import type { InquiryStatus, InquirySource } from "@/generated/prisma/enums";
-import {
-  isInquirySource,
-  isInquiryStatus,
-} from "@/lib/inquiries";
+import type { InquiryStatus, InquirySource } from "@/generated/prisma";
 
 function isUsableImageUrl(value: string): boolean {
   return /^https?:\/\//i.test(value);

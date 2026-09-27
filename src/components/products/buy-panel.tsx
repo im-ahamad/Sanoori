@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, MessageCircle, Minus, Phone, Plus } from "lucide-react";
 import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
 
 export interface BuyContactChannel {
   id: "phone";
@@ -20,6 +21,8 @@ interface BuyPanelProps {
   productSlug: string;
   /** Business phone (Call Us) when the number is configured. */
   phoneChannel?: BuyContactChannel | null;
+  /** Business settings for WhatsApp link generation. */
+  businessSettings: PublicBusinessSettings;
 }
 
 const QUANTITY_MIN = 1;
@@ -38,10 +41,11 @@ export function BuyPanel({
   productUrl,
   productSlug,
   phoneChannel,
+  businessSettings,
 }: BuyPanelProps) {
   const [quantity, setQuantity] = useState(QUANTITY_MIN);
 
-  const whatsapp = createWhatsAppProductLink({
+  const whatsapp = createWhatsAppProductLink(businessSettings, {
     productName,
     productId,
     productCode,

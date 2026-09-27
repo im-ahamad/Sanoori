@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Camera,
   MessageCircle,
@@ -9,6 +11,7 @@ import {
 import type { ContactChannel } from "@/lib/contact-channels";
 import type { ContactChannelId } from "@/lib/contact-channels";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 const CHANNEL_ICONS: Record<ContactChannelId, LucideIcon> = {
   whatsapp: MessageCircle,
@@ -18,12 +21,18 @@ const CHANNEL_ICONS: Record<ContactChannelId, LucideIcon> = {
   phone: Phone,
 };
 
-const CHANNEL_ACTIONS: Record<ContactChannelId, string> = {
-  whatsapp: "Chat on WhatsApp",
-  facebook: "Message us",
-  instagram: "Message us",
-  telegram: "Message us",
-  phone: "Call now",
+type ContactChannelTranslation = {
+  label: string;
+  action: string;
+  fastestWay?: string;
+};
+
+type ContactChannelsTranslation = {
+  whatsapp: ContactChannelTranslation;
+  facebook: ContactChannelTranslation;
+  instagram: ContactChannelTranslation;
+  telegram: ContactChannelTranslation;
+  phone: ContactChannelTranslation;
 };
 
 /**
@@ -31,7 +40,13 @@ const CHANNEL_ACTIONS: Record<ContactChannelId, string> = {
  * left as "[PLACEHOLDER]" are excluded by the caller, so nothing fake is ever
  * shown to customers.
  */
-export function ContactChannels({ channels }: { channels: ContactChannel[] }) {
+interface ContactChannelsProps {
+  channels: ContactChannel[];
+}
+
+export function ContactChannels({ channels }: ContactChannelsProps) {
+  const t = useTranslations();
+  const contactChannels = t.contact.channels as ContactChannelsTranslation;
   const primary = channels.find((channel) => channel.id === "whatsapp");
   const secondary = channels.filter((channel) => channel.id !== "whatsapp");
 
@@ -49,13 +64,13 @@ export function ContactChannels({ channels }: { channels: ContactChannel[] }) {
           </span>
           <span className="flex-1">
             <span className="block text-xs font-medium uppercase tracking-wider text-white/85">
-              {primary.label}
+              {contactChannels.whatsapp.label}
             </span>
             <span className="mt-0.5 block font-heading text-base font-semibold text-white">
-              The fastest way to reach us
+              {contactChannels.whatsapp.fastestWay}
             </span>
             <span className="mt-0.5 block text-sm text-white/85">
-              {CHANNEL_ACTIONS.whatsapp} — no account needed
+              {contactChannels.whatsapp.action}
             </span>
           </span>
           <svg
@@ -77,6 +92,7 @@ export function ContactChannels({ channels }: { channels: ContactChannel[] }) {
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {secondary.map((channel) => {
             const Icon = CHANNEL_ICONS[channel.id];
+            const channelTranslation = contactChannels[channel.id];
             return (
               <li key={channel.id}>
                 <a
@@ -84,14 +100,14 @@ export function ContactChannels({ channels }: { channels: ContactChannel[] }) {
                   {...(channel.id === "phone"
                     ? {}
                     : { target: "_blank", rel: "noopener noreferrer" })}
-                  className="group flex items-center gap-4 rounded-lg border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="group flex items-center gap-4 rounded-lg border border-border bg-card p-5 transition-[border-color,box-shadow] hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-md bg-accent text-primary">
                     <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
                   </span>
                   <span className="flex-1">
                     <span className="block text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {channel.label}
+                      {channelTranslation.label}
                     </span>
                     <span
                       className={cn(
@@ -99,7 +115,7 @@ export function ContactChannels({ channels }: { channels: ContactChannel[] }) {
                         channel.id === "phone" && "text-base"
                       )}
                     >
-                      {CHANNEL_ACTIONS[channel.id]}
+                      {channelTranslation.action}
                     </span>
                   </span>
                   <svg

@@ -1,21 +1,14 @@
 import Link from "next/link";
-import { Tag, TagPlus, SearchX } from "lucide-react";
+import { Tag, TagPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { listAdminCategories } from "@/lib/admin/categories";
 import { CategoryTable } from "@/components/admin/category-table";
 import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
-import { FlashBanner, type FlashKind } from "@/components/admin/flash-banner";
 
 export const metadata = {
   title: "Categories",
 };
-
-function stringParam(
-  value: string | string[] | undefined
-): string | undefined {
-  return typeof value === "string" && value !== "" ? value : undefined;
-}
 
 export default async function AdminCategoriesPage() {
   const listResult = await listAdminCategories();

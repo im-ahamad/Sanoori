@@ -63,7 +63,7 @@ export function QuickActions() {
                     Soon
                   </span>
                 ) : (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-gold-dark">
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-gold-text">
                     Ready
                   </span>
                 )}

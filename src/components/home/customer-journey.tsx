@@ -12,6 +12,8 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { Reveal } from "@/components/shared/reveal";
 import { getConfiguredContactChannels } from "@/lib/contact-channels";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
+import { getPublicBusinessSettings } from "@/lib/public/settings";
 
 interface JourneyStep {
   title: string;
@@ -21,16 +23,26 @@ interface JourneyStep {
   cta: string;
 }
 
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
 /**
  * Unified customer journey — replaces the old "Buying from us is simple" and
  * "How to buy" sections with a single guided progression:
  * browse → choose → get a quote → talk with us.
  */
-export function CustomerJourney() {
-  const talkChannel = getConfiguredContactChannels()[0];
-  const t = getServerTranslations("bn");
+export async function CustomerJourney() {
+  const [lang, businessSettings] = await Promise.all([
+    getLang(),
+    getPublicBusinessSettings(),
+  ]);
+  const talkChannel = getConfiguredContactChannels(businessSettings)[0];
+  const t = getServerTranslations(lang);
 
-  const steps = [
+  const steps: JourneyStep[] = [
     {
       title: t.customerJourney.steps.browse.title,
       description: t.customerJourney.steps.browse.description,
@@ -95,8 +107,8 @@ export function CustomerJourney() {
                   key={step.title}
                   className="relative flex gap-5 sm:gap-6 lg:flex-col lg:items-center lg:gap-0 lg:text-center"
                 >
-                  {/* Numbered node */}
-                  <span className="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-background font-heading text-base font-bold text-gold shadow-sm">
+{/* Numbered node */}
+                   <span className="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-background font-heading text-base font-bold text-gold-text shadow-sm">
                     {String(index + 1).padStart(2, "0")}
                   </span>
 

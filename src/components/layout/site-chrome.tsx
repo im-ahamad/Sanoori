@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
 
 const ADMIN_PREFIX = "/admin";
 
@@ -14,26 +15,26 @@ const ADMIN_PREFIX = "/admin";
  * data-fetching Server Component while the admin/non-admin switch below still
  * lives in the client.
  */
-export function SiteChrome({
-  children,
-  footer,
-}: {
+interface SiteChromeProps {
   children: React.ReactNode;
   footer: React.ReactNode;
-}) {
+  settings: PublicBusinessSettings;
+}
+
+export function SiteChrome({ children, footer, settings }: SiteChromeProps) {
   const pathname = usePathname();
   const isAdmin = pathname === ADMIN_PREFIX || pathname.startsWith(`${ADMIN_PREFIX}/`);
 
   return (
     <>
-      {isAdmin ? null : <Header />}
+      {isAdmin ? null : <Header settings={settings} />}
       <div id="main-content" className="flex flex-1 flex-col">
         {children}
       </div>
       {isAdmin ? null : (
         <>
           {footer}
-          <WhatsAppButton />
+          <WhatsAppButton settings={settings} />
         </>
       )}
     </>

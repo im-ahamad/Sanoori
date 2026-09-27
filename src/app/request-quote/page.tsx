@@ -12,17 +12,56 @@ import {
 } from "@/lib/public/catalogue";
 import { generatePageMetadata } from "@/lib/seo";
 import { notFound, redirect } from "next/navigation";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
+import { getPublicBusinessSettings } from "@/lib/public/settings";
 
-export const metadata = generatePageMetadata({
-  title: "Get a Price",
-  description:
-    "Ask Sanoori Trading for the price of sanitary ware, tiles, and building materials. Message us on WhatsApp or send a short request — we reply quickly.",
-  path: "/request-quote",
-});
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export async function generateMetadata(): Promise<ReturnType<typeof generatePageMetadata>> {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
+  const rq = t.requestQuote as typeof t.requestQuote & {
+    pageTitle: string;
+    pageDescription: string;
+  };
+  return generatePageMetadata({
+    title: rq.pageTitle,
+    description: rq.pageDescription,
+    path: "/request-quote",
+  });
+}
 
 export default async function RequestQuotePage({
   searchParams,
 }: PageProps<"/request-quote">) {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
+  const rq = t.requestQuote as typeof t.requestQuote & {
+    pageTitle: string;
+    pageDescription: string;
+    breadcrumb: string;
+    productInfoLabel: string;
+    viewProductDetails: string;
+    whatsappCTA: { title: string; description: string };
+    helpfulToInclude: {
+      title: string;
+      quantity: { title: string; description: string };
+      sizesOrColours: { title: string; description: string };
+    };
+    whatHappensNext: {
+      title: string;
+      steps: string[];
+      responseTime: string;
+    };
+    sendRequest: { title: string; description: string };
+    productSummary: { requestingPriceFor: string; modelLabel: string };
+  };
+
   const { product } = await searchParams;
   const requestedSlug = typeof product === "string" ? product.trim() : "";
 
@@ -30,10 +69,12 @@ export default async function RequestQuotePage({
     redirect("/products");
   }
 
-  const [productOptions, whatsappHref] = await Promise.all([
+  const [productOptions, businessSettings] = await Promise.all([
     getPublicProductOptions(),
-    buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE),
+    getPublicBusinessSettings(),
   ]);
+
+  const whatsappHref = buildWhatsAppLink(businessSettings, GENERAL_ENQUIRY_MESSAGE);
 
   const productDetail = productOptions.some((option) => option.slug === requestedSlug)
     ? await getPublicProductBySlug(requestedSlug)
@@ -46,9 +87,9 @@ export default async function RequestQuotePage({
   return (
     <main className="flex-1">
       <PageHeader
-        title="Get a Price"
-        description="Fastest? Message us on WhatsApp. Otherwise, send a short request below."
-        breadcrumbs={[{ label: "Get a Price", href: "/request-quote" }]}
+        title={rq.pageTitle}
+        description={rq.pageDescription}
+        breadcrumbs={[{ label: rq.breadcrumb, href: "/request-quote" }]}
       />
 
       <Container>
@@ -61,7 +102,6 @@ export default async function RequestQuotePage({
                   alt={productDetail.primaryImage.alt ?? productDetail.name}
                   width={320}
                   height={240}
-                  unoptimized
                   sizes="(max-width: 768px) 100vw, 320px"
                   className="h-48 w-full flex-shrink-0 rounded-lg bg-muted object-cover md:h-40 md:w-72"
                 />
@@ -71,8 +111,8 @@ export default async function RequestQuotePage({
                 </span>
               )}
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-dark">
-                  You are requesting a price for
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold-text">
+                  {rq.productInfoLabel}
                 </p>
                 <h1
                   id="request-quote-product-title"
@@ -83,14 +123,14 @@ export default async function RequestQuotePage({
                 <p className="mt-1.5 text-sm text-muted-foreground">
                   {productDetail.categoryName}
                   {productDetail.productCode
-                    ? ` · Model: ${productDetail.productCode}`
+                    ? ` · ${rq.productSummary.modelLabel} ${productDetail.productCode}`
                     : ""}
                 </p>
                 <Link
                   href={`/products/${productDetail.slug}`}
                   className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  View product details
+                  {rq.viewProductDetails}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </div>
@@ -110,31 +150,29 @@ export default async function RequestQuotePage({
                 </span>
                 <span>
                   <span className="block font-heading text-base font-semibold">
-                    Message us on WhatsApp
+                    {rq.whatsappCTA.title}
                   </span>
                   <span className="mt-0.5 block text-sm text-white/90">
-                    Tell us what you need and get a reply fast.
+                    {rq.whatsappCTA.description}
                   </span>
                 </span>
               </a>
             )}
 
             <h2 className="mt-10 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Helpful to include
+              {rq.helpfulToInclude.title}
             </h2>
             <ul className="mt-6 space-y-6">
               {[
                 {
                   icon: Package,
-                  title: "Quantity",
-                  description:
-                    "An approximate quantity helps us give you an accurate price.",
+                  title: rq.helpfulToInclude.quantity.title,
+                  description: rq.helpfulToInclude.quantity.description,
                 },
                 {
                   icon: Check,
-                  title: "Sizes or colours",
-                  description:
-                    "Sizes, finishes, or colours you want. Send what you know and we will fill the gaps.",
+                  title: rq.helpfulToInclude.sizesOrColours.title,
+                  description: rq.helpfulToInclude.sizesOrColours.description,
                 },
               ].map((item) => (
                 <li key={item.title} className="flex items-start gap-4">
@@ -155,31 +193,21 @@ export default async function RequestQuotePage({
 
             <div className="mt-10 rounded-lg border border-border bg-card p-6">
               <h2 className="font-heading text-base font-semibold text-foreground">
-                What happens next
+                {rq.whatHappensNext.title}
               </h2>
               <ul className="mt-4 space-y-4">
-                <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
-                    1
-                  </span>
-                  <span>We check the price and availability for you.</span>
-                </li>
-                <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
-                    2
-                  </span>
-                  <span>We reply on WhatsApp, phone, or email.</span>
-                </li>
-                <li className="flex items-start gap-3 text-sm text-muted-foreground">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
-                    3
-                  </span>
-                  <span>No obligation — just an easy way to ask.</span>
-                </li>
+                {rq.whatHappensNext.steps.map((step, index) => (
+                  <li key={index} className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
+                      {index + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
               </ul>
               <p className="mt-6 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 <Clock className="size-4" aria-hidden="true" />
-                We typically respond within one business day
+                {rq.whatHappensNext.responseTime}
               </p>
             </div>
           </div>
@@ -187,10 +215,10 @@ export default async function RequestQuotePage({
           <div className="lg:col-span-3">
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
               <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
-                Send your request
+                {rq.sendRequest.title}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Fill in the short form and we will send you the prices.
+                {rq.sendRequest.description}
               </p>
               <div className="mt-6">
                 <ProductRequestForm
@@ -207,6 +235,7 @@ export default async function RequestQuotePage({
                       : null,
                   }}
                   whatsappHref={whatsappHref}
+                  initialLang={lang}
                 />
               </div>
             </div>

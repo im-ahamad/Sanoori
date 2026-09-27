@@ -1,25 +1,100 @@
 "use client";
 
-import { useActionState } from "react";
-import { User, Building, Mail, Phone, MapPin, Globe, Settings, Key } from "lucide-react";
+import { useActionState, useState } from "react";
+import { User, Building, Globe, Key, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { businessConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import {
   updatePasswordAction,
   type UpdatePasswordActionResult,
 } from "@/lib/actions/settings";
+import {
+  updateBusinessSettingsAction,
+  type UpdateBusinessSettingsResult,
+} from "@/lib/actions/business-settings";
+import type { BusinessSettings } from "@/lib/admin/settings";
 
-export function AdminSettingsContent() {
+interface BusinessSettingsFormData {
+  name: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  address: string;
+  city: string;
+  country: string;
+  facebook: string;
+  instagram: string;
+  tiktok: string;
+  youtube: string;
+  telegram: string;
+}
+
+interface AdminSettingsContentProps {
+  initialSettings: BusinessSettings | null;
+}
+
+function getDefaultFormData(): BusinessSettingsFormData {
+  return {
+    name: "",
+    phone: "",
+    whatsapp: "",
+    email: "",
+    address: "",
+    city: "",
+    country: "",
+    facebook: "",
+    instagram: "",
+    tiktok: "",
+    youtube: "",
+    telegram: "",
+  };
+}
+
+function settingsToFormData(settings: BusinessSettings | null): BusinessSettingsFormData {
+  if (!settings) return getDefaultFormData();
+  return {
+    name: settings.name,
+    phone: settings.phone || "",
+    whatsapp: settings.whatsapp || "",
+    email: settings.email || "",
+    address: settings.address || "",
+    city: settings.city || "",
+    country: settings.country || "",
+    facebook: settings.facebook || "",
+    instagram: settings.instagram || "",
+    tiktok: settings.tiktok || "",
+    youtube: settings.youtube || "",
+    telegram: settings.telegram || "",
+  };
+}
+
+export function AdminSettingsContent({ initialSettings }: AdminSettingsContentProps) {
   const [passwordState, passwordFormAction] = useActionState<
     UpdatePasswordActionResult | undefined,
     FormData
   >(updatePasswordAction, undefined);
+
+  const [businessState, businessFormAction] = useActionState<
+    UpdateBusinessSettingsResult | undefined,
+    FormData
+  >(updateBusinessSettingsAction, undefined);
+
+  const [formData, setFormData] = useState<BusinessSettingsFormData>(() =>
+    settingsToFormData(initialSettings)
+  );
+
+  const settingsKey = initialSettings?.updatedAt?.toISOString() ?? "default";
+
+  const handleChange = (field: keyof BusinessSettingsFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const isLoading = businessState && !businessState.ok && businessState.message === "Updating…";
 
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
@@ -33,16 +108,16 @@ export function AdminSettingsContent() {
       </div>
 
       <Tabs defaultValue="business" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="business">
+        <TabsList className="flex w-full overflow-x-auto gap-2 p-1 grid-cols-3 sm:grid sm:overflow-visible sm:p-0">
+          <TabsTrigger value="business" className="whitespace-nowrap">
             <Building className="size-4 mr-2" aria-hidden="true" />
             Business
           </TabsTrigger>
-          <TabsTrigger value="social">
+          <TabsTrigger value="social" className="whitespace-nowrap">
             <Globe className="size-4 mr-2" aria-hidden="true" />
             Social Links
           </TabsTrigger>
-          <TabsTrigger value="admin">
+          <TabsTrigger value="admin" className="whitespace-nowrap">
             <User className="size-4 mr-2" aria-hidden="true" />
             Admin Profile
           </TabsTrigger>
@@ -61,111 +136,120 @@ export function AdminSettingsContent() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-1.5">
-                <Label htmlFor="business-name">Business Name</Label>
-                <Input
-                  id="business-name"
-                  defaultValue={businessConfig.name}
-                  disabled
-                  className="bg-muted/50"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Business name is configured in code. Update <code>src/config/site.ts</code> to change.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <form key={settingsKey} action={businessFormAction} className="space-y-6">
                 <div className="space-y-1.5">
-                  <Label htmlFor="business-phone">Phone</Label>
+                  <Label htmlFor="business-name">Business Name</Label>
                   <Input
-                    id="business-phone"
-                    type="tel"
-                    defaultValue={businessConfig.phone}
-                    disabled
-                    className="bg-muted/50"
+                    id="business-name"
+                    name="name"
+                    value={formData.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    required
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="business-phone">Phone</Label>
+                    <Input
+                      id="business-phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleChange("phone", e.target.value)}
+                      placeholder="+880 XX XXXX XXXX"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="business-whatsapp">WhatsApp</Label>
+                    <Input
+                      id="business-whatsapp"
+                      name="whatsapp"
+                      type="tel"
+                      value={formData.whatsapp}
+                      onChange={(e) => handleChange("whatsapp", e.target.value)}
+                      placeholder="+880 XX XXXX XXXX"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="business-whatsapp">WhatsApp</Label>
+                  <Label htmlFor="business-email">Email</Label>
                   <Input
-                    id="business-whatsapp"
-                    type="tel"
-                    defaultValue={businessConfig.whatsapp}
-                    disabled
-                    className="bg-muted/50"
+                    id="business-email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                    placeholder="info@example.com"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="business-email">Email</Label>
-                <Input
-                  id="business-email"
-                  type="email"
-                  defaultValue={businessConfig.email}
-                  disabled
-                  className="bg-muted/50"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="business-address">Address</Label>
-                <Input
-                  id="business-address"
-                  defaultValue={businessConfig.address}
-                  disabled
-                  className="bg-muted/50"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label htmlFor="business-city">City</Label>
-                  <Input
-                    id="business-city"
-                    defaultValue={businessConfig.city}
-                    disabled
-                    className="bg-muted/50"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                  </p>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="business-country">Country</Label>
+                  <Label htmlFor="business-address">Address</Label>
                   <Input
-                    id="business-country"
-                    defaultValue={businessConfig.country}
-                    disabled
-                    className="bg-muted/50"
+                    id="business-address"
+                    name="address"
+                    value={formData.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
+                    placeholder="123 Business Street"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                  </p>
                 </div>
-              </div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="business-city">City</Label>
+                    <Input
+                      id="business-city"
+                      name="city"
+                      value={formData.city}
+                      onChange={(e) => handleChange("city", e.target.value)}
+                      placeholder="Dhaka"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="business-country">Country</Label>
+                    <Input
+                      id="business-country"
+                      name="country"
+                      value={formData.country}
+                      onChange={(e) => handleChange("country", e.target.value)}
+                      placeholder="Bangladesh"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 pt-4 border-t border-border">
+                  <Button type="submit" disabled={isLoading} className="gap-2">
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                        Saving…
+                      </>
+                    ) : (
+                      <>
+                        <Save className="size-4" aria-hidden="true" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                  {businessState && !isLoading && (
+                    <p
+                      role="status"
+                      className={cn(
+                        "text-sm",
+                        businessState.ok ? "text-green-600" : "text-destructive"
+                      )}
+                    >
+                      {businessState.message}
+                    </p>
+                  )}
+                </div>
+              </form>
             </CardContent>
           </Card>
-
-          <p className="text-sm text-muted-foreground">
-            <strong>Note:</strong> Business information is currently managed in the configuration file (
-            <code>src/config/site.ts</code>). To edit these values, update the file and redeploy.
-            A database-backed settings system can be added in a future iteration if needed.
-          </p>
         </TabsContent>
 
         {/* ===== Social Links ===== */}
@@ -181,39 +265,56 @@ export function AdminSettingsContent() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {[
-                { key: "facebook", label: "Facebook", icon: "📘" },
-                { key: "instagram", label: "Instagram", icon: "📷" },
-                { key: "tiktok", label: "TikTok", icon: "🎵" },
-                { key: "youtube", label: "YouTube", icon: "▶️" },
-              ].map((social) => (
-                <div key={social.key} className="space-y-1.5">
-                  <Label htmlFor={`social-${social.key}`}>
-                    <span role="img" aria-label={social.label}>
-                      {social.icon}
-                    </span>{" "}
-                    {social.label}
-                  </Label>
-                  <Input
-                    id={`social-${social.key}`}
-                    type="url"
-                    defaultValue={businessConfig.social[social.key as keyof typeof businessConfig.social]}
-                    disabled
-                    className="bg-muted/50"
-                    placeholder={`https://${social.key.toLowerCase()}.com/yourprofile`}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Configured in <span className="font-mono text-xs bg-muted px-1 rounded">src/config/site.ts</span>.
-                  </p>
+              <form key={settingsKey} action={businessFormAction} className="space-y-4">
+                {[
+                  { key: "facebook", label: "Facebook", placeholder: "https://facebook.com/yourprofile" },
+                  { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/yourprofile" },
+                  { key: "tiktok", label: "TikTok", placeholder: "https://tiktok.com/@yourprofile" },
+                  { key: "youtube", label: "YouTube", placeholder: "https://youtube.com/@yourprofile" },
+                  { key: "telegram", label: "Telegram", placeholder: "https://t.me/yourprofile" },
+                ].map((social) => (
+                  <div key={social.key} className="space-y-1.5">
+                    <Label htmlFor={`social-${social.key}`}>{social.label}</Label>
+                    <Input
+                      id={`social-${social.key}`}
+                      name={social.key}
+                      type="url"
+                      value={formData[social.key as keyof BusinessSettingsFormData]}
+                      onChange={(e) => handleChange(social.key as keyof BusinessSettingsFormData, e.target.value)}
+                      placeholder={social.placeholder}
+                    />
+                  </div>
+                ))}
+
+                <div className="flex items-center gap-4 pt-4 border-t border-border">
+                  <Button type="submit" disabled={isLoading} className="gap-2">
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                        Saving…
+                      </>
+                    ) : (
+                      <>
+                        <Save className="size-4" aria-hidden="true" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                  {businessState && !isLoading && (
+                    <p
+                      role="status"
+                      className={cn(
+                        "text-sm",
+                        businessState.ok ? "text-green-600" : "text-destructive"
+                      )}
+                    >
+                      {businessState.message}
+                    </p>
+                  )}
                 </div>
-              ))}
+              </form>
             </CardContent>
           </Card>
-
-          <p className="text-sm text-muted-foreground">
-            <strong>Note:</strong> Social links are managed in the configuration file (
-            <code>src/config/site.ts</code>). Update the file and redeploy to change these values.
-          </p>
         </TabsContent>
 
         {/* ===== Admin Profile ===== */}
@@ -235,7 +336,7 @@ export function AdminSettingsContent() {
                 </div>
                 <div>
                   <p className="font-heading text-xl font-bold text-foreground">
-                    {businessConfig.name} Admin
+                    {formData.name || "Sanoori Trading"} Admin
                   </p>
                   <p className="text-sm text-muted-foreground">Administrator</p>
                 </div>

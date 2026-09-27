@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import type { InquiryStatus } from "@/generated/prisma/enums";
+import type { InquiryStatus } from "@/generated/prisma";
 import { inquiryStatusValues } from "@/lib/inquiries";
 
 /**

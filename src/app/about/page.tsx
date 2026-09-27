@@ -8,16 +8,27 @@ import { generatePageMetadata, generateOrganizationSchema } from "@/lib/seo";
 import { getCategoryIconElement } from "@/lib/category-icons";
 import { getPublicCategories } from "@/lib/public/catalogue";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
-export const metadata = generatePageMetadata({
-  title: "আমাদের সম্পর্কে",
-  description:
-    "সানুরি ট্রেডিং বাংলাদেশে স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস সরবরাহকারী প্রতিষ্ঠান।",
-  path: "/about",
-});
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export async function generateMetadata(): Promise<ReturnType<typeof generatePageMetadata>> {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
+  return generatePageMetadata({
+    title: t.about.heroTitle,
+    description: t.about.heroDescription,
+    path: "/about",
+  });
+}
 
 export default async function AboutPage() {
-  const t = getServerTranslations("bn");
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
   const categories = await getPublicCategories();
   const organizationSchema = JSON.stringify(generateOrganizationSchema());
 
@@ -29,7 +40,6 @@ export default async function AboutPage() {
         breadcrumbs={[{ label: t.about.breadcrumb, href: "/about" }]}
         breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
         backgroundImage="/images/about-hero.png"
-        unoptimized
         objectFit="object-contain"
         backdropOverlay="bg-[radial-gradient(ellipse_125%_80%_at_16%_-18%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_32%,transparent_78%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_90%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_80%,transparent)_20%,color-mix(in_oklab,var(--navy-dark)_60%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_36%,transparent)_66%,color-mix(in_oklab,var(--navy-dark)_14%,transparent)_84%,transparent_98%)]"
         placement="top-left"
@@ -70,7 +80,7 @@ export default async function AboutPage() {
                     <li key={category.id}>
                       <Link
                         href={`/products?category=${category.slug}`}
-                        className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-md"
+                        className="group flex items-start gap-4 rounded-lg border border-border bg-card p-5 transition-[border-color,box-shadow] hover:border-primary/30 hover:shadow-md"
                       >
                         <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-accent text-primary">
                           {getCategoryIconElement(category.slug, {

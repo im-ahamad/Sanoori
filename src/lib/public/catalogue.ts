@@ -2,7 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
-import type { Availability } from "@/generated/prisma/enums";
+import type { Availability } from "@/generated/prisma";
 import { PRODUCTS_CACHE_TAG } from "@/lib/cache";
 import {
   buildImageUrl,

@@ -2,7 +2,6 @@
 
 import { ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
-import { businessConfig } from "@/config/site";
 import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 import { useTranslations } from "@/lib/i18n";
 
@@ -17,7 +16,6 @@ export function Hero() {
         priority
         src="/images/hero.jpg"
         objectPosition="object-[64%_center]"
-        unoptimized
         noZoom
         overlayClassName="bg-[linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_28%,transparent)_30%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_58%,transparent_80%)]"
       />

@@ -5,6 +5,7 @@ import {
   Users,
   Settings,
   FileText,
+  SquareKanban,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Orders", href: "/admin/orders", icon: FileText, status: "ready" },
   { label: "Products", href: "/admin/products", icon: Package, status: "ready" },
   { label: "Categories", href: "/admin/categories", icon: Tags, status: "ready" },
+  { label: "Subcategories", href: "/admin/subcategories", icon: SquareKanban, status: "ready" },
   { label: "Customers", href: "/admin/customers", icon: Users, status: "ready" },
   { label: "Settings", href: "/admin/settings", icon: Settings, status: "ready" },
 ];

@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useTranslations, getTranslations, type SupportedLanguage } from "@/lib/i18n/use-translations";
 
 export interface ProductRequestTarget {
   slug: string;
@@ -39,6 +40,8 @@ interface ProductRequestFormProps {
   whatsappHref?: string | null;
   /** When provided (modal), the success panel shows a "Done" button. */
   onDone?: () => void;
+  /** Initial language for server-side rendering to avoid hydration mismatch. */
+  initialLang?: SupportedLanguage;
 }
 
 function FieldError({ id, error }: { id: string; error?: string }) {
@@ -60,7 +63,45 @@ export function ProductRequestForm({
   product,
   whatsappHref,
   onDone,
+  initialLang,
 }: ProductRequestFormProps) {
+  const tContext = useTranslations();
+  const [mounted, setMounted] = useState(false);
+  
+  // Use initialLang for SSR, switch to context after hydration
+  const t = mounted ? tContext : getTranslations(initialLang ?? "en");
+  const rq = t.requestQuote as typeof t.requestQuote & {
+    productSummary: { requestingPriceFor: string; modelLabel: string };
+    form: {
+      nameLabel: string;
+      namePlaceholder: string;
+      contactLabel: string;
+      contactPlaceholder: string;
+      contactHint: string;
+      quantityLabel: string;
+      quantityPlaceholder: string;
+      quantityHint: string;
+      messageLabel: string;
+      messageOptional: string;
+      messagePlaceholder: string;
+      messageHint: string;
+      submitButton: string;
+      submittingButton: string;
+      noObligation: string;
+    };
+    success: {
+      thankYou: string;
+      requestReady: string;
+      productLabel: string;
+      quantityLabel: string;
+      contactLabel: string;
+      doneButton: string;
+      continueBrowsing: string;
+      chatOnWhatsApp: string;
+    };
+    error: { default: string };
+  };
+
   const [state, formAction, pending] = useActionState(
     submitProductRequestAction,
     undefined
@@ -73,6 +114,12 @@ export function ProductRequestForm({
   });
   const successRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    // Set mounted after initial render to avoid hydration mismatch
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     if (state?.status === "success") {
@@ -136,31 +183,30 @@ export function ProductRequestForm({
               id="product-request-success-title"
               className="font-heading text-xl font-bold tracking-tight text-foreground"
             >
-              Thank you, {values.customerName.trim() || "friend"}!
+              {rq.success.thankYou.replace("{name}", values.customerName.trim() || "friend")}
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Your price request is ready. We will get back to you with the
-              price of {product.name} as quickly as possible.
+              {rq.success.requestReady.replace("{product}", product.name)}
             </p>
           </div>
         </div>
 
         <dl className="mt-6 space-y-2 rounded-lg bg-muted/40 p-4 text-sm">
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="text-muted-foreground">Product</dt>
+            <dt className="text-muted-foreground">{rq.success.productLabel}</dt>
             <dd className="text-right font-medium text-foreground">
               {product.name}
               {product.model ? ` · ${product.model}` : ""}
             </dd>
           </div>
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="text-muted-foreground">Quantity</dt>
+            <dt className="text-muted-foreground">{rq.success.quantityLabel}</dt>
             <dd className="text-right font-medium text-foreground">
               {values.quantity}
             </dd>
           </div>
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="text-muted-foreground">Contact</dt>
+            <dt className="text-muted-foreground">{rq.success.contactLabel}</dt>
             <dd className="text-right font-medium text-foreground">
               {values.contactNumber}
             </dd>
@@ -170,12 +216,12 @@ export function ProductRequestForm({
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           {onDone ? (
             <Button onClick={onDone} className="h-11 px-6">
-              Done
+              {rq.success.doneButton}
               <ArrowRight className="size-4" aria-hidden="true" />
             </Button>
           ) : (
             <ButtonLink href="/products" variant="primary">
-              Continue browsing products
+              {rq.success.continueBrowsing}
               <ArrowRight className="size-4" aria-hidden="true" />
             </ButtonLink>
           )}
@@ -187,7 +233,7 @@ export function ProductRequestForm({
               variant="outline"
             >
               <MessageCircle className="size-4" aria-hidden="true" />
-              Chat on WhatsApp
+              {rq.success.chatOnWhatsApp}
             </ButtonLink>
           )}
         </div>
@@ -214,7 +260,6 @@ export function ProductRequestForm({
             alt={product.image.alt ?? product.name}
             width={112}
             height={112}
-            unoptimized
             sizes="112px"
             className="size-16 flex-shrink-0 rounded-md object-cover sm:size-20"
           />
@@ -225,14 +270,14 @@ export function ProductRequestForm({
         )}
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            You are requesting a price for
+            {rq.productSummary.requestingPriceFor}
           </p>
           <h3 className="mt-0.5 truncate font-heading text-base font-semibold text-foreground">
             {product.name}
           </h3>
           {product.model ? (
             <p className="mt-0.5 truncate text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">Model:</span>{" "}
+              <span className="font-medium text-foreground">{rq.productSummary.modelLabel}</span>{" "}
               {product.model}
             </p>
           ) : (
@@ -248,14 +293,14 @@ export function ProductRequestForm({
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="pr-customerName">
-            Your name <span className="text-destructive">*</span>
+            {rq.form.nameLabel} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="pr-customerName"
             name="customerName"
             autoComplete="name"
             maxLength={200}
-            placeholder="e.g. Rahim Ahmed"
+            placeholder={rq.form.namePlaceholder}
             value={values.customerName}
             onChange={(event) => setValue("customerName", event.target.value)}
             required
@@ -268,7 +313,7 @@ export function ProductRequestForm({
 
         <div className="space-y-1.5">
           <Label htmlFor="pr-contactNumber">
-            WhatsApp or IMO Number <span className="text-destructive">*</span>
+            {rq.form.contactLabel} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="pr-contactNumber"
@@ -277,7 +322,7 @@ export function ProductRequestForm({
             inputMode="tel"
             autoComplete="tel"
             maxLength={30}
-            placeholder="e.g. +880 1XXX-XXXXXX"
+            placeholder={rq.form.contactPlaceholder}
             value={values.contactNumber}
             onChange={(event) => setValue("contactNumber", event.target.value)}
             required
@@ -291,7 +336,7 @@ export function ProductRequestForm({
             id="pr-contactNumber-hint"
             className={cn(contactError && "hidden", "text-xs text-muted-foreground")}
           >
-            We reply on WhatsApp or IMO.
+            {rq.form.contactHint}
           </p>
           <FieldError id="pr-contactNumber-error" error={contactError} />
         </div>
@@ -299,7 +344,7 @@ export function ProductRequestForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="pr-quantity">
-          Quantity <span className="text-destructive">*</span>
+          {rq.form.quantityLabel} <span className="text-destructive">*</span>
         </Label>
         <Input
           id="pr-quantity"
@@ -309,7 +354,7 @@ export function ProductRequestForm({
           autoComplete="off"
           maxLength={9}
           pattern="[0-9]*"
-          placeholder="e.g. 50"
+          placeholder={rq.form.quantityPlaceholder}
           value={values.quantity}
           onChange={(event) => setValue("quantity", event.target.value)}
           required
@@ -321,21 +366,21 @@ export function ProductRequestForm({
           id="pr-quantity-hint"
           className={cn(quantityError && "hidden", "text-xs text-muted-foreground")}
         >
-          How many units do you need?
+          {rq.form.quantityHint}
         </p>
         <FieldError id="pr-quantity-error" error={quantityError} />
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="pr-message">
-          Message <span className="text-muted-foreground">(optional)</span>
+          {rq.form.messageLabel} <span className="text-muted-foreground">{rq.form.messageOptional}</span>
         </Label>
         <Textarea
           id="pr-message"
           name="message"
           rows={4}
           maxLength={2000}
-          placeholder="Any sizes, finishes, delivery area, or other requirements…"
+          placeholder={rq.form.messagePlaceholder}
           value={values.message}
           onChange={(event) => setValue("message", event.target.value)}
           aria-invalid={messageError ? true : undefined}
@@ -346,7 +391,7 @@ export function ProductRequestForm({
             id="pr-message-hint"
             className={cn(messageError && "hidden", "text-xs text-muted-foreground")}
           >
-            Anything else you would like us to know.
+            {rq.form.messageHint}
           </p>
           <p className="text-right text-xs text-muted-foreground">
             {values.message.length}/2000
@@ -365,17 +410,17 @@ export function ProductRequestForm({
           {pending ? (
             <>
               <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-              Sending request…
+              {rq.form.submittingButton}
             </>
           ) : (
             <>
-              Ask for Price
+              {rq.form.submitButton}
               <Send className="size-5" aria-hidden="true" />
             </>
           )}
         </Button>
         <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">
-          No obligation — we typically reply within one business day.
+          {rq.form.noObligation}
         </p>
       </div>
     </form>

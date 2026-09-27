@@ -4,6 +4,12 @@ import { v2 as cloudinary } from "cloudinary";
 // browser. Importing this file from a client component fails the Next.js
 // client boundary check because `cloudinary` depends on Node.js APIs.
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME ?? "",
+  api_key: process.env.CLOUDINARY_API_KEY ?? "",
+  api_secret: process.env.CLOUDINARY_API_SECRET ?? "",
+});
+
 export const CLOUDINARY_ROOT_FOLDER = "SanooriTrading/products";
 
 function getConfig() {

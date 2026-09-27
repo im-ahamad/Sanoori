@@ -21,6 +21,7 @@ import {
   generateBreadcrumbSchema,
 } from "@/lib/seo";
 import { getPublicProductBySlug } from "@/lib/public/catalogue";
+import { getPublicBusinessSettings } from "@/lib/public/settings";
 
 export async function generateMetadata({
   params,
@@ -47,7 +48,10 @@ export default async function ProductDetailPage({
   params,
 }: PageProps<"/products/[slug]">) {
   const { slug } = await params;
-  const product = await getPublicProductBySlug(slug);
+  const [product, businessSettings] = await Promise.all([
+    getPublicProductBySlug(slug),
+    getPublicBusinessSettings(),
+  ]);
 
   if (!product) {
     notFound();
@@ -62,7 +66,8 @@ export default async function ProductDetailPage({
   const detailUrl = `/products/${product.slug}`;
   const productUrl = `${siteConfig.url}${detailUrl}`;
 
-  const phoneChannelEntry = getContactChannels().find(
+  const channels = getContactChannels(businessSettings);
+  const phoneChannelEntry = channels.find(
     (channel) => channel.id === "phone" && channel.isConfigured
   );
   const phoneChannel = phoneChannelEntry
@@ -151,6 +156,7 @@ export default async function ProductDetailPage({
                 productUrl={productUrl}
                 productSlug={product.slug}
                 phoneChannel={phoneChannel}
+                businessSettings={businessSettings}
               />
             </div>
           </div>

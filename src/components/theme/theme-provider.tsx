@@ -26,8 +26,16 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function applyTheme(resolved: ResolvedTheme) {
   const root = document.documentElement;
+  // Temporarily disable transitions during theme switch to avoid slow color animations
+  root.classList.add("theme-switching");
   root.classList.toggle("dark", resolved === "dark");
   root.style.colorScheme = resolved;
+  // Remove the transition-disabling class after the browser has painted
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      root.classList.remove("theme-switching");
+    });
+  });
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

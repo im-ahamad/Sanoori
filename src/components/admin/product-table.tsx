@@ -22,7 +22,7 @@ function availabilityBadge(availability: string): string {
     case "OUT_OF_STOCK":
       return "bg-muted text-muted-foreground";
     default:
-      return "bg-accent text-gold-dark";
+      return "bg-accent text-gold-text";
   }
 }
 
@@ -132,7 +132,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                   <th scope="col" className="px-4 py-3 font-semibold">
                     Featured
                   </th>
-                  <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
+                  <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
                     Updated
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
@@ -184,7 +184,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                         featured={product.featured}
                       />
                     </td>
-                    <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground xl:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground lg:table-cell">
                       <p>{formatDate(product.updatedAt)}</p>
                       <p className="text-[0.65rem] text-muted-foreground/70">
                         Created {formatDate(product.createdAt)}

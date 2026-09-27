@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
-import type { Availability } from "@/generated/prisma/enums";
+import type { Availability } from "@/generated/prisma";
 import type { AdminProductImage } from "@/lib/admin/product-images";
 
 /**

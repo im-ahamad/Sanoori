@@ -4,9 +4,17 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Reveal } from "@/components/shared/reveal";
 import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
-export function DiscoveryCta() {
-  const t = getServerTranslations("bn");
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export async function DiscoveryCta() {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
 
   return (
     <section className="relative overflow-hidden bg-navy text-white">

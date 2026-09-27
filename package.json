@@ -17,7 +17,10 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "db:create-admin": "tsx prisma/scripts/create-admin.ts"
+    "db:create-admin": "tsx prisma/scripts/create-admin.ts",
+    "db:start": "pg_ctl -D /opt/homebrew/var/postgresql@18 start",
+    "db:stop": "pg_ctl -D /opt/homebrew/var/postgresql@18 stop",
+    "db:status": "pg_ctl -D /opt/homebrew/var/postgresql@18 status"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -28,7 +31,6 @@
     "cloudinary": "^2.11.0",
     "cn": "^0.3.0",
     "lucide-react": "^1.47.0",
-    "motion": "^13.4.0",
     "next": "16.3.5",
     "next-auth": "^5.0.0-beta.32",
     "react": "19.2.8",

@@ -14,8 +14,13 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient(): PrismaClient {
+  const connectionString = process.env.DATABASE_URL ?? "";
+  const url = new URL(connectionString);
+  const database = url.pathname?.slice(1) || "sanoori_trading";
+  
   const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL ?? "",
+    connectionString,
+    database,
   });
 
   return new PrismaClient({ adapter });

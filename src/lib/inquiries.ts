@@ -1,4 +1,4 @@
-import { InquirySource, InquiryStatus } from "@/generated/prisma/enums";
+import { InquirySource, InquiryStatus } from "@/generated/prisma";
 
 export const inquiryStatusValues: ReadonlyArray<InquiryStatus> =
   Object.values(InquiryStatus);

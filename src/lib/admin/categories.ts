@@ -1,7 +1,6 @@
 import "server-only";
 
 import { db } from "@/lib/db";
-import { Prisma } from "@/generated/prisma/client";
 
 export type CategoriesResult<T> =
   | { ok: true; data: T }

@@ -46,6 +46,9 @@ interface VisualBackdropProps {
   /** Extra classes for the <img> element itself (e.g. to nudge the image
    * layer's rendered position without touching the wrapper box). */
   imageClassName?: string;
+  /** The `sizes` attribute for the image. Defaults to "100vw" for full-bleed
+   * backdrops. Override when the image does not span the full viewport width. */
+  sizes?: string;
   className?: string;
 }
 
@@ -71,8 +74,11 @@ export function VisualBackdrop({
   src,
   overlayClassName,
   imageClassName,
+  sizes = "100vw",
   className,
 }: VisualBackdropProps) {
+  const isDefaultSrc = !src || src === WEBSITE_VISUAL;
+  const shouldBlur = priority && !unoptimized && isDefaultSrc;
   return (
     <div
       aria-hidden="true"
@@ -87,11 +93,11 @@ export function VisualBackdrop({
           src={src ?? WEBSITE_VISUAL}
           alt=""
           fill
-          sizes="100vw"
+          sizes={sizes}
           quality={quality}
           priority={priority}
           unoptimized={unoptimized}
-          placeholder={priority && !unoptimized ? "blur" : "empty"}
+          placeholder={shouldBlur ? "blur" : "empty"}
           blurDataURL={WEBSITE_VISUAL_BLUR}
           className={cn(
             objectFit,

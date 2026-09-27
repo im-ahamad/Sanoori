@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import type { PublicCategory } from "@/lib/public/catalogue";
 import { cn } from "@/lib/utils";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
 /**
  * Map category slugs to their specific local hero images in /public/images/
@@ -16,6 +17,12 @@ const CATEGORY_HERO_IMAGES: Record<string, string> = {
   tiles: "/images/category-tiles.jpg",
   "building-materials": "/images/category-building.jpg",
 };
+
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 /**
  * The category records point at `/images/categories/*.jpg`, files that are not
@@ -51,7 +58,7 @@ function getCategoryNumber(index: number): string {
   return String(index).padStart(2, "0");
 }
 
-export function CategoryCard({
+export async function CategoryCard({
   category,
   featured = false,
   index = 1,
@@ -62,7 +69,8 @@ export function CategoryCard({
   index?: number;
   className?: string;
 }) {
-  const t = getServerTranslations("bn");
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
   const href = `/products?category=${category.slug}`;
   const imageSrc = getCategoryImage(category);
   const hasImage = hasCategoryImage(category);
@@ -75,8 +83,8 @@ export function CategoryCard({
       href={href}
       aria-label={t.categoryCard.ariaLabel.replace("{category}", translatedName)}
       className={cn(
-        "group relative block overflow-hidden border border-border bg-card",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
+        "group relative block overflow-hidden border border-border bg-card rounded-lg shadow-sm",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         featured ? "min-h-[320px] md:h-full md:min-h-0" : "min-h-[320px] md:h-full md:min-h-0",
         className
       )}
@@ -94,7 +102,6 @@ export function CategoryCard({
                   ? "(max-width: 768px) 100vw, 50vw"
                   : "(max-width: 768px) 100vw, 50vw"
               }
-              unoptimized
               priority={featured}
               className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.03]"
             />

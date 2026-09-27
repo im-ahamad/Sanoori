@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Phone, X } from "lucide-react";
-import { businessConfig, siteConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
 import { Button } from "@/components/ui/button";
@@ -13,13 +12,15 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LanguageToggle } from "@/components/language/language-toggle";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
 
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
+  settings: PublicBusinessSettings;
 }
 
-export function MobileNav({ open, onClose }: MobileNavProps) {
+export function MobileNav({ open, onClose, settings }: MobileNavProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const t = useTranslations();
@@ -103,16 +104,16 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  const whatsappHref = buildWhatsAppLink(GENERAL_ENQUIRY_MESSAGE);
+  const whatsappHref = buildWhatsAppLink(settings, GENERAL_ENQUIRY_MESSAGE);
   const showWhatsApp = Boolean(whatsappHref);
-  const showPhone = !isConfigPlaceholder(businessConfig.phone);
+  const showPhone = !isConfigPlaceholder(settings.phone);
   const showContactLinks = showWhatsApp || showPhone;
 
   return (
     <>
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-navy-dark/50 lg:hidden"
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -122,6 +123,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
         ref={panelRef}
         id="mobile-nav-panel"
         tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
         className={cn(
           "fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-background shadow-2xl outline-none transition-[transform,visibility] duration-300 ease-in-out motion-reduce:transition-none lg:hidden",
           open ? "visible translate-x-0" : "invisible translate-x-full"
@@ -139,7 +141,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           <Link
             href="/"
             onClick={onClose}
-            aria-label={t.mobileNav.brandHome.replace("{name}", businessConfig.name)}
+            aria-label={t.mobileNav.brandHome.replace("{name}", settings.name)}
             className="flex items-center"
           >
             <Brand size="sm" />
@@ -222,11 +224,11 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               )}
               {showPhone && (
                 <a
-                  href={`tel:${businessConfig.phone}`}
+                  href={`tel:${settings.phone}`}
                   className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                 >
                   <Phone className="size-4" aria-hidden="true" />
-                  {businessConfig.phone}
+                  {settings.phone}
                 </a>
               )}
             </div>

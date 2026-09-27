@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SlidersHorizontal, Search } from "lucide-react";
 import type { PublicCategory } from "@/lib/public/catalogue";
-import { Availability } from "@/generated/prisma/enums";
+import { Availability } from "@/generated/prisma";
 import { cn } from "@/lib/utils";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 
@@ -222,7 +222,7 @@ function CategoryChip({
         "inline-flex h-14 items-center justify-center rounded-full border px-6 font-medium transition-colors duration-200 text-[1rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         active
           ? "border-primary bg-primary text-primary-foreground hover:text-gold"
-          : "border-border bg-background text-foreground hover:border-primary/40 hover:text-gold"
+          : "border-border bg-background text-foreground hover:border-primary/40 hover:text-gold-text"
       )}
     >
       {children}

@@ -354,7 +354,7 @@ export function ProductImageManager({
             (atLimit || isPending) && "cursor-not-allowed opacity-60"
           )}
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-gold-dark">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-gold-text">
             <Upload className="size-5" aria-hidden="true" />
           </span>
           <span className="min-w-0">
@@ -368,8 +368,8 @@ export function ProductImageManager({
             </span>
           </span>
           {!atLimit && !isPending ? (
-            <span className="ml-auto hidden shrink-0 cursor-pointer rounded-lg border border-border bg-background px-2.5 py-1 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:bg-muted sm:block">
-              Browse images
+            <span className="ml-auto shrink-0 cursor-pointer rounded-lg border border-border bg-background px-2.5 py-1 text-[0.8rem] font-medium text-muted-foreground transition-colors hover:bg-muted sm:hidden">
+              Browse
             </span>
           ) : null}
         </button>

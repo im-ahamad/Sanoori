@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const cardImage = product.image;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-gold-dark/40 hover:shadow-lg">
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-gold-dark/40 hover:shadow-lg">
       <Link
         href={detailsHref}
         className="relative block aspect-[4/3] overflow-hidden bg-navy-dark"
@@ -37,7 +37,6 @@ export function ProductCard({ product }: ProductCardProps) {
             alt={cardImage.alt ?? product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            unoptimized
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (

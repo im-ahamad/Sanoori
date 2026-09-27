@@ -3,9 +3,17 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Reveal } from "@/components/shared/reveal";
 import { VisualBackdrop } from "@/components/shared/visual-backdrop";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
 
-export function CtaBand() {
-  const t = getServerTranslations("bn");
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
+
+export async function CtaBand() {
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
 
   return (
     <section className="relative overflow-hidden bg-navy-dark text-white">
@@ -31,7 +39,7 @@ export function CtaBand() {
       />
 
       <Container>
-        <div className="relative py-16 sm:py-20 lg:py-28">
+        <div className="section-spacing relative">
           <Reveal>
             <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
               <div className="max-w-2xl">

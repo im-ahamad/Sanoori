@@ -54,35 +54,37 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
         className="order-first flex gap-2 overflow-x-auto pb-1 lg:order-none lg:col-start-2 lg:row-start-1 lg:flex-col lg:overflow-visible"
         aria-label="Product image gallery"
       >
-        {images.map((image, index) => {
-          const alt = image.alt ?? `${productName} image ${index + 1}`;
-          const active = index === selectedIndex;
-          return (
-            <li key={image.id} className="shrink-0 lg:shrink">
-              <button
-                type="button"
-                onClick={() => setSelectedIndex(index)}
-                aria-label={`Show image ${index + 1} of ${images.length}: ${alt}`}
-                aria-pressed={active}
-                className={cn(
-                  "relative block size-16 overflow-hidden rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:size-20 lg:size-full lg:aspect-square",
-                  active
-                    ? "border-primary ring-1 ring-primary"
-                    : "border-border hover:border-primary/50"
-                )}
-              >
-                <Image
-                  src={productImageThumb(image.url, 200)}
-                  alt=""
-                  fill
-                  sizes="80px"
-                  unoptimized
-                  priority={index === 0}
-                />
-              </button>
-            </li>
-          );
-        })}
+{images.map((image, index) => {
+            const alt = image.alt ?? `${productName} image ${index + 1}`;
+            const active = index === selectedIndex;
+            return (
+              <li key={image.id} className="shrink-0 lg:shrink">
+                <button
+                  type="button"
+                  onClick={() => setSelectedIndex(index)}
+                  aria-label={`Show image ${index + 1} of ${images.length}: ${alt}`}
+                  aria-pressed={active}
+                  className={cn(
+                    "relative block size-16 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:size-20 lg:size-full lg:aspect-square",
+                    active
+                      ? "border-primary ring-1 ring-primary"
+                      : "border-border hover:border-primary/50"
+                  )}
+                >
+                  <span className="absolute inset-0 overflow-hidden rounded-md">
+                    <Image
+                      src={productImageThumb(image.url, 200)}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      unoptimized
+                      priority={index === 0}
+                    />
+                  </span>
+                </button>
+              </li>
+            );
+          })}
       </ul>
     </div>
   );

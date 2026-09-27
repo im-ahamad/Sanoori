@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 const initialState: ProductActionState = undefined;
 
@@ -31,6 +32,7 @@ export function DeleteProductDialog({
     deleteProductAction,
     initialState
   );
+  const t = useAdminTranslations();
 
   return (
     <AlertDialog>
@@ -38,7 +40,7 @@ export function DeleteProductDialog({
         render={
           <Button variant="ghost" size="icon-sm" className="text-destructive hover:text-destructive">
             <Trash2 className="size-4" />
-            <span className="sr-only">Delete {productName}</span>
+            <span className="sr-only">{t.common.deleteProduct} {productName}</span>
           </Button>
         }
       />
@@ -47,11 +49,9 @@ export function DeleteProductDialog({
           <AlertDialogMedia>
             <TriangleAlert className="size-6 text-destructive" aria-hidden="true" />
           </AlertDialogMedia>
-          <AlertDialogTitle>Delete &ldquo;{productName}&rdquo;?</AlertDialogTitle>
+          <AlertDialogTitle>{t.common.deleteProductConfirm.replace("{name}", productName)}</AlertDialogTitle>
           <AlertDialogDescription>
-            This permanently removes the product and its images. Related customer
-            inquiries are kept but will no longer link to this product. This action
-            cannot be undone.
+            {t.common.deleteProductDesc}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -67,7 +67,7 @@ export function DeleteProductDialog({
         <form action={formAction} aria-busy={pending}>
           <input type="hidden" name="productId" value={productId} />
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>{t.common.cancel}</AlertDialogCancel>
             <Button
               type="submit"
               variant="destructive"
@@ -76,10 +76,10 @@ export function DeleteProductDialog({
               {pending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                  Deleting…
+                  {t.common.deleting}
                 </>
               ) : (
-                "Delete product"
+                t.common.deleteProductAction
               )}
             </Button>
           </AlertDialogFooter>

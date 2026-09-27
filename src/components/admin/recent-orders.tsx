@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Inbox } from "lucide-react";
 import type { RecentOrder } from "@/lib/admin/dashboard";
 import { EmptyState } from "@/components/shared/empty-state";
 import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
 import { formatInquiryDate } from "@/lib/inquiries";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 function formatDate(date: Date): string {
   return formatInquiryDate(date);
 }
 
 export function RecentOrders({ orders }: { orders: RecentOrder[] }) {
+  const t = useAdminTranslations();
+
   if (orders.length === 0) {
     return (
       <section aria-labelledby="recent-orders-heading">
@@ -17,12 +22,12 @@ export function RecentOrders({ orders }: { orders: RecentOrder[] }) {
           id="recent-orders-heading"
           className="font-heading text-base font-bold tracking-tight text-foreground"
         >
-          Recent orders
+          {t.common.recentOrders}
         </h2>
         <div className="mt-4 rounded-lg border border-border bg-background">
           <EmptyState
-            title="No orders yet"
-            description="When customers submit a quote request, it will show up here."
+            title={t.common.noOrdersYet}
+            description={t.common.ordersAppearHere}
             icon={<Inbox className="size-8 text-muted-foreground" />}
           />
         </div>
@@ -37,13 +42,13 @@ export function RecentOrders({ orders }: { orders: RecentOrder[] }) {
           id="recent-orders-heading"
           className="font-heading text-base font-bold tracking-tight text-foreground"
         >
-          Recent orders
+          {t.common.recentOrders}
         </h2>
         <Link
           href="/admin/orders"
           className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
         >
-          View all
+          {t.common.viewAll}
           <ArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
@@ -54,19 +59,19 @@ export function RecentOrders({ orders }: { orders: RecentOrder[] }) {
           <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
               <th scope="col" className="px-4 py-3 font-semibold">
-                Customer
+                {t.common.customer}
               </th>
               <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                Product
+                {t.common.product}
               </th>
               <th scope="col" className="hidden px-4 py-3 font-semibold sm:table-cell">
-                Qty
+                {t.common.qty}
               </th>
               <th scope="col" className="px-4 py-3 font-semibold">
-                Status
+                {t.common.status}
               </th>
               <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
-                Date
+                {t.common.date}
               </th>
             </tr>
           </thead>

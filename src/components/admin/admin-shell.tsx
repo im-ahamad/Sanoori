@@ -10,6 +10,8 @@ import { logoutAction } from "@/lib/actions/auth";
 import { adminNavItems } from "@/lib/admin/nav";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LanguageToggle } from "@/components/language/language-toggle";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface AdminShellProps {
   user: { name: string | null; email: string | null };
@@ -37,6 +39,7 @@ function Brand() {
 }
 
 function LogoutButton({ className }: { className?: string }) {
+  const t = useAdminTranslations();
   return (
     <form action={logoutAction} className={className}>
       <Button
@@ -46,14 +49,24 @@ function LogoutButton({ className }: { className?: string }) {
         className="w-full justify-start text-foreground/75 hover:text-foreground"
       >
         <LogOut className="size-4" />
-        Sign out
+        {t.common.logout}
       </Button>
     </form>
   );
 }
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({ onNavigate, t }: { onNavigate?: () => void; t: ReturnType<typeof useAdminTranslations> }) {
   const pathname = usePathname();
+
+  const navLabelMap: Record<string, string> = {
+    Dashboard: t.common.dashboard,
+    Orders: t.common.orders,
+    Products: t.common.products,
+    Categories: t.common.categories,
+    Subcategories: t.common.subcategories,
+    Customers: t.common.customers,
+    Settings: t.common.settings,
+  };
 
   return (
     <nav className="flex flex-col gap-1" aria-label="Admin navigation">
@@ -74,10 +87,10 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             )}
           >
             <Icon className="size-4 shrink-0 text-gold" aria-hidden="true" />
-            <span className="flex-1">{item.label}</span>
+            <span className="flex-1">{navLabelMap[item.label] ?? item.label}</span>
             {item.status === "soon" && (
               <span className="rounded-full border border-white/20 px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-white/50">
-                Soon
+                {t.common.soon}
               </span>
             )}
           </Link>
@@ -89,9 +102,10 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AdminShell({ user, children }: AdminShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useAdminTranslations();
 
   const displayName =
-    user.name ?? (user.email ? user.email.split("@")[0] : "Administrator");
+    user.name ?? (user.email ? user.email.split("@")[0] : t.common.administrator);
 
   return (
     <div className="flex min-h-dvh flex-col bg-muted/40">
@@ -120,8 +134,10 @@ export function AdminShell({ user, children }: AdminShellProps) {
               className="hidden items-center gap-1.5 rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ExternalLink className="size-4" aria-hidden="true" />
-              View website
+              {t.common.viewWebsite}
             </Link>
+
+            <LanguageToggle variant="panel" className="hidden sm:flex" />
 
             <div className="hidden text-right leading-tight md:block">
               <p className="text-sm font-semibold text-foreground">
@@ -143,7 +159,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
         {/* ===== Desktop sidebar ===== */}
         <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-navy-dark lg:flex">
           <div className="sticky top-14 flex flex-1 flex-col gap-4 overflow-y-auto p-4">
-            <NavLinks />
+            <NavLinks t={t} />
             <div className="mt-auto border-t border-white/10 pt-4">
               <LogoutButton className="text-white/70" />
             </div>
@@ -183,7 +199,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
             </div>
 
             <div className="mt-6 flex-1">
-              <NavLinks onNavigate={() => setMobileOpen(false)} />
+              <NavLinks onNavigate={() => setMobileOpen(false)} t={t} />
             </div>
 
             <div className="border-t border-white/10 pt-4">
@@ -191,12 +207,13 @@ export function AdminShell({ user, children }: AdminShellProps) {
                 {displayName}
               </div>
               <div className="flex flex-col gap-1">
+                <LanguageToggle variant="panel" className="mb-3" />
                 <Link
                   href="/"
                   className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   <ExternalLink className="size-4 shrink-0 text-gold" />
-                  View website
+                  {t.common.viewWebsite}
                 </Link>
                 <LogoutButton className="text-white/70" />
               </div>

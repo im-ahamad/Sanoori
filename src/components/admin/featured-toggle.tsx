@@ -5,6 +5,7 @@ import { Loader2, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toggleProductFeaturedAction } from "@/lib/actions/products";
 import { cn } from "@/lib/utils";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface FeaturedToggleProps {
   productId: string;
@@ -15,6 +16,7 @@ export function FeaturedToggle({ productId, featured }: FeaturedToggleProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const t = useAdminTranslations();
 
   const toggle = () => {
     setError(null);
@@ -35,7 +37,7 @@ export function FeaturedToggle({ productId, featured }: FeaturedToggleProps) {
         onClick={toggle}
         disabled={isPending}
         aria-pressed={featured}
-        title="Mark as featured / unfeatured"
+        title={t.common.featuredToggleTitle}
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
           featured
@@ -54,7 +56,7 @@ export function FeaturedToggle({ productId, featured }: FeaturedToggleProps) {
             aria-hidden="true"
           />
         )}
-        {featured ? "Featured" : "Feature"}
+        {featured ? t.common.featured : t.common.feature}
       </button>
       <span className="sr-only" role="status" aria-live="polite">
         {error ? error : ""}

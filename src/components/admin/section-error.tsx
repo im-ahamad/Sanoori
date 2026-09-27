@@ -1,4 +1,7 @@
+"use client";
+
 import { TriangleAlert } from "lucide-react";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface SectionErrorProps {
   title?: string;
@@ -6,9 +9,11 @@ interface SectionErrorProps {
 }
 
 export function SectionError({
-  title = "Could not load data",
-  description = "Something went wrong loading this section. Please try again in a moment.",
+  title,
+  description,
 }: SectionErrorProps) {
+  const t = useAdminTranslations();
+
   return (
     <div
       role="alert"
@@ -19,10 +24,10 @@ export function SectionError({
         aria-hidden="true"
       />
       <h3 className="mt-3 font-heading text-base font-bold text-foreground">
-        {title}
+        {title ?? t.common.couldNotLoadData}
       </h3>
       <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">
-        {description}
+        {description ?? t.common.somethingWentWrongLoading}
       </p>
     </div>
   );

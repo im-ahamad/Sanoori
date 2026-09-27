@@ -10,10 +10,18 @@ import { ProductTable } from "@/components/admin/product-table";
 import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FlashBanner, type FlashKind } from "@/components/admin/flash-banner";
+import { cookies } from "next/headers";
+import { getServerAdminTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = {
   title: "Products",
 };
+
+async function getLanguage(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 function stringParam(
   value: string | string[] | undefined
@@ -24,7 +32,11 @@ function stringParam(
 export default async function AdminProductsPage(
   props: PageProps<"/admin/products">
 ) {
-  const searchParams = await props.searchParams;
+  const [lang, searchParams] = await Promise.all([
+    getLanguage(),
+    props.searchParams,
+  ]);
+  const t = getServerAdminTranslations(lang);
 
   const queryParams = {
     q: stringParam(searchParams.q) ?? "",
@@ -83,15 +95,15 @@ export default async function AdminProductsPage(
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Products
+            {t.common.products}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Create, edit, organize, and manage your product catalogue.
+            {t.common.createEditOrganizeManageCatalogue}
           </p>
         </div>
         <Button render={<Link href="/admin/products/new" />}>
           <PackagePlus className="size-4" aria-hidden="true" />
-          Add Product
+          {t.common.addProduct}
         </Button>
       </div>
 
@@ -107,15 +119,15 @@ export default async function AdminProductsPage(
 
       {!listResult.ok ? (
         <SectionError
-          title="Could not load products"
-          description="We could not load your products. Please try again in a moment."
+          title={t.common.couldNotLoadProducts}
+          description={t.common.pleaseTryAgain}
         />
       ) : listResult.data.items.length === 0 ? (
         hasFilters ? (
           <div className="rounded-lg border border-border bg-background">
             <EmptyState
-              title="No matching products"
-              description="No products match your current search or filters. Try different terms or clear the filters."
+              title={t.common.noMatchingProducts}
+              description={t.common.noProductsMatchFilters}
               icon={<SearchX className="size-8 text-muted-foreground" />}
             />
             <div className="flex justify-center pb-10">
@@ -124,21 +136,21 @@ export default async function AdminProductsPage(
                 size="sm"
                 render={<Link href="/admin/products" />}
               >
-                Clear search and filters
+                {t.common.clearSearchFilters}
               </Button>
             </div>
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-background">
             <EmptyState
-              title="No products yet"
-              description="Your catalogue is empty. Add your first product to start managing it here."
+              title={t.common.noProductsYet}
+              description={t.common.catalogueEmptyAddFirst}
               icon={<Package className="size-8 text-muted-foreground" />}
             />
             <div className="flex justify-center pb-10">
               <Button render={<Link href="/admin/products/new" />}>
                 <PackagePlus className="size-4" aria-hidden="true" />
-                Add Product
+                {t.common.addProduct}
               </Button>
             </div>
           </div>
@@ -146,7 +158,7 @@ export default async function AdminProductsPage(
       ) : (
         <div>
           <p className="sr-only" role="status">
-            Showing {listResult.data.total.toLocaleString()} products
+            {t.common.showingProducts.replace("{total}", listResult.data.total.toLocaleString())}
           </p>
           <ProductTable data={listResult.data} query={queryString} />
         </div>
@@ -154,7 +166,7 @@ export default async function AdminProductsPage(
 
       {!filtersKnown ? (
         <p className="text-xs text-muted-foreground">
-          Category filters are unavailable right now, but search still works.
+          {t.common.categoryFiltersUnavailable}
         </p>
       ) : null}
     </div>

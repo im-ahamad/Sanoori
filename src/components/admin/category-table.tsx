@@ -10,6 +10,7 @@ import {
   deleteCategoryAction,
   type DeleteCategoryActionResult,
 } from "@/lib/actions/categories";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface CategoryTableProps {
   data: AdminCategoryList;
@@ -28,9 +29,11 @@ interface SubcategoryItem {
 function CategoryRow({
   category,
   level = 0,
+  t,
 }: {
   category: AdminCategoryList["items"][0];
   level?: number;
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   const indent = level * 24;
 
@@ -63,10 +66,10 @@ function CategoryRow({
           </span>
         </td>
         <td className="hidden px-4 py-3 text-muted-foreground xl:table-cell">
-          {category._count.products} product{category._count.products !== 1 ? "s" : ""}
+          {category._count.products} {t.common.productsInCategory}
         </td>
         <td className="hidden px-4 py-3 text-muted-foreground xl:table-cell">
-          {category._count.subcategories} subcategory{category._count.subcategories !== 1 ? "s" : ""}
+          {category._count.subcategories} {t.common.subcategoriesInCategory}
         </td>
         <td className="px-4 py-3">
           <span
@@ -76,7 +79,7 @@ function CategoryRow({
                 : "bg-muted-foreground/10 text-muted-foreground"
             }`}
           >
-            {category.isActive ? "Active" : "Inactive"}
+            {category.isActive ? t.common.activeStatus : t.common.inactiveStatus}
           </span>
         </td>
         <td className="hidden px-4 py-3 text-xs text-muted-foreground xl:table-cell">
@@ -90,18 +93,18 @@ function CategoryRow({
             <Link
               href={`/admin/categories/${category.id}/edit`}
               className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-              aria-label={`Edit ${category.name}`}
+              aria-label={`${t.common.edit} ${category.name}`}
             >
               <Edit className="size-4" aria-hidden="true" />
             </Link>
-            <CategoryDeleteButton categoryId={category.id} categoryName={category.name} />
+            <CategoryDeleteButton categoryId={category.id} categoryName={category.name} t={t} />
           </div>
         </td>
       </tr>
       {category.subcategories && category.subcategories.length > 0 && (
         <>
           {category.subcategories.map((sub) => (
-            <SubcategoryRow key={sub.id} subcategory={sub} level={level + 1} />
+            <SubcategoryRow key={sub.id} subcategory={sub} level={level + 1} t={t} />
           ))}
         </>
       )}
@@ -112,9 +115,11 @@ function CategoryRow({
 function SubcategoryRow({
   subcategory,
   level = 0,
+  t,
 }: {
   subcategory: SubcategoryItem;
   level?: number;
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   const indent = level * 24;
 
@@ -144,14 +149,14 @@ function SubcategoryRow({
         <span className="line-clamp-1 text-muted-foreground">—</span>
       </td>
       <td className="hidden px-4 py-3 text-muted-foreground xl:table-cell">
-        {subcategory._count.products} product{subcategory._count.products !== 1 ? "s" : ""}
+        {subcategory._count.products} {t.common.productsInCategory}
       </td>
       <td className="hidden px-4 py-3 text-muted-foreground xl:table-cell">
-        0 subcategories
+        0 {t.common.subcategoriesInCategory}
       </td>
       <td className="px-4 py-3">
         <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-muted-foreground/10 text-muted-foreground">
-          Inactive
+          {t.common.inactiveStatus}
         </span>
       </td>
       <td className="hidden px-4 py-3 text-xs text-muted-foreground xl:table-cell">
@@ -165,7 +170,7 @@ function SubcategoryRow({
           <Link
             href={`/admin/categories/${subcategory.id}/edit`}
             className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-            aria-label={`Edit ${subcategory.name}`}
+            aria-label={`${t.common.edit} ${subcategory.name}`}
           >
             <Edit className="size-4" aria-hidden="true" />
           </Link>
@@ -178,9 +183,11 @@ function SubcategoryRow({
 function CategoryDeleteButton({
   categoryId,
   categoryName,
+  t,
 }: {
   categoryId: string;
   categoryName: string;
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   const [state, formAction] = useActionState<
     DeleteCategoryActionResult | undefined,
@@ -196,7 +203,7 @@ function CategoryDeleteButton({
         size="icon-sm"
         disabled={state?.ok === false || !state}
         className="text-destructive hover:bg-destructive/10"
-        aria-label={`Delete ${categoryName}`}
+        aria-label={`${t.common.deleteCategory} ${categoryName}`}
       >
         <Trash2 className="size-4" aria-hidden="true" />
       </Button>
@@ -205,6 +212,8 @@ function CategoryDeleteButton({
 }
 
 export function CategoryTable({ data }: CategoryTableProps) {
+  const t = useAdminTranslations();
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
@@ -215,34 +224,34 @@ export function CategoryTable({ data }: CategoryTableProps) {
               <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Category
+                    {t.common.category}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    Slug
+                    {t.common.slug}
                   </th>
                   <th scope="col" className="hidden max-w-56 px-4 py-3 font-semibold lg:table-cell">
-                    Description
+                    {t.common.description}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Products
+                    {t.common.products}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Subcategories
+                    {t.common.subcategories}
                   </th>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Status
+                    {t.common.status}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Created
+                    {t.common.created}
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
-                    Actions
+                    {t.common.actions}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {data.items.map((category) => (
-                  <CategoryRow key={category.id} category={category} />
+                  <CategoryRow key={category.id} category={category} t={t} />
                 ))}
               </tbody>
             </table>
@@ -252,12 +261,12 @@ export function CategoryTable({ data }: CategoryTableProps) {
           <ul className="divide-y divide-border lg:hidden">
             {data.items.map((category) => (
               <li key={category.id} className="p-4">
-                <CategoryCard category={category} />
+                <CategoryCard category={category} t={t} />
                 {category.subcategories && category.subcategories.length > 0 && (
                   <ul className="mt-3 space-y-3 border-l-2 border-border pl-4 ml-6">
                     {category.subcategories.map((sub) => (
                       <li key={sub.id}>
-                        <SubcategoryCard subcategory={sub} />
+                        <SubcategoryCard subcategory={sub} t={t} />
                       </li>
                     ))}
                   </ul>
@@ -273,8 +282,10 @@ export function CategoryTable({ data }: CategoryTableProps) {
 
 function CategoryCard({
   category,
+  t,
 }: {
   category: AdminCategoryList["items"][0];
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   return (
     <div>
@@ -301,17 +312,17 @@ function CategoryCard({
               : "bg-muted-foreground/10 text-muted-foreground"
           }`}
         >
-          {category.isActive ? "Active" : "Inactive"}
+          {category.isActive ? t.common.activeStatus : t.common.inactiveStatus}
         </span>
       </div>
 
       <p className="mt-2 text-xs text-muted-foreground">
-        {category._count.products} product{category._count.products !== 1 ? "s" : ""}{" "}
+        {category._count.products} {t.common.productsInCategory}{" "}
         ·{" "}
-        {category._count.subcategories} subcategory{category._count.subcategories !== 1 ? "s" : ""}
+        {category._count.subcategories} {t.common.subcategoriesInCategory}
       </p>
       <p className="mt-1 text-xs text-muted-foreground/80">
-        Created{" "}
+        {t.common.created}{" "}
         {new Intl.DateTimeFormat("en-US", {
           dateStyle: "medium",
           timeStyle: "short",
@@ -322,11 +333,11 @@ function CategoryCard({
         <Link
           href={`/admin/categories/${category.id}/edit`}
           className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-          aria-label={`Edit ${category.name}`}
+          aria-label={`${t.common.edit} ${category.name}`}
         >
           <Edit className="size-4" aria-hidden="true" />
         </Link>
-        <CategoryDeleteButton categoryId={category.id} categoryName={category.name} />
+        <CategoryDeleteButton categoryId={category.id} categoryName={category.name} t={t} />
       </div>
     </div>
   );
@@ -334,8 +345,10 @@ function CategoryCard({
 
 function SubcategoryCard({
   subcategory,
+  t,
 }: {
   subcategory: SubcategoryItem;
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   return (
     <div className="pt-2">
@@ -351,15 +364,15 @@ function SubcategoryCard({
           <p className="mt-0.5 text-xs text-muted-foreground">{subcategory.slug}</p>
         </div>
         <span className="inline-flex items-center shrink-0 rounded-full px-2 py-0.5 text-xs font-medium bg-muted-foreground/10 text-muted-foreground">
-          Inactive
+          {t.common.inactiveStatus}
         </span>
       </div>
 
       <p className="mt-1 text-xs text-muted-foreground">
-        {subcategory._count.products} product{subcategory._count.products !== 1 ? "s" : ""}
+        {subcategory._count.products} {t.common.productsInCategory}
       </p>
       <p className="mt-1 text-xs text-muted-foreground/80">
-        Created{" "}
+        {t.common.created}{" "}
         {new Intl.DateTimeFormat("en-US", {
           dateStyle: "medium",
           timeStyle: "short",
@@ -370,7 +383,7 @@ function SubcategoryCard({
         <Link
           href={`/admin/categories/${subcategory.id}/edit`}
           className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-          aria-label={`Edit ${subcategory.name}`}
+          aria-label={`${t.common.edit} ${subcategory.name}`}
         >
           <Edit className="size-4" aria-hidden="true" />
         </Link>

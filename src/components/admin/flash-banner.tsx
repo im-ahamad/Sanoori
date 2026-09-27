@@ -3,22 +3,32 @@
 import { useState } from "react";
 import { CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
-const flashMessages = {
-  created: "Product created successfully.",
-  updated: "Product updated successfully.",
-  deleted: "Product deleted.",
-  inquiryUpdated: "Inquiry status updated.",
-  subcategoryCreated: "Subcategory created successfully.",
-  subcategoryUpdated: "Subcategory updated successfully.",
-  subcategoryDeleted: "Subcategory deleted.",
-} as const;
-
-export type FlashKind = keyof typeof flashMessages;
+export type FlashKind =
+  | "created"
+  | "updated"
+  | "deleted"
+  | "inquiryUpdated"
+  | "subcategoryCreated"
+  | "subcategoryUpdated"
+  | "subcategoryDeleted";
 
 export function FlashBanner({ kind }: { kind: FlashKind }) {
   const [visible, setVisible] = useState(true);
+  const t = useAdminTranslations();
+
   if (!visible) return null;
+
+  const flashMessages: Record<FlashKind, string> = {
+    created: t.common.productCreated,
+    updated: t.common.productUpdated,
+    deleted: t.common.productDeleted,
+    inquiryUpdated: t.common.inquiryUpdated,
+    subcategoryCreated: t.common.subcategoryCreated,
+    subcategoryUpdated: t.common.subcategoryUpdated,
+    subcategoryDeleted: t.common.subcategoryDeleted,
+  };
 
   return (
     <div
@@ -33,7 +43,7 @@ export function FlashBanner({ kind }: { kind: FlashKind }) {
         variant="ghost"
         size="icon-sm"
         onClick={() => setVisible(false)}
-        aria-label="Dismiss notification"
+        aria-label={t.common.dismiss}
         className="text-emerald-900/70 hover:text-emerald-900"
       >
         <X className="size-4" />

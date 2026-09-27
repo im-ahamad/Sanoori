@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { getPublicBusinessSettings } from "@/lib/public/settings";
+import { businessConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
 import { Brand } from "@/components/shared/brand";
@@ -16,30 +16,29 @@ async function getLang(): Promise<"en" | "bn"> {
 }
 
 export async function Footer() {
-  const [lang, categories, businessSettings] = await Promise.all([
+  const [lang, categories] = await Promise.all([
     getLang(),
     getPublicCategories(),
-    getPublicBusinessSettings(),
   ]);
 
   const currentYear = new Date().getFullYear();
-  const whatsappHref = buildWhatsAppLink(businessSettings, GENERAL_ENQUIRY_MESSAGE);
+  const whatsappHref = buildWhatsAppLink(businessConfig, GENERAL_ENQUIRY_MESSAGE);
   const t = getServerTranslations(lang);
   const navigationConfig = getNavigationConfig(lang);
 
   const showWhatsApp = Boolean(whatsappHref);
-  const showPhone = !isConfigPlaceholder(businessSettings.phone);
-  const showEmail = !isConfigPlaceholder(businessSettings.email);
-  const showAddress = !isConfigPlaceholder(businessSettings.address);
-  const showCity = !isConfigPlaceholder(businessSettings.city);
+  const showPhone = !isConfigPlaceholder(businessConfig.phone);
+  const showEmail = !isConfigPlaceholder(businessConfig.email);
+  const showAddress = !isConfigPlaceholder(businessConfig.address);
+  const showCity = !isConfigPlaceholder(businessConfig.city);
   const hasContactInfo = showWhatsApp || showPhone || showEmail || showAddress;
 
   const socialLinks = [
-    { key: "facebook" as const, href: businessSettings.facebook },
-    { key: "instagram" as const, href: businessSettings.instagram },
-    { key: "telegram" as const, href: businessSettings.telegram },
-    { key: "tiktok" as const, href: businessSettings.tiktok },
-    { key: "youtube" as const, href: businessSettings.youtube },
+    { key: "facebook" as const, href: businessConfig.social.facebook },
+    { key: "instagram" as const, href: businessConfig.social.instagram },
+    { key: "telegram" as const, href: businessConfig.social.telegram },
+    { key: "tiktok" as const, href: businessConfig.social.tiktok },
+    { key: "youtube" as const, href: businessConfig.social.youtube },
   ];
 
   const quickLinks = [
@@ -64,7 +63,7 @@ export async function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link
               href="/"
-              aria-label={`${businessSettings.name} — Home`}
+              aria-label={`${businessConfig.name} — Home`}
               className="inline-flex items-center"
             >
               <Brand size="md" />
@@ -135,30 +134,30 @@ export async function Footer() {
               )}
               {showPhone && (
                 <li>
-                  <a
-                    href={`tel:${businessSettings.phone}`}
-                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  >
-                    <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                    {businessSettings.phone}
-                  </a>
+<a
+                      href={`tel:${businessConfig.phone}`}
+                      className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                    >
+                      <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                      {businessConfig.phone}
+                    </a>
                 </li>
               )}
               {showEmail && (
                 <li>
-                  <a
-                    href={`mailto:${businessSettings.email}`}
-                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                  >
-                    <Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                    {businessSettings.email}
-                  </a>
+<a
+                      href={`mailto:${businessConfig.email}`}
+                      className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                    >
+                      <Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                      {businessConfig.email}
+                    </a>
                 </li>
               )}
               {showAddress && (
                 <li className="flex items-start gap-2.5 text-sm text-muted-foreground">
                   <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  <span>{businessSettings.address}</span>
+                  <span>{businessConfig.address}</span>
                 </li>
               )}
               {!hasContactInfo && (
@@ -187,7 +186,7 @@ export async function Footer() {
             <div className="flex flex-wrap items-center justify-center gap-4 sm:col-start-3 sm:justify-end">
               {showCity && (
                 <span className="text-xs text-muted-foreground">
-                  {t.footer.cityCountry.replace("{city}", businessSettings.city || "").replace("{country}", businessSettings.country || "")}
+                  {t.footer.cityCountry.replace("{city}", businessConfig.city || "").replace("{country}", businessConfig.country || "")}
                 </span>
               )}
               <ul className="flex items-center gap-4">

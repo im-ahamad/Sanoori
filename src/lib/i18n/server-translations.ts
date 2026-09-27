@@ -1,5 +1,7 @@
 import { en } from "./dictionaries/en";
 import { bn } from "./dictionaries/bn";
+import { adminEn } from "./dictionaries/admin/en";
+import { adminBn } from "./dictionaries/admin/bn";
 
 // Helper to widen literal string types to string
 type Widen<T> = {
@@ -26,6 +28,12 @@ type Seo = Widen<typeof en.seo>;
 type Categories = Widen<typeof en.categories>;
 type Contact = Widen<typeof en.contact>;
 type RequestQuote = Widen<typeof en.requestQuote>;
+
+type AdminCommon = Widen<typeof adminEn.common>;
+
+type AdminDictionary = {
+  common: AdminCommon;
+};
 
 type Dictionary = {
   common: Common;
@@ -55,8 +63,17 @@ const dictionaries: Record<"en" | "bn", Dictionary> = {
   bn,
 } as const satisfies Record<"en" | "bn", Dictionary>;
 
+const adminDictionaries: Record<"en" | "bn", AdminDictionary> = {
+  en: adminEn,
+  bn: adminBn,
+} as const satisfies Record<"en" | "bn", AdminDictionary>;
+
 export function getServerTranslations(lang: "en" | "bn" = "en"): Dictionary {
   return dictionaries[lang];
+}
+
+export function getServerAdminTranslations(lang: "en" | "bn" = "en"): AdminDictionary {
+  return adminDictionaries[lang];
 }
 
 export function getNavigationConfig(lang: "en" | "bn" = "en") {

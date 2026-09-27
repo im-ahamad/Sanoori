@@ -1,12 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import type { AdminProductListData } from "@/lib/admin/products";
-import { availabilityLabels } from "@/lib/validators/product";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FeaturedToggle } from "@/components/admin/featured-toggle";
 import { DeleteProductDialog } from "@/components/admin/delete-product-dialog";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -26,7 +28,12 @@ function availabilityBadge(availability: string): string {
   }
 }
 
-function AvailabilityBadge({ value }: { value: string }) {
+function AvailabilityBadge({ value, t }: { value: string; t: ReturnType<typeof useAdminTranslations> }) {
+  const labels: Record<string, string> = {
+    IN_STOCK: t.common.inStock,
+    ON_REQUEST: t.common.onRequest,
+    OUT_OF_STOCK: t.common.outOfStock,
+  };
   return (
     <span
       className={cn(
@@ -34,7 +41,7 @@ function AvailabilityBadge({ value }: { value: string }) {
         availabilityBadge(value)
       )}
     >
-      {availabilityLabels[value] ?? value}
+      {labels[value] ?? value}
     </span>
   );
 }
@@ -44,7 +51,7 @@ interface PaginationProps {
   query: string;
 }
 
-function ProductPagination({ data, query }: PaginationProps) {
+function ProductPagination({ data, query, t }: PaginationProps & { t: ReturnType<typeof useAdminTranslations> }) {
   const { page, totalPages, total, pageSize } = data;
   if (total === 0) return null;
 
@@ -64,15 +71,15 @@ function ProductPagination({ data, query }: PaginationProps) {
 
   return (
     <nav
-      aria-label="Product pagination"
+      aria-label={t.common.productPagination}
       className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-xs text-muted-foreground">
-        Showing {start}–{end} of {total.toLocaleString()} products
+        {t.common.showing} {start}–{end} {t.common.of} {total.toLocaleString()} {t.common.products}
       </p>
       <div className="flex items-center gap-3">
         <p className="text-xs text-muted-foreground">
-          Page {page} of {totalPages}
+          {t.common.page} {page} {t.common.of} {totalPages}
         </p>
         <div className="flex items-center gap-1.5">
           <Link
@@ -85,7 +92,7 @@ function ProductPagination({ data, query }: PaginationProps) {
             )}
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
-            <span className="sr-only">Previous page</span>
+            <span className="sr-only">{t.common.previousPage}</span>
           </Link>
           <Link
             href={buildHref(page + 1)}
@@ -97,7 +104,7 @@ function ProductPagination({ data, query }: PaginationProps) {
             )}
           >
             <ChevronRight className="size-4" aria-hidden="true" />
-            <span className="sr-only">Next page</span>
+            <span className="sr-only">{t.common.nextPage}</span>
           </Link>
         </div>
       </div>
@@ -111,6 +118,8 @@ interface ProductTableProps {
 }
 
 export function ProductTable({ data, query }: ProductTableProps) {
+  const t = useAdminTranslations();
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
@@ -121,22 +130,22 @@ export function ProductTable({ data, query }: ProductTableProps) {
               <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Product
+                    {t.common.product}
                   </th>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Category
+                    {t.common.category}
                   </th>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Availability
+                    {t.common.availability}
                   </th>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Featured
+                    {t.common.featured}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
-                    Updated
+                    {t.common.updated}
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
-                    Actions
+                    {t.common.actions}
                   </th>
                 </tr>
               </thead>
@@ -153,7 +162,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                         </Link>
                         {!product.isActive ? (
                           <span className="rounded-full border border-border px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                            Inactive
+                            {t.common.inactive}
                           </span>
                         ) : null}
                       </div>
@@ -176,7 +185,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                       ) : null}
                     </td>
                     <td className="px-4 py-3">
-                      <AvailabilityBadge value={product.availability} />
+                      <AvailabilityBadge value={product.availability} t={t} />
                     </td>
                     <td className="px-4 py-3">
                       <FeaturedToggle
@@ -187,7 +196,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                     <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted-foreground lg:table-cell">
                       <p>{formatDate(product.updatedAt)}</p>
                       <p className="text-[0.65rem] text-muted-foreground/70">
-                        Created {formatDate(product.createdAt)}
+                        {t.common.created} {formatDate(product.createdAt)}
                       </p>
                     </td>
                     <td className="px-4 py-3">
@@ -200,7 +209,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                           })}
                         >
                           <Pencil className="size-3.5" aria-hidden="true" />
-                          Edit
+                          {t.common.edit}
                         </Link>
                         <DeleteProductDialog
                           productId={product.id}
@@ -228,7 +237,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                     </Link>
                     {!product.isActive ? (
                       <span className="ml-2 rounded-full border border-border px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Inactive
+                        {t.common.inactive}
                       </span>
                     ) : null}
                     <p className="mt-0.5 text-xs text-muted-foreground">
@@ -250,7 +259,7 @@ export function ProductTable({ data, query }: ProductTableProps) {
                 </div>
 
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <AvailabilityBadge value={product.availability} />
+                  <AvailabilityBadge value={product.availability} t={t} />
                   <FeaturedToggle
                     productId={product.id}
                     featured={product.featured}
@@ -262,20 +271,20 @@ export function ProductTable({ data, query }: ProductTableProps) {
                   {product.subcategoryName ? ` · ${product.subcategoryName}` : ""}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground/80">
-                  Updated {formatDate(product.updatedAt)}
+                  {t.common.updated} {formatDate(product.updatedAt)}
                 </p>
 
                 <div className="mt-3">
                   <Button variant="outline" size="sm" render={<Link href={`/admin/products/${product.id}/edit`} />}>
                     <Pencil className="size-3.5" aria-hidden="true" />
-                    Edit product
+                    {t.common.editProduct}
                   </Button>
                 </div>
               </li>
             ))}
           </ul>
 
-          <ProductPagination data={data} query={query} />
+          <ProductPagination data={data} query={query} t={t} />
         </>
       ) : null}
     </div>

@@ -13,10 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  availabilityLabels,
-  availabilityValues,
-} from "@/lib/validators/product";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface ProductFilterValues {
   q: string;
@@ -29,11 +26,6 @@ interface ProductFiltersProps {
   categories: Array<{ id: string; name: string }>;
   values: ProductFilterValues;
 }
-
-const featuredOptions = [
-  { value: "true", label: "Featured only" },
-  { value: "false", label: "Not featured" },
-];
 
 function buildQuery(pathname: string, values: ProductFilterValues): string {
   const params = new URLSearchParams();
@@ -51,6 +43,8 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useAdminTranslations();
+
   const [values, setValues] = useState<ProductFilterValues>({
     q: initialValues.q,
     category: initialValues.category,
@@ -69,6 +63,17 @@ export function ProductFilters({
     values.availability !== "" ||
     values.featured !== "";
 
+  const availabilityOptions = [
+    { value: "IN_STOCK", label: t.common.inStock },
+    { value: "ON_REQUEST", label: t.common.onRequest },
+    { value: "OUT_OF_STOCK", label: t.common.outOfStock },
+  ];
+
+  const featuredOptions = [
+    { value: "true", label: t.common.featuredOnly },
+    { value: "false", label: t.common.notFeatured },
+  ];
+
   return (
     <form
       onSubmit={(event) => {
@@ -79,7 +84,7 @@ export function ProductFilters({
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(160px,220px)_minmax(160px,220px)_minmax(160px,200px)_auto]">
         <div className="space-y-1.5">
-          <Label htmlFor="product-search">Search</Label>
+          <Label htmlFor="product-search">{t.common.search}</Label>
           <div className="relative">
             <Search
               className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
@@ -88,7 +93,7 @@ export function ProductFilters({
             <Input
               id="product-search"
               type="search"
-              placeholder="Name, slug or product ID"
+              placeholder={t.common.searchPlaceholderProducts}
               value={values.q}
               onChange={(event) =>
                 setValues({ ...values, q: event.target.value })
@@ -100,7 +105,7 @@ export function ProductFilters({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-category">Category</Label>
+          <Label htmlFor="filter-category">{t.common.category}</Label>
           <Select
             value={values.category || null}
             onValueChange={(value) =>
@@ -108,10 +113,10 @@ export function ProductFilters({
             }
           >
             <SelectTrigger id="filter-category" className="w-full">
-              <SelectValue placeholder="All categories" />
+              <SelectValue placeholder={t.common.allCategories} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={null}>All categories</SelectItem>
+              <SelectItem value={null}>{t.common.allCategories}</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
@@ -122,7 +127,7 @@ export function ProductFilters({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-availability">Availability</Label>
+          <Label htmlFor="filter-availability">{t.common.availability}</Label>
           <Select
             value={values.availability || null}
             onValueChange={(value) =>
@@ -130,13 +135,13 @@ export function ProductFilters({
             }
           >
             <SelectTrigger id="filter-availability" className="w-full">
-              <SelectValue placeholder="Any status" />
+              <SelectValue placeholder={t.common.anyAvailability} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={null}>Any status</SelectItem>
-              {availabilityValues.map((value) => (
-                <SelectItem key={value} value={value}>
-                  {availabilityLabels[value]}
+              <SelectItem value={null}>{t.common.anyAvailability}</SelectItem>
+              {availabilityOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -144,7 +149,7 @@ export function ProductFilters({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-featured">Featured</Label>
+          <Label htmlFor="filter-featured">{t.common.featured}</Label>
           <Select
             value={values.featured || null}
             onValueChange={(value) =>
@@ -152,10 +157,10 @@ export function ProductFilters({
             }
           >
             <SelectTrigger id="filter-featured" className="w-full">
-              <SelectValue placeholder="Any" />
+              <SelectValue placeholder={t.common.any} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={null}>Any</SelectItem>
+              <SelectItem value={null}>{t.common.any}</SelectItem>
               {featuredOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -168,8 +173,8 @@ export function ProductFilters({
         <div className="flex items-end gap-2">
           <Button type="submit" variant="outline" className="h-9">
             <Search className="size-4" aria-hidden="true" />
-            <span className="sr-only">Apply search and filters</span>
-            Apply
+            <span className="sr-only">{t.common.applyFilters}</span>
+            {t.common.apply}
           </Button>
           {hasActiveFilters ? (
             <Button
@@ -181,8 +186,8 @@ export function ProductFilters({
               }
             >
               <X className="size-4" aria-hidden="true" />
-              <span className="sr-only">Clear search and filters</span>
-              Clear
+              <span className="sr-only">{t.common.clearSearchFilters}</span>
+              {t.common.clear}
             </Button>
           ) : null}
         </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   MessagesSquare,
@@ -5,54 +7,57 @@ import {
   PackagePlus,
   type LucideIcon,
 } from "lucide-react";
+import { useAdminTranslations, type AdminDictionary } from "@/lib/i18n/use-admin-translations";
 
 interface QuickAction {
-  label: string;
-  description: string;
+  labelKey: keyof AdminDictionary["common"];
+  descriptionKey: keyof AdminDictionary["common"];
   href: string;
   icon: LucideIcon;
   status: "ready" | "soon";
 }
 
-const actions: QuickAction[] = [
-  {
-    label: "Add Product",
-    description: "Create a new product listing.",
-    href: "/admin/products/new",
-    icon: PackagePlus,
-    status: "ready",
-  },
-  {
-    label: "View Products",
-    description: "Browse, search, and manage the catalogue.",
-    href: "/admin/products",
-    icon: Package,
-    status: "ready",
-  },
-  {
-    label: "View Inquiries",
-    description: "Review customer quote requests.",
-    href: "/admin/inquiries",
-    icon: MessagesSquare,
-    status: "ready",
-  },
-];
-
 export function QuickActions() {
+  const t = useAdminTranslations();
+
+  const actions: QuickAction[] = [
+    {
+      labelKey: "addProduct",
+      descriptionKey: "createNewProduct",
+      href: "/admin/products/new",
+      icon: PackagePlus,
+      status: "ready",
+    },
+    {
+      labelKey: "viewProducts",
+      descriptionKey: "browseManageCatalogue",
+      href: "/admin/products",
+      icon: Package,
+      status: "ready",
+    },
+    {
+      labelKey: "viewInquiries",
+      descriptionKey: "reviewCustomerRequests",
+      href: "/admin/orders",
+      icon: MessagesSquare,
+      status: "ready",
+    },
+  ];
+
   return (
     <section aria-labelledby="quick-actions-heading">
       <h2
         id="quick-actions-heading"
         className="font-heading text-base font-bold tracking-tight text-foreground"
       >
-        Quick actions
+        {t.common.quickActions}
       </h2>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {actions.map((action) => {
           const Icon = action.icon;
           return (
             <Link
-              key={action.label}
+              key={action.labelKey}
               href={action.href}
               className="group rounded-lg border border-border bg-background p-4 transition-colors hover:border-primary/40 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
@@ -60,19 +65,19 @@ export function QuickActions() {
                 <Icon className="size-5 text-primary" aria-hidden="true" />
                 {action.status === "soon" ? (
                   <span className="rounded-full bg-muted px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Soon
+                    {t.common.soon}
                   </span>
                 ) : (
                   <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-gold-text">
-                    Ready
+                    {t.common.ready}
                   </span>
                 )}
               </div>
               <p className="mt-3 text-sm font-semibold text-foreground">
-                {action.label}
+                {t.common[action.labelKey]}
               </p>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                {action.description}
+                {t.common[action.descriptionKey]}
               </p>
             </Link>
           );

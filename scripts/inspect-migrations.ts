@@ -13,7 +13,16 @@ const db = new PrismaClient({ adapter });
 
 async function main() {
   // Get complete migration metadata
-  const migrations = await db.$queryRawUnsafe(`
+  const migrations = await db.$queryRawUnsafe<{
+    id: string;
+    migration_name: string;
+    checksum: string | null;
+    finished_at: Date | null;
+    started_at: Date | null;
+    applied_steps_count: number;
+    rolled_back_at: Date | null;
+    logs: string | null;
+  }[]>(`
     SELECT 
       id,
       migration_name,

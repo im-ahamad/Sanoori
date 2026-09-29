@@ -1,22 +1,67 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { authenticate, type LoginActionState } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const initialState: LoginActionState = undefined;
+interface LoginFormProps {
+  csrfToken: string;
+}
 
-export function LoginForm() {
-  const [state, formAction, pending] = useActionState(
-    authenticate,
-    initialState
-  );
+export function LoginForm({ csrfToken }: LoginFormProps) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPending(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    const body = new URLSearchParams();
+    body.append("email", email as string);
+    body.append("password", password as string);
+    body.append("csrfToken", csrfToken);
+    body.append("callbackUrl", "/admin");
+
+    try {
+      const res = await fetch("/api/auth/callback/credentials", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: body.toString(),
+        redirect: "manual",
+      });
+
+      if (res.redirected) {
+        router.push(res.url);
+        return;
+      }
+
+      if (res.ok) {
+        router.push("/admin");
+        return;
+      }
+
+      const data = await res.json();
+      setError(data.error || "Invalid email or password.");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
-    <form action={formAction} noValidate aria-busy={pending}>
+    <form onSubmit={handleSubmit} noValidate aria-busy={pending}>
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
@@ -45,12 +90,12 @@ export function LoginForm() {
           />
         </div>
 
-        {state?.error ? (
+        {error ? (
           <p
             role="alert"
             className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
           >
-            {state.error}
+            {error}
           </p>
         ) : null}
 

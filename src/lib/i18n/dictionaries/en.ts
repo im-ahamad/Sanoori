@@ -1,3 +1,5 @@
+import { siteConfig } from "@/config/site";
+
 export const en = {
   common: {
     browseProducts: "Browse Products",
@@ -196,6 +198,31 @@ export const en = {
     viewDetails: "View",
     viewCatalogue: "View the Catalogue",
   },
+  productDetails: {
+    breadcrumb: "Products",
+    moreAboutTitle: "More about this product",
+    moreAboutDescription: "Information supplied by Sanoori Trading.",
+    keyFeaturesTitle: "Key features",
+    specificationsTitle: "Specifications",
+    variantsTitle: "Available options",
+    needDifferentTitle: "Need something different?",
+    needDifferentDescription: "Tell us what you need and we will find it for you.",
+    getPriceButton: "Get a Price",
+    seeAllProductsButton: "See all products",
+    backToProducts: "Back to all products",
+    getPriceTitle: "Get a price for this product",
+    getPriceDescription: "Choose a quantity, then message us — we reply with the price.",
+    quantityLabel: "Quantity",
+    quantityHint: "You can change this in the WhatsApp message too.",
+    getPriceOnWhatsApp: "Get Price on WhatsApp",
+    askForPrice: "Ask for Price",
+    whatsappOpensWithDetails: "Opens WhatsApp with this product and quantity already in your message.",
+    callUs: "Call Us",
+    projectOrderTitle: "Ordering for a project or many products?",
+    projectOrderDescription: "Send us a list and we will send you prices for everything.",
+    sendProjectList: "Send a project list",
+    productCodeLabel: "Product Code",
+  },
   about: {
     pageTitle: "About",
     pageDescription: "Sanoori Trading is a Bangladesh-based supplier of sanitary ware, tiles, and building materials.",
@@ -364,6 +391,128 @@ export const en = {
     },
     error: {
       default: "Something went wrong. Please try again.",
+    },
+  },
+  privacyPolicy: {
+    pageTitle: "Privacy Policy",
+    pageDescription:
+      "How Sanoori Trading collects, uses, and protects the information you share with us when you visit our website or contact us.",
+    breadcrumb: "Privacy Policy",
+    headerTitle: "Privacy Policy",
+    headerDescription: "Simple, honest information about how we handle the data you share with us.",
+    lastUpdated: "Last updated: September 2024",
+    sections: {
+      introduction: {
+        title: "Introduction",
+        body1: `This Privacy Policy explains how ${siteConfig.name} ("we", "us", or "our") handles the information you share with us when you visit our website. We aim to keep things simple: we collect only the information we need to respond to you, and we do not sell your personal information.`,
+        body2: "By using this website, you agree to the practices described in this policy. If you do not agree with any part of it, please stop using the website.",
+      },
+      informationWeCollect: {
+        title: "Information We Collect",
+        body: "We collect information that you choose to give us. This happens in two main ways:",
+        list: [
+          "Information you send us through our enquiry forms, such as your name, phone number, email address, company name (optional), the products you are interested in, quantities, and any message you write.",
+          "Information you share with us on WhatsApp or by phone or email when you contact us directly.",
+        ],
+      },
+      howWeUseInformation: {
+        title: "How We Use Information",
+        body: "We use the information you provide for a limited set of purposes:",
+        list: [
+          "To answer your questions and respond to your enquiries.",
+          "To prepare price quotes and delivery information for the products you ask about.",
+          "To follow up on orders or requests you have sent us.",
+          "To improve our website and the way we respond to customers.",
+        ],
+      },
+      contactAndInquiry: {
+        title: "Contact and Inquiry Information",
+        body1: "When you contact us — through a form, WhatsApp, phone, or email — we keep the details of that conversation so we can refer back to it and serve you better. For example, we keep the products you enquired about, the prices we quoted, and the message history.",
+        body2: "We only keep this information as long as it is useful for the purpose it was shared, and we do not use it for anything unrelated to your enquiry.",
+      },
+      cookiesAndWebsiteUsage: {
+        title: "Cookies and Website Usage",
+        body1: "We do not place marketing or advertising cookies on this website. The site stores a small amount of information in your browser (local storage) to remember your preferences, such as your preferred theme (light or dark) and language. This stays on your device and is not shared with anyone.",
+        body2: "Like most websites, our server logs record basic technical details while you browse, such as the pages you visit and the time of your visit. This helps us keep the website working and understand how it is used, without identifying you personally.",
+      },
+      thirdPartyServices: {
+        title: "Third-Party Services",
+        body: "We use a few services to run this website, and each is responsible for its own handling of data under its own terms and privacy policy:",
+        list: [
+          "Cloudinary: we use this service to store and deliver the product images shown on the website.",
+          "WhatsApp: if you message us on WhatsApp, your message and the number you send it from are handled by WhatsApp under its own privacy policy.",
+          "Fonts and other basic building blocks are loaded by the website itself, not by third-party trackers. We do not use advertising or analytics trackers on this site.",
+        ],
+      },
+      dataSecurity: {
+        title: "Data Security",
+        body: `We take reasonable steps to protect the information you share with us against loss, misuse, and unauthorised access. Access to your information is limited to the people at ${siteConfig.name} who need it to serve you.`,
+      },
+      dataRetention: {
+        title: "Data Retention",
+        body: "We keep your information only for as long as needed to deal with your enquiry, prepare a quote, or complete an order — or for as long as we are required to keep it by law. When it is no longer needed, we delete it or remove the details that identify you.",
+      },
+      yourRights: {
+        title: "Your Rights",
+        body: "You can ask us, at any time, to see what information we hold about you, to correct it, or to delete it. You can also ask us to stop processing your information. To make any of these requests, use the contact details below. We will respond within a reasonable time.",
+      },
+      changes: {
+        title: "Changes to This Privacy Policy",
+        body: "We may update this policy from time to time, for example as our website or the way we work changes. The latest version will always be available on this page, with the date it was last updated shown below. Please check back if this matters to you.",
+      },
+    },
+    contactUs: {
+      title: "Contact Us",
+      body: "If you have any questions about this Privacy Policy or about the information we hold about you, please get in touch. We will be happy to help.",
+      contactButton: "Contact Us",
+      seeProductsButton: "See Products",
+    },
+  },
+  contactPage: {
+    contactInfo: {
+      title: "Contact Information",
+      description: "Reach out to us through any of these channels. We are here to help.",
+      phone: "Phone",
+      whatsapp: "WhatsApp",
+      email: "Email",
+      address: "Address",
+    },
+    quickContact: {
+      title: "Send a Message",
+      description: "Fill in the form below and we will get back to you as soon as possible.",
+      nameLabel: "Your Name",
+      namePlaceholder: "e.g. Rahim Ahmed",
+      contactLabel: "WhatsApp / Phone",
+      contactPlaceholder: "e.g. +880 1XXX-XXXXXX",
+      contactHint: "We will contact you via WhatsApp or phone.",
+      productCategoryLabel: "Product or Category",
+      productCategoryPlaceholder: "Select a category or product",
+      messageLabel: "Message",
+      messagePlaceholder: "Tell us what you need...",
+      submitButton: "Send Message",
+      submittingButton: "Sending...",
+      successMessage: "Your message has been sent. We will get back to you soon.",
+      errorMessage: "Something went wrong. Please try again.",
+    },
+    categories: {
+      title: "What are you looking for?",
+      description: "Browse our main product categories.",
+      sanitaryWare: "Sanitary Ware",
+      tiles: "Tiles",
+      buildingMaterials: "Building Materials",
+    },
+    location: {
+      title: "Find Us",
+      description: "Visit our showroom at the address below.",
+    },
+    whatsappCTA: {
+      title: "Need a quick answer?",
+      description: "Message us directly on WhatsApp for the fastest response.",
+      button: "Chat on WhatsApp",
+    },
+    socialMedia: {
+      title: "Follow Us",
+      description: "Stay connected with us on social media.",
     },
   },
 } as const;

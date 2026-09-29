@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface CustomerFilterValues {
   q: string;
@@ -34,6 +35,7 @@ function buildQuery(pathname: string, values: CustomerFilterValues): string {
 export function CustomerFilters({ values: initialValues }: CustomerFiltersProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useAdminTranslations();
   const [values, setValues] = useState<CustomerFilterValues>({
     q: initialValues.q,
     sort: initialValues.sort,
@@ -56,7 +58,7 @@ export function CustomerFilters({ values: initialValues }: CustomerFiltersProps)
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(160px,220px)_auto]">
         <div className="space-y-1.5">
-          <Label htmlFor="customer-search">Search</Label>
+          <Label htmlFor="customer-search">{t.common.search}</Label>
           <div className="relative">
             <Search
               className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
@@ -65,7 +67,7 @@ export function CustomerFilters({ values: initialValues }: CustomerFiltersProps)
             <Input
               id="customer-search"
               type="search"
-              placeholder="Name, phone or email"
+              placeholder={t.common.searchPlaceholderCustomers}
               value={values.q}
               onChange={(event) =>
                 setValues({ ...values, q: event.target.value })
@@ -77,7 +79,7 @@ export function CustomerFilters({ values: initialValues }: CustomerFiltersProps)
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-sort">Sort</Label>
+          <Label htmlFor="filter-sort">{t.common.sortBy}</Label>
           <Select
             value={values.sort}
             onValueChange={(value) =>
@@ -85,15 +87,15 @@ export function CustomerFilters({ values: initialValues }: CustomerFiltersProps)
             }
           >
             <SelectTrigger id="filter-sort" className="w-full">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t.common.sortBy} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">
-                Recent first
+                {t.common.recentFirst}
                 <ChevronsUpDown className="size-3.5 ml-2" aria-hidden="true" />
               </SelectItem>
               <SelectItem value="oldest">
-                Oldest first
+                {t.common.oldestFirst}
                 <ChevronsUpDown className="size-3.5 ml-2 rotate-180" aria-hidden="true" />
               </SelectItem>
             </SelectContent>
@@ -103,8 +105,8 @@ export function CustomerFilters({ values: initialValues }: CustomerFiltersProps)
         <div className="flex items-end gap-2">
           <Button type="submit" variant="outline" className="h-9">
             <Search className="size-4" aria-hidden="true" />
-            <span className="sr-only">Apply search and filters</span>
-            Apply
+            <span className="sr-only">{t.common.applyFilters}</span>
+            {t.common.apply}
           </Button>
           {hasActiveFilters ? (
             <Button
@@ -114,8 +116,8 @@ export function CustomerFilters({ values: initialValues }: CustomerFiltersProps)
               onClick={() => navigate({ q: "", sort: "newest" })}
             >
               <X className="size-4" aria-hidden="true" />
-              <span className="sr-only">Clear search and filters</span>
-              Clear
+              <span className="sr-only">{t.common.clearSearchFilters}</span>
+              {t.common.clear}
             </Button>
           ) : null}
         </div>

@@ -126,6 +126,14 @@
   --gold-dark: oklch(0.60 0.15 75);
   --gold-text: oklch(0.30 0.15 80);
 
+  /* Logo colors — adapt to theme for visibility */
+  --logo-navy: #082D55;
+  --logo-wordmark: #082B50;
+  --logo-subtitle: #0789C6;
+  --logo-gradient-start: #00A5E5;
+  --logo-gradient-mid: #0095DA;
+  --logo-gradient-end: #0877BA;
+
   /* Radius */
   --radius: 0.5rem;
 
@@ -172,6 +180,15 @@
   --gold-light: oklch(0.78 0.10 85);
   --gold-dark: oklch(0.58 0.14 75);
   --gold-text: oklch(0.68 0.13 80);
+
+  /* Logo colors — light mode values for dark background visibility */
+  --logo-navy: #FFFFFF;
+  --logo-wordmark: #FFFFFF;
+  --logo-subtitle: #00A5E5;
+  --logo-gradient-start: #FFFFFF;
+  --logo-gradient-mid: #FFFFFF;
+  --logo-gradient-end: #FFFFFF;
+
   --chart-1: oklch(0.55 0.12 250);
   --chart-2: oklch(0.65 0.12 75);
   --chart-3: oklch(0.45 0.03 250);

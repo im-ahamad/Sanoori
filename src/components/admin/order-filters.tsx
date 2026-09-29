@@ -19,6 +19,7 @@ import {
   inquiryStatusLabel,
   inquiryStatusValues,
 } from "@/lib/inquiries";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface OrderFilterValues {
   q: string;
@@ -44,6 +45,7 @@ function buildQuery(pathname: string, values: OrderFilterValues): string {
 export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useAdminTranslations();
   const [values, setValues] = useState<OrderFilterValues>({
     q: initialValues.q,
     status: initialValues.status,
@@ -72,7 +74,7 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(160px,220px)_minmax(160px,220px)_minmax(160px,220px)_auto]">
         <div className="space-y-1.5">
-          <Label htmlFor="order-search">Search</Label>
+          <Label htmlFor="order-search">{t.common.search}</Label>
           <div className="relative">
             <Search
               className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
@@ -81,7 +83,7 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
             <Input
               id="order-search"
               type="search"
-              placeholder="Name, phone, product name or model"
+              placeholder={t.common.searchPlaceholderOrders}
               value={values.q}
               onChange={(event) =>
                 setValues({ ...values, q: event.target.value })
@@ -93,7 +95,7 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-status">Status</Label>
+          <Label htmlFor="filter-status">{t.common.status}</Label>
           <Select
             value={values.status || null}
             onValueChange={(value) =>
@@ -101,10 +103,10 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
             }
           >
             <SelectTrigger id="filter-status" className="w-full">
-              <SelectValue placeholder="Any status" />
+              <SelectValue placeholder={t.common.anyStatus} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={null}>Any status</SelectItem>
+              <SelectItem value={null}>{t.common.anyStatus}</SelectItem>
               {inquiryStatusValues.map((value) => (
                 <SelectItem key={value} value={value}>
                   {inquiryStatusLabel(value)}
@@ -115,7 +117,7 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-source">Source</Label>
+          <Label htmlFor="filter-source">{t.common.sourceFilter}</Label>
           <Select
             value={values.source || null}
             onValueChange={(value) =>
@@ -123,10 +125,10 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
             }
           >
             <SelectTrigger id="filter-source" className="w-full">
-              <SelectValue placeholder="Any source" />
+              <SelectValue placeholder={t.common.anySource} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={null}>Any source</SelectItem>
+              <SelectItem value={null}>{t.common.anySource}</SelectItem>
               {inquirySourceValues.map((value) => (
                 <SelectItem key={value} value={value}>
                   {inquirySourceLabel(value)}
@@ -137,7 +139,7 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="filter-sort">Sort</Label>
+          <Label htmlFor="filter-sort">{t.common.sortBy}</Label>
           <Select
             value={values.sort}
             onValueChange={(value) =>
@@ -145,15 +147,15 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
             }
           >
             <SelectTrigger id="filter-sort" className="w-full">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t.common.sortBy} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">
-                Newest first
+                {t.common.newestFirst}
                 <ChevronsUpDown className="size-3.5 ml-2" aria-hidden="true" />
               </SelectItem>
               <SelectItem value="oldest">
-                Oldest first
+                {t.common.oldestFirst}
                 <ChevronsUpDown className="size-3.5 ml-2 rotate-180" aria-hidden="true" />
               </SelectItem>
             </SelectContent>
@@ -163,8 +165,8 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
         <div className="flex items-end gap-2">
           <Button type="submit" variant="outline" className="h-9">
             <Search className="size-4" aria-hidden="true" />
-            <span className="sr-only">Apply search and filters</span>
-            Apply
+            <span className="sr-only">{t.common.applyFilters}</span>
+            {t.common.apply}
           </Button>
           {hasActiveFilters ? (
             <Button
@@ -176,8 +178,8 @@ export function OrderFilters({ values: initialValues }: OrderFiltersProps) {
               }
             >
               <X className="size-4" aria-hidden="true" />
-              <span className="sr-only">Clear search and filters</span>
-              Clear
+              <span className="sr-only">{t.common.clearSearchFilters}</span>
+              {t.common.clear}
             </Button>
           ) : null}
         </div>

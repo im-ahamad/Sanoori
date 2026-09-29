@@ -1,48 +1,142 @@
 "use client";
 
-import { ArrowRight, MapPin, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  type LucideIcon,
+} from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
-import { ContactChannels } from "@/components/contact/contact-channels";
-import { ButtonLink } from "@/components/ui/button-link";
-import { getConfiguredContactChannels } from "@/lib/contact-channels";
-import { isConfigPlaceholder } from "@/lib/config";
+import { SectionHeader } from "@/components/shared/section-header";
+import { Reveal } from "@/components/shared/reveal";
 import { VisualBackdrop } from "@/components/shared/visual-backdrop";
+import { getCategoryIconElement } from "@/lib/category-icons";
+import { isConfigPlaceholder } from "@/lib/config";
+import {
+  buildWhatsAppChatLink,
+  GENERAL_ENQUIRY_MESSAGE,
+} from "@/lib/contact/whatsapp";
 import { useTranslations } from "@/lib/i18n";
+import { businessConfig } from "@/config/site";
 import type { PublicBusinessSettings } from "@/lib/public/settings";
+
+/** The three catalogue categories the site is built around, in display order. */
+const FEATURED_CATEGORY_SLUGS = [
+  "sanitary-ware",
+  "tiles",
+  "building-materials",
+] as const;
+
+/**
+ * Business Settings are admin-editable, but a stored row can still hold
+ * `[PLACEHOLDER]` tokens. Fall back per field to the shipped site
+ * configuration so this page shows the same real details the rest of the site
+ * already publishes, instead of dropping fields that have not been filled in
+ * yet. No new information is introduced — both sources are existing project
+ * data.
+ */
+function resolveSetting(stored: string | null, configured: string): string {
+  if (stored === null || isConfigPlaceholder(stored)) {
+    return configured;
+  }
+  return stored;
+}
+
+const isSet = (value: string): boolean => !isConfigPlaceholder(value);
+
+interface ContactCategory {
+  slug: string;
+  name: string;
+}
 
 interface ContactPageContentProps {
   businessSettings: PublicBusinessSettings;
+  categories: ContactCategory[];
 }
 
-export function ContactPageContent({ businessSettings }: ContactPageContentProps) {
+export function ContactPageContent({
+  businessSettings,
+  categories,
+}: ContactPageContentProps) {
   const t = useTranslations();
-  const configuredChannels = getConfiguredContactChannels(businessSettings);
-  const channelsAvailable = configuredChannels.length > 0;
-  const showAddress = !isConfigPlaceholder(businessSettings.address);
+  const cp = t.contactPage;
+  const contact = t.contact;
 
-  const contact = t.contact as {
-    pageTitle: string;
-    pageDescription: string;
-    breadcrumb: string;
-    contactDirectly: {
-      title: string;
-      description: string;
-      comingSoon: string;
-      browseProducts: string;
-      visitUs: string;
-    };
-    projectPrices: {
-      title: string;
-      description: string;
-      browseProducts: string;
-    };
-    askAnything: {
-      title: string;
-      description: string;
-      responseTime: string;
-    };
-  };
+  const whatsappHref = buildWhatsAppChatLink(
+    resolveSetting(businessSettings.whatsapp, businessConfig.whatsapp),
+    GENERAL_ENQUIRY_MESSAGE
+  );
+  const mapsHref = businessSettings.maps.googleMapsLink;
+
+  const phone = resolveSetting(businessSettings.phone, businessConfig.phone);
+  const whatsapp = resolveSetting(businessSettings.whatsapp, businessConfig.whatsapp);
+  const email = resolveSetting(businessSettings.email, businessConfig.email);
+  const street = resolveSetting(businessSettings.address, businessConfig.address);
+  const city = resolveSetting(businessSettings.city, businessConfig.city);
+  const country = resolveSetting(businessSettings.country, businessConfig.country);
+
+  const address = [street, city, country].filter(isSet).join(", ");
+
+  const contactDetails: Array<{
+    key: string;
+    icon: LucideIcon;
+    label: string;
+    value: string;
+    href?: string;
+    isExternal?: boolean;
+  }> = [];
+
+  if (isSet(phone)) {
+    contactDetails.push({
+      key: "phone",
+      icon: Phone,
+      label: cp.contactInfo.phone,
+      value: phone,
+      href: `tel:${phone}`,
+    });
+  }
+
+  if (isSet(whatsapp)) {
+    contactDetails.push({
+      key: "whatsapp",
+      icon: MessageCircle,
+      label: cp.contactInfo.whatsapp,
+      value: whatsapp,
+      href: whatsappHref ?? undefined,
+      isExternal: true,
+    });
+  }
+
+  if (isSet(email)) {
+    contactDetails.push({
+      key: "email",
+      icon: Mail,
+      label: cp.contactInfo.email,
+      value: email,
+      href: `mailto:${email}`,
+    });
+  }
+
+  if (address) {
+    contactDetails.push({
+      key: "address",
+      icon: MapPin,
+      label: cp.contactInfo.address,
+      value: address,
+      href: mapsHref || undefined,
+      isExternal: true,
+    });
+  }
+
+  // Only surface categories that actually exist in the catalogue.
+  const featuredCategories = FEATURED_CATEGORY_SLUGS.filter((slug) =>
+    categories.some((category) => category.slug === slug)
+  ).map((slug) => ({ slug, name: t.categories[slug] }));
 
   return (
     <main className="flex-1">
@@ -60,88 +154,239 @@ export function ContactPageContent({ businessSettings }: ContactPageContentProps
         className="min-h-[calc(100vw/3)]"
       />
 
+      {/* Contact information */}
       <Container>
-        <div className="section-spacing grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-12">
-          <div className="lg:col-span-3">
-            <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              {contact.contactDirectly.title}
-            </h2>
-            <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
-              {contact.contactDirectly.description}
-            </p>
+        <section className="section-spacing-sm">
+          <SectionHeader
+            title={cp.contactInfo.title}
+            description={cp.contactInfo.description}
+          />
 
-            <div className="mt-8">
-              {channelsAvailable ? (
-                <ContactChannels channels={configuredChannels} />
-              ) : (
-                <div className="rounded-lg border border-border bg-muted/40 p-6 text-sm leading-relaxed text-muted-foreground">
-                  {contact.contactDirectly.comingSoon}
-                </div>
-              )}
+          {contactDetails.length > 0 && (
+            <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {contactDetails.map((detail, index) => {
+                const { key, ...props } = detail;
+                return (
+                  <Reveal key={key} delay={index * 0.1} className="h-full">
+                    <ContactDetailCard key={key} {...props} />
+                  </Reveal>
+                );
+              })}
             </div>
-
-            {!channelsAvailable && (
-              <div className="mt-6">
-                <ButtonLink href="/products" variant="primary">
-                  {contact.contactDirectly.browseProducts}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </ButtonLink>
-              </div>
-            )}
-
-            {showAddress && (
-              <div className="mt-8 flex items-start gap-3 rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
-                <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                <span>
-                  <span className="block font-heading text-base font-semibold text-foreground">
-                    {contact.contactDirectly.visitUs}
-                  </span>
-                  <span className="mt-1 block">
-                    {businessSettings.address}
-                    {!isConfigPlaceholder(businessSettings.city) &&
-                      `, ${businessSettings.city}${!isConfigPlaceholder(businessSettings.country) ? `, ${businessSettings.country}` : ""}`}
-                  </span>
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-2">
-            <div className="relative overflow-hidden rounded-lg bg-navy-dark/90 p-6 text-white sm:p-8">
-              <VisualBackdrop variant="band" objectPosition="object-top" />
-              <div className="relative">
-              <h2 className="font-heading text-xl font-bold tracking-tight">
-                {contact.projectPrices.title}
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-white/75">
-                {contact.projectPrices.description}
-              </p>
-              <ButtonLink
-                href="/products"
-                variant="inverse"
-                className="mt-6 w-full sm:w-auto"
-              >
-                {contact.projectPrices.browseProducts}
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </ButtonLink>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-lg border border-border bg-card p-6">
-              <h2 className="font-heading text-base font-semibold text-foreground">
-                {contact.askAnything.title}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {contact.askAnything.description}
-              </p>
-              <p className="mt-4 flex items-center gap-2 text-sm font-medium text-foreground">
-                <MessageCircle className="size-4 text-primary" aria-hidden="true" />
-                {contact.askAnything.responseTime}
-              </p>
-            </div>
-          </div>
-        </div>
+          )}
+        </section>
       </Container>
+
+      {/* Location & Product Categories */}
+      {((address || mapsHref) || featuredCategories.length > 0) && (
+        <Container>
+          <section className="section-spacing-sm grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+            {/* Find Us */}
+            {(address || mapsHref) && (
+              <Reveal className="h-full">
+                <section
+                  className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+                  aria-labelledby="contact-location-heading"
+                >
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary">
+                    <MapPin className="size-5" strokeWidth={1.75} aria-hidden="true" />
+                  </span>
+                  <h3
+                    id="contact-location-heading"
+                    className="mt-5 font-heading text-lg font-semibold tracking-tight text-foreground"
+                  >
+                    {cp.location.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {cp.location.description}
+                  </p>
+                  {address && (
+                    <AddressLine address={address} mapsHref={mapsHref} />
+                  )}
+                </section>
+              </Reveal>
+            )}
+
+            {/* Product Categories */}
+            {featuredCategories.length > 0 && (
+              <Reveal delay={0.1} className="h-full">
+                <section
+                  className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+                  aria-labelledby="contact-categories-heading"
+                >
+                  <h3
+                    id="contact-categories-heading"
+                    className="font-heading text-lg font-semibold tracking-tight text-foreground"
+                  >
+                    {cp.categories.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {cp.categories.description}
+                  </p>
+                  <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {featuredCategories.map((category, index) => (
+                      <Reveal key={category.slug} delay={index * 0.1} className="h-full">
+                        <CategoryTile
+                          slug={category.slug}
+                          name={category.name}
+                          actionLabel={t.categoryCard.browseProducts}
+                        />
+                      </Reveal>
+                    ))}
+                  </div>
+                </section>
+              </Reveal>
+            )}
+          </section>
+        </Container>
+      )}
+
+      {/* WhatsApp call to action */}
+      {whatsappHref && (
+        <Container>
+          <section
+            className="pb-16 sm:pb-20 lg:pb-24"
+            aria-labelledby="contact-whatsapp-heading"
+          >
+            <div className="relative overflow-hidden rounded-2xl bg-navy-dark/90 px-6 py-12 text-white shadow-sm sm:px-12 sm:py-14">
+              <VisualBackdrop variant="band" objectPosition="object-top" />
+              <div className="relative flex flex-col items-start gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+                <div className="max-w-xl">
+                  <h2
+                    id="contact-whatsapp-heading"
+                    className="font-heading text-2xl font-bold tracking-tight sm:text-3xl"
+                  >
+                    {cp.whatsappCTA.title}
+                  </h2>
+                  <p className="mt-3 text-base leading-relaxed text-white/75">
+                    {cp.whatsappCTA.description}
+                  </p>
+                </div>
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-12 shrink-0 items-center gap-2 rounded-md bg-[#25D366] px-7 text-sm font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 focus-visible:ring-offset-navy-dark"
+                >
+                  <MessageCircle className="size-5" strokeWidth={1.75} aria-hidden="true" />
+                  {cp.whatsappCTA.button}
+                </a>
+              </div>
+            </div>
+          </section>
+        </Container>
+      )}
     </main>
+  );
+}
+
+function ContactDetailCard({
+  icon: Icon,
+  label,
+  value,
+  href,
+  isExternal = false,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  href?: string;
+  isExternal?: boolean;
+}) {
+  const className =
+    "flex h-full flex-col rounded-2xl border border-border bg-card p-6 text-left shadow-sm transition-[border-color,box-shadow] hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+
+  const body = (
+    <>
+      <span className="flex size-11 items-center justify-center rounded-xl bg-accent text-primary">
+        <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
+      </span>
+      <span className="mt-5 block text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </span>
+      <span className="mt-2 block text-sm font-semibold leading-relaxed break-words text-foreground">
+        {value}
+      </span>
+    </>
+  );
+
+  if (!href) {
+    return <div className={className}>{body}</div>;
+  }
+
+  return (
+    <a
+      href={href}
+      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className={className}
+    >
+      {body}
+    </a>
+  );
+}
+
+function AddressLine({
+  address,
+  mapsHref,
+}: {
+  address: string;
+  mapsHref: string;
+}) {
+  if (!mapsHref) {
+    return (
+      <p className="mt-4 text-sm font-medium leading-relaxed text-foreground">
+        {address}
+      </p>
+    );
+  }
+
+  return (
+    <a
+      href={mapsHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group mt-4 inline-flex items-start gap-2 text-sm font-medium leading-relaxed text-foreground transition-colors hover:text-gold-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+    >
+      {address}
+      <ArrowUpRight
+        className="mt-0.5 size-4 shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+        aria-hidden="true"
+      />
+    </a>
+  );
+}
+
+function CategoryTile({
+  slug,
+  name,
+  actionLabel,
+}: {
+  slug: string;
+  name: string;
+  actionLabel: string;
+}) {
+  return (
+    <Link
+      href={`/products?category=${slug}`}
+      className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      <span className="flex size-12 items-center justify-center rounded-xl bg-accent text-primary">
+        {getCategoryIconElement(slug, {
+          className: "size-6",
+          strokeWidth: 1.75,
+          "aria-hidden": true,
+        })}
+      </span>
+      <h3 className="mt-5 font-heading text-lg font-semibold tracking-tight text-foreground">
+        {name}
+      </h3>
+      <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-gold-text transition-colors group-hover:text-gold-dark">
+        {actionLabel}
+        <ArrowRight
+          className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+          aria-hidden="true"
+        />
+      </span>
+    </Link>
   );
 }

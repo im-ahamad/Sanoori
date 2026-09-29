@@ -62,8 +62,9 @@ export default async function RequestQuotePage({
     productSummary: { requestingPriceFor: string; modelLabel: string };
   };
 
-  const { product } = await searchParams;
+  const { product, quantity } = await searchParams;
   const requestedSlug = typeof product === "string" ? product.trim() : "";
+  const initialQuantity = typeof quantity === "string" ? parseInt(quantity, 10) : undefined;
 
   if (!requestedSlug) {
     redirect("/products");
@@ -236,6 +237,7 @@ export default async function RequestQuotePage({
                   }}
                   whatsappHref={whatsappHref}
                   initialLang={lang}
+                  initialQuantity={initialQuantity}
                 />
               </div>
             </div>

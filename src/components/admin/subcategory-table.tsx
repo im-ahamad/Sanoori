@@ -11,6 +11,7 @@ import {
   deleteSubcategoryAction,
   type DeleteSubcategoryActionResult,
 } from "@/lib/actions/subcategories";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface SubcategoryTableProps {
   data: AdminSubcategoryList;
@@ -20,9 +21,11 @@ interface SubcategoryTableProps {
 function SubcategoryRow({
   subcategory,
   level = 0,
+  t,
 }: {
   subcategory: AdminSubcategoryList["items"][0];
   level?: number;
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   const indent = level * 24;
 
@@ -52,7 +55,7 @@ function SubcategoryRow({
         {subcategory.categoryName}
       </td>
       <td className="hidden px-4 py-3 text-muted-foreground xl:table-cell">
-        {subcategory._count.products} product{subcategory._count.products !== 1 ? "s" : ""}
+        {subcategory._count.products} {t.common.products}
       </td>
       <td className="hidden px-4 py-3 text-xs text-muted-foreground xl:table-cell">
         {new Intl.DateTimeFormat("en-US", {
@@ -65,11 +68,11 @@ function SubcategoryRow({
           <Link
             href={`/admin/subcategories/${subcategory.id}/edit`}
             className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-            aria-label={`Edit ${subcategory.name}`}
+            aria-label={`${t.common.edit} ${subcategory.name}`}
           >
             <Edit className="size-4" aria-hidden="true" />
           </Link>
-          <SubcategoryDeleteButton subcategoryId={subcategory.id} subcategoryName={subcategory.name} />
+          <SubcategoryDeleteButton subcategoryId={subcategory.id} subcategoryName={subcategory.name} t={t} />
         </div>
       </td>
     </tr>
@@ -79,9 +82,11 @@ function SubcategoryRow({
 function SubcategoryDeleteButton({
   subcategoryId,
   subcategoryName,
+  t,
 }: {
   subcategoryId: string;
   subcategoryName: string;
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   const [state, formAction] = useActionState<
     DeleteSubcategoryActionResult | undefined,
@@ -97,7 +102,7 @@ function SubcategoryDeleteButton({
         size="icon-sm"
         disabled={state?.ok === false || !state}
         className="text-destructive hover:bg-destructive/10"
-        aria-label={`Delete ${subcategoryName}`}
+        aria-label={`${t.common.deleteSubcategory} ${subcategoryName}`}
       >
         <Trash2 className="size-4" aria-hidden="true" />
       </Button>
@@ -105,7 +110,11 @@ function SubcategoryDeleteButton({
   );
 }
 
-function SubcategoryPagination({ data, query }: { data: AdminSubcategoryList; query: string }) {
+function SubcategoryPagination({
+  data,
+  query,
+  t,
+}: { data: AdminSubcategoryList; query: string; t: ReturnType<typeof useAdminTranslations> }) {
   const { page, totalPages, total, pageSize } = data;
   if (total === 0) return null;
 
@@ -125,15 +134,15 @@ function SubcategoryPagination({ data, query }: { data: AdminSubcategoryList; qu
 
   return (
     <nav
-      aria-label="Subcategory pagination"
+      aria-label={t.common.productPagination}
       className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-xs text-muted-foreground">
-        Showing {start}–{end} of {total.toLocaleString()} subcategories
+        {t.common.showing} {start}–{end} {t.common.of} {total.toLocaleString()} {t.common.subcategories}
       </p>
       <div className="flex items-center gap-3">
         <p className="text-xs text-muted-foreground">
-          Page {page} of {totalPages}
+          {t.common.page} {page} {t.common.of} {totalPages}
         </p>
         <div className="flex items-center gap-1.5">
           <Link
@@ -146,7 +155,7 @@ function SubcategoryPagination({ data, query }: { data: AdminSubcategoryList; qu
             )}
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
-            <span className="sr-only">Previous page</span>
+            <span className="sr-only">{t.common.previousPage}</span>
           </Link>
           <Link
             href={buildHref(page + 1)}
@@ -158,7 +167,7 @@ function SubcategoryPagination({ data, query }: { data: AdminSubcategoryList; qu
             )}
           >
             <ChevronRight className="size-4" aria-hidden="true" />
-            <span className="sr-only">Next page</span>
+            <span className="sr-only">{t.common.nextPage}</span>
           </Link>
         </div>
       </div>
@@ -167,6 +176,8 @@ function SubcategoryPagination({ data, query }: { data: AdminSubcategoryList; qu
 }
 
 export function SubcategoryTable({ data, query }: SubcategoryTableProps) {
+  const t = useAdminTranslations();
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
@@ -177,28 +188,28 @@ export function SubcategoryTable({ data, query }: SubcategoryTableProps) {
               <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Subcategory
+                    {t.common.subcategory}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    Slug
+                    {t.common.slug}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
-                    Category
+                    {t.common.category}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Products
+                    {t.common.products}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Created
+                    {t.common.created}
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
-                    Actions
+                    {t.common.actions}
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {data.items.map((subcategory) => (
-                  <SubcategoryRow key={subcategory.id} subcategory={subcategory} />
+                  <SubcategoryRow key={subcategory.id} subcategory={subcategory} t={t} />
                 ))}
               </tbody>
             </table>
@@ -208,12 +219,12 @@ export function SubcategoryTable({ data, query }: SubcategoryTableProps) {
           <ul className="divide-y divide-border lg:hidden">
             {data.items.map((subcategory) => (
               <li key={subcategory.id} className="p-4">
-                <SubcategoryCard subcategory={subcategory} />
+                <SubcategoryCard subcategory={subcategory} t={t} />
               </li>
             ))}
           </ul>
 
-          <SubcategoryPagination data={data} query={query} />
+          <SubcategoryPagination data={data} query={query} t={t} />
         </>
       ) : null}
     </div>
@@ -222,8 +233,10 @@ export function SubcategoryTable({ data, query }: SubcategoryTableProps) {
 
 function SubcategoryCard({
   subcategory,
+  t,
 }: {
   subcategory: AdminSubcategoryList["items"][0];
+  t: ReturnType<typeof useAdminTranslations>;
 }) {
   return (
     <div>
@@ -242,10 +255,10 @@ function SubcategoryCard({
       </div>
 
       <p className="mt-2 text-xs text-muted-foreground">
-        {subcategory._count.products} product{subcategory._count.products !== 1 ? "s" : ""}
+        {subcategory._count.products} {t.common.products}
       </p>
       <p className="mt-1 text-xs text-muted-foreground/80">
-        Created{" "}
+        {t.common.created}{" "}
         {new Intl.DateTimeFormat("en-US", {
           dateStyle: "medium",
           timeStyle: "short",
@@ -256,11 +269,11 @@ function SubcategoryCard({
         <Link
           href={`/admin/subcategories/${subcategory.id}/edit`}
           className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-          aria-label={`Edit ${subcategory.name}`}
+          aria-label={`${t.common.edit} ${subcategory.name}`}
         >
           <Edit className="size-4" aria-hidden="true" />
         </Link>
-        <SubcategoryDeleteButton subcategoryId={subcategory.id} subcategoryName={subcategory.name} />
+        <SubcategoryDeleteButton subcategoryId={subcategory.id} subcategoryName={subcategory.name} t={t} />
       </div>
     </div>
   );

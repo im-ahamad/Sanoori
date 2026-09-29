@@ -42,6 +42,8 @@ interface ProductRequestFormProps {
   onDone?: () => void;
   /** Initial language for server-side rendering to avoid hydration mismatch. */
   initialLang?: SupportedLanguage;
+  /** Initial quantity value from URL query parameter. */
+  initialQuantity?: number;
 }
 
 function FieldError({ id, error }: { id: string; error?: string }) {
@@ -64,6 +66,7 @@ export function ProductRequestForm({
   whatsappHref,
   onDone,
   initialLang,
+  initialQuantity,
 }: ProductRequestFormProps) {
   const tContext = useTranslations();
   const [mounted, setMounted] = useState(false);
@@ -109,7 +112,7 @@ export function ProductRequestForm({
   const [values, setValues] = useState({
     customerName: "",
     contactNumber: "",
-    quantity: "",
+    quantity: initialQuantity ? String(initialQuantity) : "",
     message: "",
   });
   const successRef = useRef<HTMLDivElement>(null);
@@ -400,6 +403,7 @@ export function ProductRequestForm({
         <FieldError id="pr-message-error" error={messageError} />
       </div>
 
+      <input type="hidden" name="productSlug" value={product.slug} />
       <div>
         <Button
           type="submit"

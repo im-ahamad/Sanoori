@@ -14,7 +14,7 @@ export const businessConfig = {
     alt: "Sanoori Trading",
   },
   phone: "01305-229911",
-  whatsapp: "01933323522",
+  whatsapp: "01305-229911",
   email: "sanoori.trading@gmail.com",
   address: "Abu Taher Super Market, Dhanikhola Road, Sanoori Trading",
   city: "Trishal Shador",

@@ -1,16 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import type { CustomerList } from "@/lib/admin/customers";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface PaginationProps {
   data: CustomerList;
   query: string;
 }
 
-function CustomerPagination({ data, query }: PaginationProps) {
+function CustomerPagination({
+  data,
+  query,
+  t,
+}: PaginationProps & { t: ReturnType<typeof useAdminTranslations> }) {
   const { page, totalPages, total, pageSize } = data;
   if (total === 0) return null;
 
@@ -30,15 +37,15 @@ function CustomerPagination({ data, query }: PaginationProps) {
 
   return (
     <nav
-      aria-label="Customer pagination"
+      aria-label={t.common.productPagination}
       className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-xs text-muted-foreground">
-        Showing {start}–{end} of {total.toLocaleString()} customers
+        {t.common.showing} {start}–{end} {t.common.of} {total.toLocaleString()} {t.common.customers}
       </p>
       <div className="flex items-center gap-3">
         <p className="text-xs text-muted-foreground">
-          Page {page} of {totalPages}
+          {t.common.page} {page} {t.common.of} {totalPages}
         </p>
         <div className="flex items-center gap-1.5">
           <Link
@@ -51,7 +58,7 @@ function CustomerPagination({ data, query }: PaginationProps) {
             )}
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
-            <span className="sr-only">Previous page</span>
+            <span className="sr-only">{t.common.previousPage}</span>
           </Link>
           <Link
             href={buildHref(page + 1)}
@@ -63,7 +70,7 @@ function CustomerPagination({ data, query }: PaginationProps) {
             )}
           >
             <ChevronRight className="size-4" aria-hidden="true" />
-            <span className="sr-only">Next page</span>
+            <span className="sr-only">{t.common.nextPage}</span>
           </Link>
         </div>
       </div>
@@ -77,6 +84,8 @@ interface CustomerTableProps {
 }
 
 export function CustomerTable({ data, query }: CustomerTableProps) {
+  const t = useAdminTranslations();
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
@@ -87,22 +96,22 @@ export function CustomerTable({ data, query }: CustomerTableProps) {
               <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Customer
+                    {t.common.customer}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    WhatsApp / IMO
+                    {t.common.customerPhone}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
-                    Email
+                    {t.common.email}
                   </th>
                   <th scope="col" className="px-4 py-3 font-semibold text-right">
-                    Orders
+                    {t.common.orders}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Last Order
+                    {t.common.lastOrder}
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
-                    Actions
+                    {t.common.actions}
                   </th>
                 </tr>
               </thead>
@@ -144,7 +153,7 @@ export function CustomerTable({ data, query }: CustomerTableProps) {
                           })}
                         >
                           <Eye className="size-3.5" aria-hidden="true" />
-                          View
+                          {t.common.view}
                         </Link>
                       </div>
                     </td>
@@ -179,7 +188,7 @@ export function CustomerTable({ data, query }: CustomerTableProps) {
                 </div>
 
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Last order: {formatDate(customer.lastOrderAt)}
+                  {t.common.lastOrder}: {formatDate(customer.lastOrderAt)}
                 </p>
 
                 <div className="mt-3 flex items-center justify-end">
@@ -193,14 +202,14 @@ export function CustomerTable({ data, query }: CustomerTableProps) {
                     }
                   >
                     <Eye className="size-3.5" aria-hidden="true" />
-                    View customer
+                    {t.common.viewCustomer}
                   </Button>
                 </div>
               </li>
             ))}
           </ul>
 
-          <CustomerPagination data={data} query={query} />
+          <CustomerPagination data={data} query={query} t={t} />
         </>
       ) : null}
     </div>

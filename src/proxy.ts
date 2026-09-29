@@ -19,16 +19,18 @@ export default auth((req) => {
     if (req.auth) {
       return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
     }
-    return NextResponse.next();
+    const res = NextResponse.next();
+    res.headers.set("X-Frame-Options", "DENY");
+    return res;
   }
 
   if (!req.auth) {
-    return NextResponse.redirect(
-      new URL("/admin/login", req.nextUrl.origin)
-    );
+    return NextResponse.redirect(new URL("/admin/login", req.nextUrl.origin));
   }
 
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set("X-Frame-Options", "DENY");
+  return res;
 });
 
 export const config = {

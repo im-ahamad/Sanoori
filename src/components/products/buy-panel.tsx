@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ArrowRight, MessageCircle, Minus, Phone, Plus } from "lucide-react";
 import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
 import type { PublicBusinessSettings } from "@/lib/public/settings";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 export interface BuyContactChannel {
   id: "phone";
@@ -29,10 +30,9 @@ const QUANTITY_MIN = 1;
 const QUANTITY_MAX = 9999;
 
 /**
- * The main buying action. Opens WhatsApp with the product name, code, quantity
- * and page link already in the message when the business number is configured.
- * Otherwise it links to the product-specific "Ask for Price" request page with
- * this product pre-filled. No cart, no checkout.
+ * The main buying actions. Two independent options:
+ * - Ask for Price: opens the website Request Quote flow.
+ * - WhatsApp: directly opens WhatsApp with the product request prepared.
  */
 export function BuyPanel({
   productName,
@@ -43,6 +43,8 @@ export function BuyPanel({
   phoneChannel,
   businessSettings,
 }: BuyPanelProps) {
+  const t = useTranslations();
+  const pd = t.productDetails;
   const [quantity, setQuantity] = useState(QUANTITY_MIN);
 
   const whatsapp = createWhatsAppProductLink(businessSettings, {
@@ -53,7 +55,7 @@ export function BuyPanel({
     productUrl,
   });
 
-  const requestHref = `/request-quote?product=${productSlug}`;
+  const requestHref = `/request-quote?product=${productSlug}&quantity=${quantity}`;
 
   function clamp(value: number): number {
     if (Number.isNaN(value)) return QUANTITY_MIN;
@@ -66,7 +68,17 @@ export function BuyPanel({
     setQuantity(clamp(parsed));
   }
 
-  const primaryButton = (extraClassName: string) =>
+  const askForPriceButton = (extraClassName: string) => (
+    <Link
+      href={requestHref}
+      className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${extraClassName}`}
+    >
+      <span>{pd.askForPrice}</span>
+      <ArrowRight className="size-5" aria-hidden="true" />
+    </Link>
+  );
+
+  const whatsAppButton = (extraClassName: string) =>
     whatsapp ? (
       <a
         href={whatsapp.url}
@@ -76,26 +88,19 @@ export function BuyPanel({
         className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-[#25D366] px-6 text-base font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 ${extraClassName}`}
       >
         <MessageCircle className="size-5" aria-hidden="true" />
-        <span>Get Price on WhatsApp</span>
+        <span>{pd.getPriceOnWhatsApp}</span>
       </a>
-    ) : (
-      <Link
-        href={requestHref}
-        className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${extraClassName}`}
-      >
-        <span>Ask for Price</span>
-      </Link>
-    );
+    ) : null;
 
   return (
     <>
       <div className="space-y-5 rounded-lg border border-border bg-card p-5 shadow-sm">
         <div>
           <h2 className="font-heading text-lg font-bold tracking-tight text-foreground">
-            Get a price for this product
+            {pd.getPriceTitle}
           </h2>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Choose a quantity, then message us — we reply with the price.
+            {pd.getPriceDescription}
           </p>
         </div>
 
@@ -105,7 +110,7 @@ export function BuyPanel({
             htmlFor="buy-quantity"
             className="font-heading text-sm font-semibold text-foreground"
           >
-            Quantity
+            {pd.quantityLabel}
           </label>
           <div className="mt-1.5 flex items-center gap-2">
             <button
@@ -139,17 +144,19 @@ export function BuyPanel({
             </button>
           </div>
           <p className="mt-1.5 text-xs text-muted-foreground">
-            You can change this in the WhatsApp message too.
+            {pd.quantityHint}
           </p>
         </div>
 
-        {/* Primary action */}
-        {primaryButton("w-full")}
+        {/* Primary actions: Ask for Price + WhatsApp */}
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {askForPriceButton("flex-1")}
+          {whatsAppButton("flex-1")}
+        </div>
 
         {whatsapp && (
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Opens WhatsApp with this product and quantity already in your
-            message.
+          <p className="text-xs leading-relaxed text-muted-foreground text-center sm:text-left">
+            {pd.whatsappOpensWithDetails}
           </p>
         )}
 
@@ -160,23 +167,23 @@ export function BuyPanel({
             className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-6 text-base font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Phone className="size-5" aria-hidden="true" />
-            Call Us
+            {pd.callUs}
           </a>
         )}
 
         {/* Large project / multiple products */}
         <div className="rounded-md border border-border bg-muted/30 p-4">
           <p className="text-sm font-semibold text-foreground">
-            Ordering for a project or many products?
+            {pd.projectOrderTitle}
           </p>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Send us a list and we will send you prices for everything.
+            {pd.projectOrderDescription}
           </p>
           <Link
             href={requestHref}
             className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-2 hover:underline"
           >
-            Send a project list
+            {pd.sendProjectList}
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
@@ -185,14 +192,15 @@ export function BuyPanel({
       {/* Mobile sticky action bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur md:hidden">
         <div className="grid grid-cols-1 gap-2">
-          {primaryButton("w-full")}
+          {askForPriceButton("w-full")}
+          {whatsAppButton("w-full")}
           {phoneChannel && (
             <a
               href={phoneChannel.href}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border bg-background px-6 text-base font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Phone className="size-5" aria-hidden="true" />
-              Call Us
+              {pd.callUs}
             </a>
           )}
         </div>

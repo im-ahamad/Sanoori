@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import type { OrderList } from "@/lib/admin/orders";
@@ -7,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
 import { InquiryContactActions } from "@/components/admin/inquiry-contact-actions";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 function buildWhatsAppMessage(
   customerName: string,
@@ -21,7 +24,7 @@ interface PaginationProps {
   query: string;
 }
 
-function OrderPagination({ data, query }: PaginationProps) {
+function OrderPagination({ data, query, t }: PaginationProps & { t: ReturnType<typeof useAdminTranslations> }) {
   const { page, totalPages, total, pageSize } = data;
   if (total === 0) return null;
 
@@ -41,15 +44,15 @@ function OrderPagination({ data, query }: PaginationProps) {
 
   return (
     <nav
-      aria-label="Order pagination"
+      aria-label={t.common.productPagination}
       className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <p className="text-xs text-muted-foreground">
-        Showing {start}–{end} of {total.toLocaleString()} orders
+        {t.common.showing} {start}–{end} {t.common.of} {total.toLocaleString()} {t.common.orders}
       </p>
       <div className="flex items-center gap-3">
         <p className="text-xs text-muted-foreground">
-          Page {page} of {totalPages}
+          {t.common.page} {page} {t.common.of} {totalPages}
         </p>
         <div className="flex items-center gap-1.5">
           <Link
@@ -62,7 +65,7 @@ function OrderPagination({ data, query }: PaginationProps) {
             )}
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
-            <span className="sr-only">Previous page</span>
+            <span className="sr-only">{t.common.previousPage}</span>
           </Link>
           <Link
             href={buildHref(page + 1)}
@@ -74,7 +77,7 @@ function OrderPagination({ data, query }: PaginationProps) {
             )}
           >
             <ChevronRight className="size-4" aria-hidden="true" />
-            <span className="sr-only">Next page</span>
+            <span className="sr-only">{t.common.nextPage}</span>
           </Link>
         </div>
       </div>
@@ -88,6 +91,8 @@ interface OrderTableProps {
 }
 
 export function OrderTable({ data, query }: OrderTableProps) {
+  const t = useAdminTranslations();
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       {data.items.length > 0 ? (
@@ -98,31 +103,31 @@ export function OrderTable({ data, query }: OrderTableProps) {
               <thead className="border-b border-border bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Customer
+                    {t.common.customer}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    Phone
+                    {t.common.phone}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold lg:table-cell">
-                    Product
+                    {t.common.product}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Model
+                    {t.common.model}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Qty
+                    {t.common.qty}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold md:table-cell">
-                    Source
+                    {t.common.sourceFilter}
                   </th>
                   <th scope="col" className="px-4 py-3 font-semibold">
-                    Status
+                    {t.common.status}
                   </th>
                   <th scope="col" className="hidden px-4 py-3 font-semibold xl:table-cell">
-                    Received
+                    {t.common.received}
                   </th>
                   <th scope="col" className="px-4 py-3 text-right font-semibold">
-                    Actions
+                    {t.common.actions}
                   </th>
                 </tr>
               </thead>
@@ -189,7 +194,7 @@ export function OrderTable({ data, query }: OrderTableProps) {
                           })}
                         >
                           <Eye className="size-3.5" aria-hidden="true" />
-                          View
+                          {t.common.view}
                         </Link>
                       </div>
                     </td>
@@ -225,10 +230,10 @@ export function OrderTable({ data, query }: OrderTableProps) {
 
                 <p className="mt-3 text-xs text-muted-foreground">
                   {order.productName
-                    ? `Product: ${order.productName}`
-                    : "No product selected"}
-                  {order.productCode ? ` · Model: ${order.productCode}` : ""}
-                  {order.quantity ? ` · Qty ${order.quantity.toLocaleString()}` : ""}
+                    ? `${t.common.product}: ${order.productName}`
+                    : t.common.noProductSelected}
+                  {order.productCode ? ` · ${t.common.model}: ${order.productCode}` : ""}
+                  {order.quantity ? ` · ${t.common.qty} ${order.quantity.toLocaleString()}` : ""}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground/80">
                   {inquirySourceLabel(order.source)} ·{" "}
@@ -253,14 +258,14 @@ export function OrderTable({ data, query }: OrderTableProps) {
                     }
                   >
                     <Eye className="size-3.5" aria-hidden="true" />
-                    View order
+                    {t.common.view}
                   </Button>
                 </div>
               </li>
             ))}
           </ul>
 
-          <OrderPagination data={data} query={query} />
+          <OrderPagination data={data} query={query} t={t} />
         </>
       ) : null}
     </div>

@@ -6,10 +6,18 @@ import { CustomerFilters } from "@/components/admin/customer-filters";
 import { CustomerTable } from "@/components/admin/customer-table";
 import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
+import { cookies } from "next/headers";
+import { getServerAdminTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = {
   title: "Customers",
 };
+
+async function getLanguage(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 function stringParam(
   value: string | string[] | undefined
@@ -20,7 +28,11 @@ function stringParam(
 export default async function AdminCustomersPage(
   props: PageProps<"/admin/customers">
 ) {
-  const searchParams = await props.searchParams;
+  const [lang, searchParams] = await Promise.all([
+    getLanguage(),
+    props.searchParams,
+  ]);
+  const t = getServerAdminTranslations(lang);
 
   const q = stringParam(searchParams.q) ?? "";
   const sort = stringParam(searchParams.sort) ?? "newest";
@@ -46,10 +58,10 @@ export default async function AdminCustomersPage(
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Customers
+          {t.common.customers}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          View customers derived from order history. No customer accounts required.
+          {t.common.customersDerived}
         </p>
       </div>
 
@@ -57,15 +69,15 @@ export default async function AdminCustomersPage(
 
       {!listResult.ok ? (
         <SectionError
-          title="Could not load customers"
-          description="We could not load customers. Please try again in a moment."
+          title={t.common.couldNotLoadCustomers}
+          description={t.common.pleaseTryAgain}
         />
       ) : listResult.data.items.length === 0 ? (
         hasFilters ? (
           <div className="rounded-lg border border-border bg-background">
             <EmptyState
-              title="No matching customers"
-              description="No customers match your current search or filters. Try different terms or clear the filters."
+              title={t.common.noMatchingCustomers}
+              description={t.common.noCustomersMatchFilters}
               icon={<SearchX className="size-8 text-muted-foreground" />}
             />
             <div className="flex justify-center pb-10">
@@ -74,15 +86,15 @@ export default async function AdminCustomersPage(
                 size="sm"
                 render={<Link href="/admin/customers" />}
               >
-                Clear search and filters
+                {t.common.clearSearchFilters}
               </Button>
             </div>
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-background">
             <EmptyState
-              title="No customers yet"
-              description="Customers appear here when they submit their first order."
+              title={t.common.noCustomersYet}
+              description={t.common.addCustomerDesc}
               icon={<Users className="size-8 text-muted-foreground" />}
             />
           </div>
@@ -90,7 +102,7 @@ export default async function AdminCustomersPage(
       ) : (
         <div>
           <p className="sr-only" role="status">
-            Showing {listResult.data.total.toLocaleString()} customers
+            {t.common.showing} {listResult.data.total.toLocaleString()} {t.common.customers}
           </p>
           <CustomerTable data={listResult.data} query={queryString} />
         </div>

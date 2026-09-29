@@ -8,10 +8,18 @@ import { OrderTable } from "@/components/admin/order-table";
 import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FlashBanner } from "@/components/admin/flash-banner";
+import { cookies } from "next/headers";
+import { getServerAdminTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = {
   title: "Orders",
 };
+
+async function getLanguage(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 function stringParam(
   value: string | string[] | undefined
@@ -40,13 +48,17 @@ export default async function AdminOrdersPage(
   if (sort !== "newest") query.set("sort", sort);
   const queryString = query.toString();
 
-  const listResult = await listAdminOrders({
-    q,
-    status: isInquiryStatus(status) ? status : undefined,
-    source: isInquirySource(source) ? source : undefined,
-    sort,
-    page,
-  });
+  const [lang, listResult] = await Promise.all([
+    getLanguage(),
+    listAdminOrders({
+      q,
+      status: isInquiryStatus(status) ? status : undefined,
+      source: isInquirySource(source) ? source : undefined,
+      sort,
+      page,
+    }),
+  ]);
+  const t = getServerAdminTranslations(lang);
 
   const hasFilters = q !== "" || status !== "" || source !== "" || sort !== "newest";
 
@@ -54,10 +66,10 @@ export default async function AdminOrdersPage(
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Orders
+          {t.common.orders}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Review customer quote requests, view details, and update their status.
+          {t.common.reviewCustomerRequests}
         </p>
       </div>
 
@@ -74,15 +86,15 @@ export default async function AdminOrdersPage(
 
       {!listResult.ok ? (
         <SectionError
-          title="Could not load orders"
-          description="We could not load your orders. Please try again in a moment."
+          title={t.common.couldNotLoadOrders}
+          description={t.common.pleaseTryAgain}
         />
       ) : listResult.data.items.length === 0 ? (
         hasFilters ? (
           <div className="rounded-lg border border-border bg-background">
             <EmptyState
-              title="No matching orders"
-              description="No orders match your current search or filters. Try different terms or clear the filters."
+              title={t.common.noMatchingOrders}
+              description={t.common.noOrdersMatchFilters}
               icon={<SearchX className="size-8 text-muted-foreground" />}
             />
             <div className="flex justify-center pb-10">
@@ -91,15 +103,15 @@ export default async function AdminOrdersPage(
                 size="sm"
                 render={<Link href="/admin/orders" />}
               >
-                Clear search and filters
+                {t.common.clearSearchFilters}
               </Button>
             </div>
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-background">
             <EmptyState
-              title="No orders yet"
-              description="When customers submit a quote request on the website, it will show up here."
+              title={t.common.noOrdersYet}
+              description={t.common.ordersAppearHere}
               icon={<Inbox className="size-8 text-muted-foreground" />}
             />
           </div>
@@ -107,7 +119,7 @@ export default async function AdminOrdersPage(
       ) : (
         <div>
           <p className="sr-only" role="status">
-            Showing {listResult.data.total.toLocaleString()} orders
+            {t.common.showingProducts.replace("{total}", listResult.data.total.toLocaleString())}
           </p>
           <OrderTable data={listResult.data} query={queryString} />
         </div>

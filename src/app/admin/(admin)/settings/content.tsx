@@ -18,6 +18,7 @@ import {
   type UpdateBusinessSettingsResult,
 } from "@/lib/actions/business-settings";
 import type { BusinessSettings } from "@/lib/admin/settings";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface BusinessSettingsFormData {
   name: string;
@@ -74,6 +75,7 @@ function settingsToFormData(settings: BusinessSettings | null): BusinessSettings
 }
 
 export function AdminSettingsContent({ initialSettings }: AdminSettingsContentProps) {
+  const t = useAdminTranslations();
   const [passwordState, passwordFormAction] = useActionState<
     UpdatePasswordActionResult | undefined,
     FormData
@@ -94,16 +96,16 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const isLoading = businessState && !businessState.ok && businessState.message === "Updating…";
+  const isLoading = businessState && !businessState.ok && businessState.message === t.common.saving;
 
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Settings
+          {t.common.settings}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Configure business details and admin preferences.
+          {t.common.configureBusiness}
         </p>
       </div>
 
@@ -111,15 +113,15 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
         <TabsList className="flex w-full overflow-x-auto gap-2 p-1 grid-cols-3 sm:grid sm:overflow-visible sm:p-0">
           <TabsTrigger value="business" className="whitespace-nowrap">
             <Building className="size-4 mr-2" aria-hidden="true" />
-            Business
+            {t.common.businessInformation}
           </TabsTrigger>
           <TabsTrigger value="social" className="whitespace-nowrap">
             <Globe className="size-4 mr-2" aria-hidden="true" />
-            Social Links
+            {t.common.socialLinks}
           </TabsTrigger>
           <TabsTrigger value="admin" className="whitespace-nowrap">
             <User className="size-4 mr-2" aria-hidden="true" />
-            Admin Profile
+            {t.common.adminProfile}
           </TabsTrigger>
         </TabsList>
 
@@ -129,16 +131,16 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building className="size-5 text-gold" aria-hidden="true" />
-                Business Information
+                {t.common.businessInformation}
               </CardTitle>
               <CardDescription>
-                These details are displayed on the public website and used for contact purposes.
+                {t.common.businessDetailsPublic}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <form key={settingsKey} action={businessFormAction} className="space-y-6">
                 <div className="space-y-1.5">
-                  <Label htmlFor="business-name">Business Name</Label>
+                  <Label htmlFor="business-name">{t.common.businessName}</Label>
                   <Input
                     id="business-name"
                     name="name"
@@ -150,7 +152,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <Label htmlFor="business-phone">Phone</Label>
+                    <Label htmlFor="business-phone">{t.common.businessPhone}</Label>
                     <Input
                       id="business-phone"
                       name="phone"
@@ -162,7 +164,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="business-whatsapp">WhatsApp</Label>
+                    <Label htmlFor="business-whatsapp">{t.common.businessWhatsApp}</Label>
                     <Input
                       id="business-whatsapp"
                       name="whatsapp"
@@ -175,7 +177,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="business-email">Email</Label>
+                  <Label htmlFor="business-email">{t.common.businessEmail}</Label>
                   <Input
                     id="business-email"
                     name="email"
@@ -187,7 +189,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="business-address">Address</Label>
+                  <Label htmlFor="business-address">{t.common.businessAddress}</Label>
                   <Input
                     id="business-address"
                     name="address"
@@ -199,7 +201,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <Label htmlFor="business-city">City</Label>
+                    <Label htmlFor="business-city">{t.common.businessCity}</Label>
                     <Input
                       id="business-city"
                       name="city"
@@ -210,7 +212,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="business-country">Country</Label>
+                    <Label htmlFor="business-country">{t.common.businessCountry}</Label>
                     <Input
                       id="business-country"
                       name="country"
@@ -226,12 +228,12 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                     {isLoading ? (
                       <>
                         <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                        Saving…
+                        {t.common.saving}
                       </>
                     ) : (
                       <>
                         <Save className="size-4" aria-hidden="true" />
-                        Save Changes
+                        {t.common.saveBusinessChanges}
                       </>
                     )}
                   </Button>
@@ -258,20 +260,20 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="size-5 text-gold" aria-hidden="true" />
-                Social Media Links
+                {t.common.socialLinks}
               </CardTitle>
               <CardDescription>
-                Links to your social media profiles displayed on the website.
+                {t.common.socialLinksPublic}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <form key={settingsKey} action={businessFormAction} className="space-y-4">
                 {[
-                  { key: "facebook", label: "Facebook", placeholder: "https://facebook.com/yourprofile" },
-                  { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/yourprofile" },
-                  { key: "tiktok", label: "TikTok", placeholder: "https://tiktok.com/@yourprofile" },
-                  { key: "youtube", label: "YouTube", placeholder: "https://youtube.com/@yourprofile" },
-                  { key: "telegram", label: "Telegram", placeholder: "https://t.me/yourprofile" },
+                  { key: "facebook", label: t.common.socialFacebook, placeholder: t.common.socialPlaceholderFacebook },
+                  { key: "instagram", label: t.common.socialInstagram, placeholder: t.common.socialPlaceholderInstagram },
+                  { key: "tiktok", label: t.common.socialTikTok, placeholder: t.common.socialPlaceholderTikTok },
+                  { key: "youtube", label: t.common.socialYouTube, placeholder: t.common.socialPlaceholderYouTube },
+                  { key: "telegram", label: t.common.socialTelegram, placeholder: t.common.socialPlaceholderTelegram },
                 ].map((social) => (
                   <div key={social.key} className="space-y-1.5">
                     <Label htmlFor={`social-${social.key}`}>{social.label}</Label>
@@ -291,12 +293,12 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                     {isLoading ? (
                       <>
                         <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                        Saving…
+                        {t.common.saving}
                       </>
                     ) : (
                       <>
                         <Save className="size-4" aria-hidden="true" />
-                        Save Changes
+                        {t.common.saveBusinessChanges}
                       </>
                     )}
                   </Button>
@@ -323,10 +325,10 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="size-5 text-gold" aria-hidden="true" />
-                Admin Profile
+                {t.common.adminProfile}
               </CardTitle>
               <CardDescription>
-                Manage your admin account settings.
+                {t.common.manageAccount}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -338,14 +340,14 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                   <p className="font-heading text-xl font-bold text-foreground">
                     {formData.name || "Sanoori Trading"} Admin
                   </p>
-                  <p className="text-sm text-muted-foreground">Administrator</p>
+                  <p className="text-sm text-muted-foreground">{t.common.administrator}</p>
                 </div>
               </div>
 
               <Separator />
 
               <div className="space-y-1.5">
-                <Label htmlFor="admin-email">Email</Label>
+                <Label htmlFor="admin-email">{t.common.email}</Label>
                 <Input
                   id="admin-email"
                   type="email"
@@ -354,15 +356,15 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                   className="bg-muted/50"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Email cannot be changed from here. Contact system administrator if needed.
+                  {t.common.emailCannotChange}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="admin-role">Role</Label>
+                <Label htmlFor="admin-role">{t.common.role}</Label>
                 <Input
                   id="admin-role"
-                  defaultValue="ADMIN"
+                  defaultValue={t.common.administrator}
                   disabled
                   className="bg-muted/50"
                 />
@@ -374,10 +376,10 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Key className="size-5 text-gold" aria-hidden="true" />
-                Change Password
+                {t.common.changePassword}
               </CardTitle>
               <CardDescription>
-                Update your admin panel password.
+                {t.common.updatePasswordDesc}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -392,7 +394,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Label htmlFor="currentPassword">{t.common.currentPassword}</Label>
                   <Input
                     id="currentPassword"
                     name="currentPassword"
@@ -403,7 +405,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">{t.common.newPassword}</Label>
                   <Input
                     id="newPassword"
                     name="newPassword"
@@ -413,12 +415,12 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                     autoComplete="new-password"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Must be at least 8 characters.
+                    {t.common.passwordMinLength}
                   </p>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword">{t.common.confirmPassword}</Label>
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -429,7 +431,7 @@ export function AdminSettingsContent({ initialSettings }: AdminSettingsContentPr
                 </div>
 
                 <Button type="submit" disabled={passwordState && !passwordState.ok}>
-                  {passwordState && !passwordState.ok ? "Updating…" : "Update Password"}
+                  {passwordState && !passwordState.ok ? t.common.updating : t.common.updatePassword}
                 </Button>
               </form>
             </CardContent>

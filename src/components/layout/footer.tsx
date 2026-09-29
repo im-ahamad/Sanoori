@@ -79,7 +79,7 @@ export async function Footer() {
               <h3 className="-translate-x-[16px] text-center font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
                 {t.footer.quickLinks}
               </h3>
-              <ul className="mt-2 grid w-fit grid-cols-2 gap-x-1 gap-y-2">
+              <ul className="mt-2 space-y-1">
                 {quickLinks.map((item) => (
                   <li key={`footer-${item.href}`}>
                     <Link

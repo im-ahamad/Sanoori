@@ -6,10 +6,18 @@ import { SubcategoryTable } from "@/components/admin/subcategory-table";
 import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
 import { FlashBanner, type FlashKind } from "@/components/admin/flash-banner";
+import { cookies } from "next/headers";
+import { getServerAdminTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = {
   title: "Subcategories",
 };
+
+async function getLanguage(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 function stringParam(
   value: string | string[] | undefined
@@ -29,7 +37,11 @@ interface SearchParams {
 export default async function AdminSubcategoriesPage(
   props: { searchParams: Promise<SearchParams> }
 ) {
-  const searchParams = await props.searchParams;
+  const [lang, searchParams] = await Promise.all([
+    getLanguage(),
+    props.searchParams,
+  ]);
+  const t = getServerAdminTranslations(lang);
 
   const queryParams = {
     q: stringParam(searchParams.q) ?? "",
@@ -61,15 +73,15 @@ export default async function AdminSubcategoriesPage(
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Subcategories
+            {t.common.subcategories}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage product subcategories organized under categories.
+            {t.common.manageSubcategories}
           </p>
         </div>
         <Button render={<Link href="/admin/subcategories/new" />}>
           <Plus className="size-4" aria-hidden="true" />
-          Add Subcategory
+          {t.common.addSubcategory}
         </Button>
       </div>
 
@@ -83,27 +95,27 @@ export default async function AdminSubcategoriesPage(
 
       {!listResult.ok ? (
         <SectionError
-          title="Could not load subcategories"
-          description="We could not load your subcategories. Please try again in a moment."
+          title={t.common.couldNotLoadSubcategories}
+          description={t.common.pleaseTryAgain}
         />
       ) : listResult.data.items.length === 0 ? (
         <div className="rounded-lg border border-border bg-background">
           <EmptyState
-            title="No subcategories yet"
-            description="Create your first subcategory to further organize products within categories."
+            title={t.common.noSubcategoriesYet}
+            description={t.common.addSubcategoryDesc}
             icon={<SquareKanban className="size-8 text-muted-foreground" />}
           />
           <div className="flex justify-center pb-10">
             <Button render={<Link href="/admin/subcategories/new" />}>
               <Plus className="size-4" aria-hidden="true" />
-              Add Subcategory
+              {t.common.addSubcategory}
             </Button>
           </div>
         </div>
       ) : (
         <div>
           <p className="sr-only" role="status">
-            Showing {listResult.data.items.length} subcategories
+            {t.common.showing} {listResult.data.items.length} {t.common.subcategories}
           </p>
           <SubcategoryTable data={listResult.data} query={queryString} />
         </div>

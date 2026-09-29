@@ -9,7 +9,6 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
 import { Brand } from "@/components/shared/brand";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { HeaderSearch } from "@/components/layout/header-search";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LanguageToggle } from "@/components/language/language-toggle";
 import { useTranslations } from "@/lib/i18n";
@@ -128,10 +127,8 @@ export function Header({ settings }: HeaderProps) {
             ))}
           </nav>
 
-          {/* Right side — Logo → Nav → Search → Theme → Language → CTA */}
+          {/* Right side — Logo → Nav → Theme → Language → CTA */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <HeaderSearch />
-
             {/* Desktop header controls — hidden on mobile to keep header uncluttered */}
             <div className="hidden items-center gap-2 sm:flex">
               <ThemeToggle />

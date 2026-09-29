@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { ArrowLeft, BadgeCheck, ListChecks, Ruler } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
@@ -22,6 +23,14 @@ import {
 } from "@/lib/seo";
 import { getPublicProductBySlug } from "@/lib/public/catalogue";
 import { getPublicBusinessSettings } from "@/lib/public/settings";
+import { getServerTranslations } from "@/lib/i18n/server-translations";
+import { cookies } from "next/headers";
+
+async function getLang(): Promise<"en" | "bn"> {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("sanoori-lang")?.value;
+  return lang === "bn" ? "bn" : "en";
+}
 
 export async function generateMetadata({
   params,
@@ -48,6 +57,11 @@ export default async function ProductDetailPage({
   params,
 }: PageProps<"/products/[slug]">) {
   const { slug } = await params;
+  const lang = await getLang();
+  const t = getServerTranslations(lang);
+  const pd = t.productDetails;
+  const products = t.products;
+
   const [product, businessSettings] = await Promise.all([
     getPublicProductBySlug(slug),
     getPublicBusinessSettings(),
@@ -64,7 +78,9 @@ export default async function ProductDetailPage({
   }));
 
   const detailUrl = `/products/${product.slug}`;
-  const productUrl = `${siteConfig.url}${detailUrl}`;
+  const host = (await headers()).get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") ? "http" : "https";
+  const productUrl = `${protocol}://${host}${detailUrl}`;
 
   const channels = getContactChannels(businessSettings);
   const phoneChannelEntry = channels.find(
@@ -89,7 +105,7 @@ export default async function ProductDetailPage({
 
   const breadcrumbSchema = JSON.stringify(
     generateBreadcrumbSchema([
-      { name: "Products", url: "/products" },
+      { name: products.breadcrumb, url: "/products" },
       { name: product.name, url: detailUrl },
     ])
   );
@@ -104,7 +120,7 @@ export default async function ProductDetailPage({
         title={product.name}
         description={product.shortDescription ?? undefined}
         breadcrumbs={[
-          { label: "Products", href: "/products" },
+          { label: products.breadcrumb, href: "/products" },
           { label: product.name, href: detailUrl },
         ]}
       />
@@ -141,7 +157,7 @@ export default async function ProductDetailPage({
                 </p>
                 {product.productCode && (
                   <p className="text-sm text-muted-foreground">
-                    Product Code:{" "}
+                    {pd.productCodeLabel}:{" "}
                     <span className="font-semibold text-foreground">
                       {product.productCode}
                     </span>
@@ -165,8 +181,8 @@ export default async function ProductDetailPage({
           {product.description && (
             <section aria-labelledby="description-heading" className="mt-14">
               <SectionHeader
-                title="More about this product"
-                description="Information supplied by Sanoori Trading."
+                title={pd.moreAboutTitle}
+                description={pd.moreAboutDescription}
               />
               <div className="mt-5 max-w-3xl whitespace-pre-line rounded-lg border border-border bg-card p-6 text-base leading-relaxed text-muted-foreground">
                 {product.description}
@@ -182,7 +198,7 @@ export default async function ProductDetailPage({
                 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
               >
                 <BadgeCheck className="size-5 text-primary" aria-hidden="true" />
-                Key features
+                {pd.keyFeaturesTitle}
               </h2>
               <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {product.features.map((feature, index) => (
@@ -209,7 +225,7 @@ export default async function ProductDetailPage({
                 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
               >
                 <Ruler className="size-5 text-primary" aria-hidden="true" />
-                Specifications
+                {pd.specificationsTitle}
               </h2>
               <dl className="mt-5 max-w-3xl overflow-hidden rounded-lg border border-border">
                 {specificationsEntries.map(([key, value], index) => (
@@ -241,7 +257,7 @@ export default async function ProductDetailPage({
                 className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
               >
                 <ListChecks className="size-5 text-primary" aria-hidden="true" />
-                Available options
+                {pd.variantsTitle}
               </h2>
               <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {product.variants.map((variant, index) => (
@@ -272,20 +288,20 @@ export default async function ProductDetailPage({
           <div className="mt-14 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-muted/40 p-6 sm:flex-row sm:items-center">
             <div>
               <h2 className="font-heading text-lg font-semibold text-foreground">
-                Need something different?
+                {pd.needDifferentTitle}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Tell us what you need and we will find it for you.
+                {pd.needDifferentDescription}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <ButtonLink
                 href={`/request-quote?product=${product.slug}`}
               >
-                Get a Price
+                {pd.getPriceButton}
               </ButtonLink>
               <ButtonLink href="/products" variant="outline">
-                See all products
+                {pd.seeAllProductsButton}
               </ButtonLink>
             </div>
           </div>
@@ -295,7 +311,7 @@ export default async function ProductDetailPage({
             className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Back to all products
+            {pd.backToProducts}
           </Link>
 
           <div className="h-20 md:hidden" aria-hidden="true" />

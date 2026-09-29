@@ -2,22 +2,22 @@
   <title id="logo-title">SANOORI TRADING</title>
   <defs>
     <linearGradient id="roof-blue" x1="143" y1="59" x2="306" y2="224" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#00A5E5"/>
-      <stop offset="0.52" stop-color="#0095DA"/>
-      <stop offset="1" stop-color="#0877BA"/>
+      <stop offset="0" stop-color="var(--logo-gradient-start, #00A5E5)"/>
+      <stop offset="0.52" stop-color="var(--logo-gradient-mid, #0095DA)"/>
+      <stop offset="1" stop-color="var(--logo-gradient-end, #0877BA)"/>
     </linearGradient>
     <linearGradient id="diagonal-blue" x1="110" y1="154" x2="256" y2="284" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#00A5E5"/>
-      <stop offset="1" stop-color="#007DC3"/>
+      <stop offset="0" stop-color="var(--logo-gradient-start, #00A5E5)"/>
+      <stop offset="1" stop-color="var(--logo-gradient-end, #007DC3)"/>
     </linearGradient>
     <linearGradient id="accent-blue" x1="118" y1="19" x2="163" y2="42" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#00A5E5"/>
-      <stop offset="1" stop-color="#0084C9"/>
+      <stop offset="0" stop-color="var(--logo-gradient-start, #00A5E5)"/>
+      <stop offset="1" stop-color="var(--logo-gradient-end, #0084C9)"/>
     </linearGradient>
     <style>
-      .navy { fill: #082D55; }
-      .wordmark { fill: #082B50; }
-      .subtitle { fill: #0789C6; }
+      .navy { fill: var(--logo-navy, #082D55); }
+      .wordmark { fill: var(--logo-wordmark, #082B50); }
+      .subtitle { fill: var(--logo-subtitle, #0789C6); }
     </style>
   </defs>
 

@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "@/components/language/language-toggle";
 import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
+import { hasPermission, type Permission, type UserRole } from "@/lib/auth/permissions";
 
 interface AdminShellProps {
   user: { name: string | null; email: string | null };
+  role: UserRole;
+  permissions: string[];
   children: React.ReactNode;
 }
 
@@ -55,7 +58,7 @@ function LogoutButton({ className }: { className?: string }) {
   );
 }
 
-function NavLinks({ onNavigate, t }: { onNavigate?: () => void; t: ReturnType<typeof useAdminTranslations> }) {
+function NavLinks({ onNavigate, t, role, permissions }: { onNavigate?: () => void; t: ReturnType<typeof useAdminTranslations>; role: UserRole; permissions: string[] }) {
   const pathname = usePathname();
 
   const navLabelMap: Record<string, string> = {
@@ -68,9 +71,13 @@ function NavLinks({ onNavigate, t }: { onNavigate?: () => void; t: ReturnType<ty
     Settings: t.common.settings,
   };
 
+  const visibleNavItems = adminNavItems.filter((item) =>
+    hasPermission(role, permissions, item.permission as Permission)
+  );
+
   return (
     <nav className="flex flex-col gap-1" aria-label="Admin navigation">
-      {adminNavItems.map((item) => {
+      {visibleNavItems.map((item) => {
         const active = pathname === item.href;
         const Icon = item.icon;
         return (
@@ -100,7 +107,7 @@ function NavLinks({ onNavigate, t }: { onNavigate?: () => void; t: ReturnType<ty
   );
 }
 
-export function AdminShell({ user, children }: AdminShellProps) {
+export function AdminShell({ user, role, permissions, children }: AdminShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const t = useAdminTranslations();
 
@@ -159,7 +166,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
         {/* ===== Desktop sidebar ===== */}
         <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-navy-dark lg:flex">
           <div className="sticky top-14 flex flex-1 flex-col gap-4 overflow-y-auto p-4">
-            <NavLinks t={t} />
+            <NavLinks t={t} role={role} permissions={permissions} />
             <div className="mt-auto border-t border-white/10 pt-4">
               <LogoutButton className="text-white/70" />
             </div>
@@ -199,7 +206,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
             </div>
 
             <div className="mt-6 flex-1">
-              <NavLinks onNavigate={() => setMobileOpen(false)} t={t} />
+              <NavLinks onNavigate={() => setMobileOpen(false)} t={t} role={role} permissions={permissions} />
             </div>
 
             <div className="border-t border-white/10 pt-4">

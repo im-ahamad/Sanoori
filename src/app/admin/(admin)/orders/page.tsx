@@ -74,6 +74,7 @@ export default async function AdminOrdersPage(
       </div>
 
       {searchParams.updated === "1" ? <FlashBanner kind="inquiryUpdated" /> : null}
+      {searchParams.deleted === "1" ? <FlashBanner kind="deleted" /> : null}
 
       <OrderFilters
         values={{

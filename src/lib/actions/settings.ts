@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { hasPermission, type UserRole, type Permission } from "@/lib/auth/permissions";
 
 export type UpdatePasswordActionResult =
   | { ok: true; message: string }
@@ -18,12 +19,29 @@ const updatePasswordSchema = z.object({
   path: ["confirmPassword"],
 });
 
+async function getUserPermissions(): Promise<{ role: UserRole; permissions: unknown } | null> {
+  const session = await auth();
+  if (!session?.user) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+  if (!user || !user.isActive) return null;
+  return { role: user.role as UserRole, permissions: user.permissions };
+}
+
+function requirePermission(permission: Permission): Promise<boolean> {
+  return getUserPermissions().then((user) => {
+    if (!user) return false;
+    return hasPermission(user.role, user.permissions, permission);
+  });
+}
+
 export async function updatePasswordAction(
   _prevState: UpdatePasswordActionResult | undefined,
   formData: FormData
 ): Promise<UpdatePasswordActionResult> {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!(await requirePermission("settings:write"))) {
     return { ok: false, message: "Unauthorized" };
   }
 
@@ -38,6 +56,9 @@ export async function updatePasswordAction(
   }
 
   try {
+    const session = await auth();
+    if (!session?.user) return { ok: false, message: "Unauthorized" };
+
     const user = await db.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, passwordHash: true, isActive: true, role: true },
@@ -47,7 +68,7 @@ export async function updatePasswordAction(
       return { ok: false, message: "User not found" };
     }
 
-    if (!user.isActive || user.role !== "ADMIN") {
+    if (!user.isActive) {
       return { ok: false, message: "Unauthorized" };
     }
 

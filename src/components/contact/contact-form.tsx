@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useTranslations, getTranslations, type SupportedLanguage } from "@/lib/i18n/use-translations";
-import { submitContactFormAction, type ContactFormActionState } from "@/lib/actions/contact-form";
+import { useTranslations, getTranslations } from "@/lib/i18n/use-translations";
+import { submitContactFormAction } from "@/lib/actions/contact-form";
 
 export function ContactForm() {
   const tContext = useTranslations();

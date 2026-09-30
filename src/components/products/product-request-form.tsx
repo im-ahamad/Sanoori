@@ -15,6 +15,8 @@ import {
   submitProductRequestAction,
   type ProductRequestActionState,
 } from "@/lib/actions/product-requests";
+import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
+import type { PublicBusinessSettings } from "@/lib/public/settings";
 import { productRequestSchema } from "@/lib/validators/product-request";
 import type { ProductRequestInput } from "@/lib/validators/product-request";
 import { Button } from "@/components/ui/button";
@@ -26,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useTranslations, getTranslations, type SupportedLanguage } from "@/lib/i18n/use-translations";
 
 export interface ProductRequestTarget {
+  id: string;
   slug: string;
   name: string;
   /** Product code / SKU — shown as the product "Model". */
@@ -36,8 +39,8 @@ export interface ProductRequestTarget {
 
 interface ProductRequestFormProps {
   product: ProductRequestTarget;
-  /** Optional WhatsApp chat link shown after a successful request. */
-  whatsappHref?: string | null;
+  /** Business settings for WhatsApp link generation. */
+  businessSettings: PublicBusinessSettings;
   /** When provided (modal), the success panel shows a "Done" button. */
   onDone?: () => void;
   /** Initial language for server-side rendering to avoid hydration mismatch. */
@@ -63,7 +66,7 @@ function getFieldError(state: ProductRequestActionState, field: string): string 
 
 export function ProductRequestForm({
   product,
-  whatsappHref,
+  businessSettings,
   onDone,
   initialLang,
   initialQuantity,
@@ -106,7 +109,16 @@ export function ProductRequestForm({
   };
 
   const [state, formAction, pending] = useActionState(
-    submitProductRequestAction,
+    async (prevState: ProductRequestActionState, formData: FormData) => {
+      const fd = new FormData();
+      for (const [key, value] of formData.entries()) {
+        fd.append(key, value);
+      }
+      if (!fd.has("productSlug")) {
+        fd.set("productSlug", product.slug);
+      }
+      return submitProductRequestAction(prevState, fd);
+    },
     undefined
   );
   const [values, setValues] = useState({
@@ -168,8 +180,17 @@ export function ProductRequestForm({
   const contactError = getFieldError(state, "contactNumber") ?? errors.contactNumber;
   const quantityError = getFieldError(state, "quantity") ?? errors.quantity;
   const messageError = getFieldError(state, "message") ?? errors.message;
+  const productSlugError = getFieldError(state, "productSlug");
 
   if (state?.status === "success") {
+    const whatsapp = createWhatsAppProductLink(businessSettings, {
+      productName: product.name,
+      productId: product.id,
+      productCode: product.model,
+      quantity: Number(values.quantity),
+      productUrl: `${window.location.origin}/products/${product.slug}`,
+    });
+
     return (
       <section
         ref={successRef}
@@ -228,9 +249,9 @@ export function ProductRequestForm({
               <ArrowRight className="size-4" aria-hidden="true" />
             </ButtonLink>
           )}
-          {whatsappHref && (
+          {whatsapp && (
             <ButtonLink
-              href={whatsappHref}
+              href={whatsapp.url}
               target="_blank"
               rel="noopener noreferrer"
               variant="outline"
@@ -252,6 +273,15 @@ export function ProductRequestForm({
           className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
           {state.message}
+        </div>
+      )}
+
+      {productSlugError && (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          {productSlugError}
         </div>
       )}
 

@@ -21,18 +21,10 @@ import { FlashBanner } from "@/components/admin/flash-banner";
 import { SectionError } from "@/components/admin/section-error";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { cookies } from "next/headers";
-import { getServerAdminTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = {
   title: "Order",
 };
-
-async function getLanguage(): Promise<"en" | "bn"> {
-  const cookieStore = await cookies();
-  const lang = cookieStore.get("sanoori-lang")?.value;
-  return lang === "bn" ? "bn" : "en";
-}
 
 function buildWhatsAppMessage(
   customerName: string,

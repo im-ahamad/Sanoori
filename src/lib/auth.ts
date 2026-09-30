@@ -23,7 +23,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (!user) return null;
-        if (!user.isActive || user.role !== "ADMIN") return null;
+        if (!user.isActive) return null;
+        const validRoles = ["SUPER_ADMIN", "ADMIN", "JUNIOR_ADMIN", "STAFF"];
+        if (!validRoles.includes(user.role)) return null;
+        if (!user.emailVerified) return null;
 
         const passwordMatches = await bcrypt.compare(
           parsed.data.password,

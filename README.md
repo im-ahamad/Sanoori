@@ -20,13 +20,15 @@ npm run db:migrate    # create & apply a dev migration (prisma migrate dev)
 npm run db:deploy     # apply pending migrations (production)
 npm run db:seed       # insert reference/demo data (categories, subcategories, [DEMO] products)
 npm run db:studio     # open Prisma Studio
-npm run db:create-admin -- --email admin@example.com --password 'your-password' [--name 'Name']
+npm run db:create-admin -- --email admin@example.com --password 'your-password' [--name 'Name'] [--activate]
+npm run db:create-admin -- --list      # list accounts (no hashes, no passwords)
 ```
 
 Admin area:
 
 - Login at `/admin/login`, dashboard at `/admin` (Auth.js v5 / credentials).
 - Create or reset the admin account with the `db:create-admin` script above. Passwords are bcrypt-hashed; plain text is never stored or printed.
+- There is no "forgot password" flow: that script is the recovery path. It can also list accounts (`--list`) and re-enable a deactivated one (`--activate`). Pass the password via `SANOORI_ADMIN_PASSWORD` instead of `--password` to keep it out of your shell history.
 - Requires `AUTH_SECRET` (generate with `openssl rand -base64 32`) and, off localhost, `AUTH_TRUST_HOST=true`.
 
 Notes:

@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import type { ZodError } from "zod";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { PRODUCTS_CACHE_TAG } from "@/lib/cache";
 import {
   getSignedUploadParams,
@@ -29,19 +30,33 @@ import {
   type ReorderImagesInput,
   type UpdateImageAltInput,
 } from "@/lib/validators/product-images";
+import { hasPermission, type UserRole, type Permission } from "@/lib/auth/permissions";
 
 /**
  * Server actions backing the admin product image manager.
  *
- * Every action re-authenticates the session and re-checks the ADMIN role
+ * Every action re-authenticates the session and re-checks permissions
  * server-side, validates input with Zod, and only then touches the database.
  * The Cloudinary API secret never leaves the server: the browser receives a
  * short-lived signature that only works for ONE upload scoped to ONE product.
  */
 
-async function requireAdmin(): Promise<boolean> {
+async function getUserPermissions(): Promise<{ role: UserRole; permissions: unknown } | null> {
   const session = await auth();
-  return Boolean(session?.user && session.user.role === "ADMIN");
+  if (!session?.user) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+  if (!user || !user.isActive) return null;
+  return { role: user.role as UserRole, permissions: user.permissions };
+}
+
+function requirePermission(permission: Permission): Promise<boolean> {
+  return getUserPermissions().then((user) => {
+    if (!user) return false;
+    return hasPermission(user.role, user.permissions, permission);
+  });
 }
 
 function unauthorizedError(): string {
@@ -67,7 +82,7 @@ export type SignedUploadResult =
 export async function getSignedUploadParamsAction(
   input: SignUploadInput
 ): Promise<SignedUploadResult> {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("products:images"))) {
     return { ok: false, error: unauthorizedError() };
   }
 
@@ -105,7 +120,7 @@ export type AttachImageResult =
 export async function attachImageAction(
   input: AttachImageInput
 ): Promise<AttachImageResult> {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("products:images"))) {
     return { ok: false, error: unauthorizedError() };
   }
 
@@ -131,7 +146,7 @@ export type ReorderImagesResult = { ok: true } | { ok: false; error: string };
 export async function reorderImagesAction(
   input: ReorderImagesInput
 ): Promise<ReorderImagesResult> {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("products:images"))) {
     return { ok: false, error: unauthorizedError() };
   }
 
@@ -156,7 +171,7 @@ export type UpdateImageAltResult = { ok: true } | { ok: false; error: string };
 export async function updateImageAltAction(
   input: UpdateImageAltInput
 ): Promise<UpdateImageAltResult> {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("products:images"))) {
     return { ok: false, error: unauthorizedError() };
   }
 
@@ -181,7 +196,7 @@ export type DeleteImageResult = { ok: true } | { ok: false; error: string };
 export async function deleteImageAction(
   input: DeleteImageInput
 ): Promise<DeleteImageResult> {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("products:images"))) {
     return { ok: false, error: unauthorizedError() };
   }
 

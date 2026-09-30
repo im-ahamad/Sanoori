@@ -2,8 +2,10 @@
 
 import { z } from "zod";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { updateBusinessSettings, getBusinessSettings } from "@/lib/admin/settings";
 import type { BusinessSettings } from "@/lib/admin/settings";
+import { hasPermission, type UserRole, type Permission } from "@/lib/auth/permissions";
 
 export type UpdateBusinessSettingsResult =
   | { ok: true; message: string }
@@ -26,12 +28,29 @@ const updateBusinessSettingsSchema = z.object({
   telegram: urlOrEmptySchema,
 });
 
+async function getUserPermissions(): Promise<{ role: UserRole; permissions: unknown } | null> {
+  const session = await auth();
+  if (!session?.user) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+  if (!user || !user.isActive) return null;
+  return { role: user.role as UserRole, permissions: user.permissions };
+}
+
+function requirePermission(permission: Permission): Promise<boolean> {
+  return getUserPermissions().then((user) => {
+    if (!user) return false;
+    return hasPermission(user.role, user.permissions, permission);
+  });
+}
+
 export async function updateBusinessSettingsAction(
   _prevState: UpdateBusinessSettingsResult | undefined,
   formData: FormData
 ): Promise<UpdateBusinessSettingsResult> {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!(await requirePermission("settings:write"))) {
     return { ok: false, message: "Unauthorized" };
   }
 
@@ -78,6 +97,10 @@ export async function getBusinessSettingsAction(): Promise<
   | { ok: true; data: BusinessSettings }
   | { ok: false; message: string }
 > {
+  if (!(await requirePermission("settings:read"))) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
   try {
     const result = await getBusinessSettings();
     if (!result.ok) {

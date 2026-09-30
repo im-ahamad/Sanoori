@@ -16,6 +16,10 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
 
   if (pathname === "/admin/login") {
+    return new NextResponse(null, { status: 404 });
+  }
+
+  if (pathname === "/secure-admin") {
     if (req.auth) {
       return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
     }
@@ -25,7 +29,7 @@ export default auth((req) => {
   }
 
   if (!req.auth) {
-    return NextResponse.redirect(new URL("/admin/login", req.nextUrl.origin));
+    return NextResponse.redirect(new URL("/secure-admin", req.nextUrl.origin));
   }
 
   const res = NextResponse.next();

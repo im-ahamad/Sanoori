@@ -1,67 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { authenticate } from "@/lib/actions/auth";
 
-interface LoginFormProps {
-  csrfToken: string;
-}
-
-export function LoginForm({ csrfToken }: LoginFormProps) {
-  const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setPending(true);
-    setError(null);
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
-
-    const body = new URLSearchParams();
-    body.append("email", email as string);
-    body.append("password", password as string);
-    body.append("csrfToken", csrfToken);
-    body.append("callbackUrl", "/admin");
-
-    try {
-      const res = await fetch("/api/auth/callback/credentials", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: body.toString(),
-        redirect: "manual",
-      });
-
-      if (res.redirected) {
-        router.push(res.url);
-        return;
-      }
-
-      if (res.ok) {
-        router.push("/admin");
-        return;
-      }
-
-      const data = await res.json();
-      setError(data.error || "Invalid email or password.");
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setPending(false);
-    }
-  };
+export function LoginForm() {
+  const [state, formAction, pending] = useActionState(authenticate, undefined);
+  const error = state?.error ?? null;
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-busy={pending}>
+    <form action={formAction} noValidate aria-busy={pending}>
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
@@ -70,7 +21,7 @@ export function LoginForm({ csrfToken }: LoginFormProps) {
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="admin@sanooritrading.com"
+            placeholder="admin@sanoori.test"
             required
             autoFocus
             disabled={pending}
@@ -99,12 +50,7 @@ export function LoginForm({ csrfToken }: LoginFormProps) {
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          size="lg"
-          className="w-full"
-          disabled={pending}
-        >
+        <Button type="submit" size="lg" className="w-full" disabled={pending}>
           {pending ? (
             <>
               <Loader2 className="size-4 animate-spin" aria-hidden="true" />

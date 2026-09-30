@@ -39,5 +39,5 @@ export async function authenticate(
 
 /** Signs the current admin out and returns them to the login page. */
 export async function logoutAction() {
-  await signOut({ redirectTo: "/admin/login" });
+  await signOut({ redirectTo: "/secure-admin" });
 }

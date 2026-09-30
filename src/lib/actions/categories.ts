@@ -2,7 +2,9 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { hasPermission, type UserRole, type Permission } from "@/lib/auth/permissions";
 
 export type CreateCategoryActionResult =
   | { ok: true; message: string }
@@ -17,10 +19,32 @@ const createCategorySchema = z.object({
   isActive: z.coerce.boolean().default(true),
 });
 
+async function getUserPermissions(): Promise<{ role: UserRole; permissions: unknown } | null> {
+  const session = await auth();
+  if (!session?.user) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+  if (!user || !user.isActive) return null;
+  return { role: user.role as UserRole, permissions: user.permissions };
+}
+
+function requirePermission(permission: Permission): Promise<boolean> {
+  return getUserPermissions().then((user) => {
+    if (!user) return false;
+    return hasPermission(user.role, user.permissions, permission);
+  });
+}
+
 export async function createCategoryAction(
   _prevState: CreateCategoryActionResult | undefined,
   formData: FormData
 ): Promise<CreateCategoryActionResult> {
+  if (!(await requirePermission("categories:write"))) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
   const parsed = createCategorySchema.safeParse({
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -71,6 +95,10 @@ export async function updateCategoryAction(
   _prevState: UpdateCategoryActionResult | undefined,
   formData: FormData
 ): Promise<UpdateCategoryActionResult> {
+  if (!(await requirePermission("categories:write"))) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
   const parsed = updateCategorySchema.safeParse({
     id: formData.get("id"),
     name: formData.get("name"),
@@ -118,6 +146,10 @@ export async function deleteCategoryAction(
   _prevState: DeleteCategoryActionResult | undefined,
   formData: FormData
 ): Promise<DeleteCategoryActionResult> {
+  if (!(await requirePermission("categories:delete"))) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
   const id = formData.get("id") as string;
   if (!id) return { ok: false, message: "Category ID is required" };
 

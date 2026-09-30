@@ -4,10 +4,9 @@ import Image from "next/image";
 import { businessConfig } from "@/config/site";
 import { auth } from "@/lib/auth";
 import { LoginForm } from "@/components/admin/login-form";
-import { cookies } from "next/headers";
 
 export const metadata = {
-  title: "Admin Login",
+  title: "Admin Access",
   robots: {
     index: false,
     follow: false,
@@ -16,12 +15,9 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminLoginPage() {
+export default async function SecureAdminPage() {
   const session = await auth();
   if (session?.user) redirect("/admin");
-
-  const cookieStore = await cookies();
-  const csrfToken = cookieStore.get("authjs.csrf-token")?.value?.split("|")[0] ?? "";
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-muted/40 px-4 py-12">
@@ -50,7 +46,7 @@ export default async function AdminLoginPage() {
           </div>
 
           <div className="mt-8">
-            <LoginForm csrfToken={csrfToken} />
+            <LoginForm />
           </div>
 
           <p className="mt-6 text-center text-xs leading-relaxed text-muted-foreground">

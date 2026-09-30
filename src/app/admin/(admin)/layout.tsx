@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { hasPermission, type UserRole } from "@/lib/auth/permissions";
 import { AdminShell } from "@/components/admin/admin-shell";
 
 export const metadata = {
@@ -26,8 +28,21 @@ export default async function AdminLayout({
 }: LayoutProps<"/admin">) {
   const session = await auth();
 
-  if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/login");
+  if (!session?.user) {
+    redirect("/secure-admin");
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+
+  if (!user || !user.isActive) {
+    redirect("/secure-admin");
+  }
+
+  if (!hasPermission(user.role as UserRole, user.permissions, "dashboard:read")) {
+    redirect("/secure-admin");
   }
 
   return (
@@ -36,6 +51,8 @@ export default async function AdminLayout({
         name: session.user.name ?? null,
         email: session.user.email ?? null,
       }}
+      role={user.role as UserRole}
+      permissions={user.permissions as string[]}
     >
       {children}
     </AdminShell>

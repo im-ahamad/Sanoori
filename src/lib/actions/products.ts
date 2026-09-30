@@ -12,11 +12,12 @@ import {
   productFormSchema,
 } from "@/lib/validators/product";
 import { destroyAssetsForProduct } from "@/lib/admin/product-images";
+import { hasPermission, type UserRole, type Permission } from "@/lib/auth/permissions";
 
 /**
  * Server actions backing the admin product management screens.
  *
- * Every mutation re-authenticates the session and re-checks the ADMIN role
+ * Every mutation re-authenticates the session and re-checks permissions
  * server-side — the UI gating in the layout is not the security boundary.
  * All input is validated with Zod before touching the database, and failures
  * return friendly messages without leaking database internals.
@@ -29,9 +30,22 @@ export type ProductActionState =
 
 const INITIAL_FIELD_ERRORS: Record<string, string[]> = {};
 
-async function requireAdmin(): Promise<boolean> {
+async function getUserPermissions(): Promise<{ role: UserRole; permissions: unknown } | null> {
   const session = await auth();
-  return Boolean(session?.user && session.user.role === "ADMIN");
+  if (!session?.user) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+  if (!user || !user.isActive) return null;
+  return { role: user.role as UserRole, permissions: user.permissions };
+}
+
+function requirePermission(permission: Permission): Promise<boolean> {
+  return getUserPermissions().then((user) => {
+    if (!user) return false;
+    return hasPermission(user.role, user.permissions, permission);
+  });
 }
 
 function unauthorizedState(): ProductActionState {
@@ -113,7 +127,7 @@ async function writeProduct(
   formData: FormData,
   expectedProductId: string | "create"
 ): Promise<ProductActionState> {
-  if (!(await requireAdmin())) return unauthorizedState();
+  if (!(await requirePermission("products:write"))) return unauthorizedState();
 
   const parsed = productFormSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
@@ -235,7 +249,7 @@ export async function deleteProductAction(
   _prevState: ProductActionState,
   formData: FormData
 ): Promise<ProductActionState> {
-  if (!(await requireAdmin())) return unauthorizedState();
+  if (!(await requirePermission("products:delete"))) return unauthorizedState();
 
   const parsed = productDeleteSchema.safeParse({
     productId: formData.get("productId"),
@@ -282,7 +296,7 @@ export type FeaturedToggleResult =
 async function loadAdminContext(
   productId: string
 ): Promise<{ featured: boolean } | { error: string }> {
-  if (!(await requireAdmin())) {
+  if (!(await requirePermission("products:write"))) {
     return { error: "You are not authorized to manage products." };
   }
   const product = await db.product.findUnique({

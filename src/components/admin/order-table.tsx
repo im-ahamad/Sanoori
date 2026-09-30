@@ -9,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { InquiryStatusBadge } from "@/components/admin/inquiry-status-badge";
 import { InquiryContactActions } from "@/components/admin/inquiry-contact-actions";
+import { DeleteOrderDialog } from "@/components/admin/delete-order-dialog";
 import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 function buildWhatsAppMessage(
@@ -196,6 +197,10 @@ export function OrderTable({ data, query }: OrderTableProps) {
                           <Eye className="size-3.5" aria-hidden="true" />
                           {t.common.view}
                         </Link>
+                        <DeleteOrderDialog
+                          orderId={order.id}
+                          customerName={order.customerName}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -260,6 +265,10 @@ export function OrderTable({ data, query }: OrderTableProps) {
                     <Eye className="size-3.5" aria-hidden="true" />
                     {t.common.view}
                   </Button>
+                  <DeleteOrderDialog
+                    orderId={order.id}
+                    customerName={order.customerName}
+                  />
                 </div>
               </li>
             ))}

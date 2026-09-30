@@ -23,14 +23,11 @@ function normalizeFormData(raw: Record<string, unknown>): Record<string, string>
   return out;
 }
 
-import { writeFileSync } from "fs";
-
 export async function submitProductRequestAction(
   _prevState: ProductRequestActionState,
   formData: FormData
 ): Promise<ProductRequestActionState> {
   const raw = Object.fromEntries(formData.entries());
-  writeFileSync("/tmp/formdata-debug.json", JSON.stringify(raw, null, 2));
   const normalized = normalizeFormData(raw);
   const parsed = productRequestSchema.safeParse(normalized);
   if (!parsed.success) {

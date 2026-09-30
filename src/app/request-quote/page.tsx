@@ -224,6 +224,7 @@ export default async function RequestQuotePage({
               <div className="mt-6">
                 <ProductRequestForm
                   product={{
+                    id: productDetail.id,
                     slug: productDetail.slug,
                     name: productDetail.name,
                     model: productDetail.productCode,
@@ -235,7 +236,7 @@ export default async function RequestQuotePage({
                         }
                       : null,
                   }}
-                  whatsappHref={whatsappHref}
+                  businessSettings={businessSettings}
                   initialLang={lang}
                   initialQuantity={initialQuantity}
                 />

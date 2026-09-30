@@ -5,6 +5,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { hasPermission, type UserRole, type Permission } from "@/lib/auth/permissions";
 
 export type CreateSubcategoryActionResult =
   | { ok: true; message: string; fieldErrors?: Record<string, string[]> }
@@ -16,12 +17,29 @@ const createSubcategorySchema = z.object({
   categoryId: z.string().trim().min(1, "Category is required"),
 });
 
+async function getUserPermissions(): Promise<{ role: UserRole; permissions: unknown } | null> {
+  const session = await auth();
+  if (!session?.user) return null;
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, permissions: true, isActive: true },
+  });
+  if (!user || !user.isActive) return null;
+  return { role: user.role as UserRole, permissions: user.permissions };
+}
+
+function requirePermission(permission: Permission): Promise<boolean> {
+  return getUserPermissions().then((user) => {
+    if (!user) return false;
+    return hasPermission(user.role, user.permissions, permission);
+  });
+}
+
 export async function createSubcategoryAction(
   _prevState: CreateSubcategoryActionResult | undefined,
   formData: FormData
 ): Promise<CreateSubcategoryActionResult> {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!(await requirePermission("subcategories:write"))) {
     return { ok: false, message: "Unauthorized" };
   }
 
@@ -92,8 +110,7 @@ export async function updateSubcategoryAction(
   _prevState: UpdateSubcategoryActionResult | undefined,
   formData: FormData
 ): Promise<UpdateSubcategoryActionResult> {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!(await requirePermission("subcategories:write"))) {
     return { ok: false, message: "Unauthorized" };
   }
 
@@ -169,8 +186,7 @@ export async function deleteSubcategoryAction(
   _prevState: DeleteSubcategoryActionResult | undefined,
   formData: FormData
 ): Promise<DeleteSubcategoryActionResult> {
-  const session = await auth();
-  if (!session?.user || session.user.role !== "ADMIN") {
+  if (!(await requirePermission("subcategories:delete"))) {
     return { ok: false, message: "Unauthorized" };
   }
 

@@ -123,6 +123,7 @@ export default async function ProductDetailPage({
           { label: products.breadcrumb, href: "/products" },
           { label: product.name, href: detailUrl },
         ]}
+        objectFit="object-contain sm:object-cover"
       />
 
       <Container>
@@ -233,8 +234,8 @@ export default async function ProductDetailPage({
                     key={key}
                     className={
                       index % 2 === 0
-                        ? "grid grid-cols-1 gap-1 bg-background p-4 sm:grid-cols-[220px_1fr] sm:gap-4"
-                        : "grid grid-cols-1 gap-1 bg-card p-4 sm:grid-cols-[220px_1fr] sm:gap-4"
+                        ? "grid grid-cols-1 gap-1 bg-background p-4 sm:grid-cols-[1fr_2fr] sm:gap-4"
+                        : "grid grid-cols-1 gap-1 bg-card p-4 sm:grid-cols-[1fr_2fr] sm:gap-4"
                     }
                   >
                     <dt className="text-sm font-semibold text-foreground">

@@ -71,7 +71,7 @@ export function BuyPanel({
   const askForPriceButton = (extraClassName: string) => (
     <Link
       href={requestHref}
-      className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${extraClassName}`}
+      className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-primary px-4 py-0 text-sm sm:text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap ${extraClassName}`}
     >
       <span>{pd.askForPrice}</span>
       <ArrowRight className="size-5" aria-hidden="true" />
@@ -85,7 +85,7 @@ export function BuyPanel({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Get the price of ${productName} on WhatsApp`}
-        className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-[#25D366] px-6 text-base font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 ${extraClassName}`}
+        className={`inline-flex h-13 items-center justify-center gap-2 rounded-md bg-[#25D366] px-4 py-0 text-sm sm:text-base font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 whitespace-nowrap ${extraClassName}`}
       >
         <MessageCircle className="size-5" aria-hidden="true" />
         <span>{pd.getPriceOnWhatsApp}</span>
@@ -148,10 +148,10 @@ export function BuyPanel({
           </p>
         </div>
 
-        {/* Primary actions: Ask for Price + WhatsApp */}
-        <div className="flex flex-col gap-3 sm:flex-row">
-          {askForPriceButton("flex-1")}
-          {whatsAppButton("flex-1")}
+        {/* Primary actions: Ask for Price + WhatsApp — side-by-side on all screens */}
+        <div className="flex gap-2">
+          {askForPriceButton("flex-1 min-w-0")}
+          {whatsAppButton("flex-1 min-w-0")}
         </div>
 
         {whatsapp && (
@@ -191,13 +191,13 @@ export function BuyPanel({
 
       {/* Mobile sticky action bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur md:hidden">
-        <div className="grid grid-cols-1 gap-2">
-          {askForPriceButton("w-full")}
-          {whatsAppButton("w-full")}
+        <div className="flex gap-2">
+          {askForPriceButton("flex-1 min-w-0")}
+          {whatsAppButton("flex-1 min-w-0")}
           {phoneChannel && (
             <a
               href={phoneChannel.href}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border bg-background px-6 text-base font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 text-base font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Phone className="size-5" aria-hidden="true" />
               {pd.callUs}

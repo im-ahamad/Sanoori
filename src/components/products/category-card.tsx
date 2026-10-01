@@ -85,7 +85,9 @@ export async function CategoryCard({
       className={cn(
         "group relative block overflow-hidden border border-border bg-card rounded-lg shadow-sm",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        featured ? "min-h-[320px] md:h-full md:min-h-0" : "min-h-[320px] md:h-full md:min-h-0",
+        featured
+          ? "min-h-[240px] sm:min-h-[280px] md:min-h-[320px] lg:min-h-[360px] md:h-full md:min-h-0"
+          : "min-h-[240px] sm:min-h-[280px] md:min-h-[320px] lg:min-h-[360px] md:h-full md:min-h-0",
         className
       )}
     >
@@ -117,29 +119,29 @@ export async function CategoryCard({
       </div>
 
       {/* Content — anchored to bottom of card, sits on top of image */}
-      <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:p-8">
         {/* Gold number */}
-        <span className="block text-xs font-semibold uppercase tracking-[0.14em] text-gold">
+        <span className="block text-[0.7rem] sm:text-xs font-semibold uppercase tracking-[0.14em] text-gold">
           {categoryNumber}
         </span>
 
         {/* Category title */}
-        <h3 className="mt-2 font-heading text-[1.875rem] font-semibold leading-tight tracking-tight text-white sm:text-[2.25rem]">
+        <h3 className="mt-1.5 font-heading text-[1.5rem] sm:text-[1.875rem] lg:text-[2.25rem] font-semibold leading-tight tracking-tight text-white">
           {translatedName}
         </h3>
 
         {/* Description */}
         {translatedDescription && (
-          <p className="mt-3 max-w-[28rem] text-sm leading-6 text-white/80">
+          <p className="mt-2 max-w-full sm:max-w-[28rem] lg:max-w-[32rem] text-[0.8125rem] sm:text-sm leading-5 sm:leading-6 text-white/80">
             {translatedDescription}
           </p>
         )}
 
         {/* Browse Products CTA */}
-        <span className="mt-5 inline-flex min-h-[2.75rem] items-center gap-2 text-sm font-semibold text-gold">
+        <span className="mt-4 inline-flex min-h-[2.5rem] sm:min-h-[2.75rem] items-center gap-2 text-[0.8125rem] sm:text-sm font-semibold text-gold">
           {t.categoryCard.browseProducts}
           <ArrowRight
-            className="size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+            className="size-3.5 sm:size-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
             aria-hidden="true"
           />
         </span>

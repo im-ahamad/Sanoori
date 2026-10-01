@@ -135,7 +135,7 @@ export function CatalogueFilters({
             {t.products.searchProducts}
           </label>
           <div className="flex gap-2">
-            <div className="relative flex-1">
+            <div className="relative flex-1 min-w-0">
               <Search
                 className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
                 aria-hidden="true"
@@ -151,7 +151,7 @@ export function CatalogueFilters({
             </div>
             <button
               type="submit"
-              className="h-12 rounded-md bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="h-12 rounded-md bg-primary px-4 sm:px-6 text-sm sm:text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
             >
               {t.products.searchButton}
             </button>
@@ -186,14 +186,14 @@ export function CatalogueFilters({
                 })}
               </select>
             </div>
-            <div className="flex items-end pb-1">
-              <label className="flex h-12 items-center gap-2.5 text-base font-medium text-foreground">
+            <div className="flex items-center">
+              <label className="flex h-12 items-center gap-2.5 text-sm font-medium text-foreground">
                 <input
                   type="checkbox"
                   name="featured"
                   value="true"
                   defaultChecked={Boolean(values.featured)}
-                  className="size-5 rounded border-input accent-primary"
+                  className="size-4 rounded border-input accent-primary"
                 />
                 {t.products.featuredOnly}
               </label>
@@ -219,7 +219,7 @@ function CategoryChip({
       href={href}
       aria-current={active ? "true" : undefined}
       className={cn(
-        "inline-flex h-14 items-center justify-center rounded-full border px-6 font-medium transition-colors duration-200 text-[1rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "inline-flex h-12 items-center justify-center rounded-full border px-4 font-medium transition-colors duration-200 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         active
           ? "border-primary bg-primary text-primary-foreground hover:text-gold"
           : "border-border bg-background text-foreground hover:border-primary/40 hover:text-gold-text"
@@ -244,7 +244,7 @@ function SubcategoryChip({
       href={href}
       aria-current={active ? "true" : undefined}
       className={cn(
-        "inline-flex h-10 items-center rounded-full border px-5 text-base transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "inline-flex h-9 items-center rounded-full border px-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         active
           ? "border-gold bg-gold/15 font-medium text-navy-dark"
           : "border-border bg-background text-muted-foreground hover:border-gold/50 hover:text-foreground"

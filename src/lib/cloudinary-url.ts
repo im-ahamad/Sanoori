@@ -9,7 +9,7 @@
  */
 export function buildImageUrl(
   deliveryUrl: string,
-  options?: { width?: number; height?: number; format?: "auto" | "webp" | "jpg" | "png"; quality?: "auto" | number }
+  options?: { width?: number; height?: number; format?: "auto" | "webp" | "jpg" | "png"; quality?: "auto" | number; crop?: "fill" | "limit" }
 ): string {
   if (!deliveryUrl) return deliveryUrl;
 
@@ -17,7 +17,7 @@ export function buildImageUrl(
   parts.push(options?.format === "auto" ? "f_auto" : options?.format ? `f_${options.format}` : "f_auto");
   parts.push(options?.quality === "auto" ? "q_auto" : options?.quality ? `q_${options.quality}` : "q_auto");
   if (options?.width) parts.push(`w_${options.width}`);
-  if (options?.height) parts.push(`h_${options.height}`, "c_fill");
+  if (options?.height) parts.push(`h_${options.height}`, options?.crop ?? "c_fill");
 
   const marker = "/image/upload/";
   const index = deliveryUrl.indexOf(marker);
@@ -37,5 +37,5 @@ export function productImageHero(
   width = 1200,
   quality: "auto" | number = "auto"
 ): string {
-  return buildImageUrl(deliveryUrl, { width, format: "auto", quality });
+  return buildImageUrl(deliveryUrl, { width, height: width, crop: "limit", format: "auto", quality });
 }

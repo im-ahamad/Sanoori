@@ -35,6 +35,7 @@ export default async function PrivacyPolicyPage() {
         title={pp.headerTitle}
         description={pp.headerDescription}
         breadcrumbs={[{ label: pp.breadcrumb, href: "/privacy-policy" }]}
+        objectFit="object-cover"
       />
 
       <div className="section-spacing">

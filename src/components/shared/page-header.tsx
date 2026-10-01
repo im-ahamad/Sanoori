@@ -148,7 +148,7 @@ export function PageHeader({
       />
       <Container className="relative">
         {placement === "top-left" ? (
-          <div className="relative w-full -ml-20 pr-4 sm:-ml-28 sm:pr-6 lg:-ml-32">
+          <div className="relative w-full pr-4 sm:pr-6 lg:-ml-32 lg:pr-8">
             <div className={cn(topPadding ?? "pt-16 sm:pt-20 lg:pt-24", "pb-10")}>
               <div className="relative">
                 {textScrim && (
@@ -162,7 +162,7 @@ export function PageHeader({
                 <nav aria-label="Breadcrumb" className="mb-4">
                   <ol
                     className={cn(
-                      "flex items-center gap-1.5 text-xs",
+                      "flex items-center gap-1.5 text-xs sm:text-sm",
                       textColor
                         ? toneClass.breadcrumb
                         : navyText
@@ -225,7 +225,7 @@ export function PageHeader({
 
               <h1
                 className={cn(
-                  "font-heading text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl",
+                  "font-heading font-bold tracking-tight text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]",
                   textColor
                     ? toneClass.heading
                     : navyText
@@ -280,7 +280,7 @@ export function PageHeader({
             <nav aria-label="Breadcrumb" className="mb-4">
               <ol
                 className={cn(
-                  "flex items-center gap-1.5 text-xs",
+                  "flex items-center gap-1.5 text-xs sm:text-sm",
                   toneClass.breadcrumb,
                   toneClass.glow
                 )}
@@ -329,7 +329,7 @@ export function PageHeader({
 
           <h1
             className={cn(
-              "font-heading text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl",
+              "font-heading font-bold tracking-tight text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]",
               toneClass.heading,
               toneClass.glow
             )}

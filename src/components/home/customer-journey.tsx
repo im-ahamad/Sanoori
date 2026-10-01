@@ -88,9 +88,9 @@ export async function CustomerJourney() {
 
         {/* Connectors must live outside the <ol> to keep the list semantic */}
         <div className="relative mx-auto mt-14 w-full max-w-xl lg:max-w-none">
-          {/* Mobile / tablet vertical connector */}
+          {/* Mobile vertical connector (single column) */}
           <span
-            className="absolute bottom-6 left-6 top-6 w-px bg-gold/25 lg:hidden"
+            className="absolute bottom-6 left-6 top-6 w-px bg-gold/25 sm:hidden"
             aria-hidden="true"
           />
           {/* Desktop horizontal progress line */}
@@ -99,35 +99,35 @@ export async function CustomerJourney() {
             aria-hidden="true"
           />
 
-          <ol className="grid gap-10 sm:gap-12 lg:grid-cols-4 lg:gap-8">
+<ol className="grid gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-8">
             {steps.map((step, index) => {
               const Icon = step.icon;
               return (
                 <li
                   key={step.title}
-                  className="relative flex gap-5 sm:gap-6 lg:flex-col lg:items-center lg:gap-0 lg:text-center"
+                  className="relative flex gap-4 sm:gap-5 lg:flex-col lg:items-center lg:gap-0 lg:text-center"
                 >
 {/* Numbered node */}
-                   <span className="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-background font-heading text-base font-bold text-gold-text shadow-sm">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+                    <span className="relative z-10 flex size-10 sm:size-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-background font-heading text-sm sm:text-base font-bold text-gold-text shadow-sm">
+                     {String(index + 1).padStart(2, "0")}
+                   </span>
 
-                  <div className="lg:mt-6">
-                    <h3 className="flex items-center gap-2.5 font-heading text-lg font-semibold text-foreground lg:justify-center">
-                      <Icon className="size-5 shrink-0 text-gold-dark" aria-hidden="true" />
-                      {step.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {step.description}
-                    </p>
-                    <Link
-                      href={step.href}
-                      className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-sm px-1 text-sm font-semibold text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:min-h-0 lg:px-0"
-                    >
-                      {step.cta}
-                      <ArrowRight className="size-4" aria-hidden="true" />
-                    </Link>
-                  </div>
+                   <div className="lg:mt-6">
+                     <h3 className="flex items-center gap-2 font-heading text-base sm:text-lg font-semibold text-foreground lg:justify-center">
+                       <Icon className="size-4 sm:size-5 shrink-0 text-gold-dark" aria-hidden="true" />
+                       {step.title}
+                     </h3>
+                     <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                       {step.description}
+                     </p>
+                     <Link
+                       href={step.href}
+                       className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-sm px-1 text-sm font-semibold text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:min-h-0 lg:px-0"
+                     >
+                       {step.cta}
+                       <ArrowRight className="size-3.5 sm:size-4" aria-hidden="true" />
+                     </Link>
+                   </div>
                 </li>
               );
             })}

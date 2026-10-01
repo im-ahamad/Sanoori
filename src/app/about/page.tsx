@@ -40,11 +40,11 @@ export default async function AboutPage() {
         breadcrumbs={[{ label: t.about.breadcrumb, href: "/about" }]}
         breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
         backgroundImage="/images/about-hero.png"
-        objectFit="object-contain"
+        objectFit="object-cover lg:object-contain"
         backdropOverlay="bg-[radial-gradient(ellipse_125%_80%_at_16%_-18%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_32%,transparent_78%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_90%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_80%,transparent)_20%,color-mix(in_oklab,var(--navy-dark)_60%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_36%,transparent)_66%,color-mix(in_oklab,var(--navy-dark)_14%,transparent)_84%,transparent_98%)]"
         placement="top-left"
         textColor="pureWhite"
-        className="min-h-[calc(100vw/3)]"
+        className="lg:min-h-[calc(100dvh-5rem)]"
       />
 
       <div className="section-spacing">

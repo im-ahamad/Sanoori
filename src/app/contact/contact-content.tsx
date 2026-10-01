@@ -224,11 +224,11 @@ export function ContactPageContent({
         breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
         backgroundImage="/images/contact-hero.png"
         backdropOverlay="bg-[radial-gradient(ellipse_120%_75%_at_50%_-15%,color-mix(in_oklab,var(--navy-dark)_74%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_30%,transparent_72%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_92%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_22%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_40%,transparent)_64%,color-mix(in_oklab,var(--navy-dark)_16%,transparent)_84%,transparent_98%)]"
-        objectFit="object-contain"
+        objectFit="object-cover lg:object-contain"
         noZoom
         textColor="pureWhite"
         exactCenter
-        className="min-h-[calc(100vw/3)]"
+        className="lg:min-h-[calc(100dvh-5rem)]"
       />
 
       {/* ================================================================
@@ -538,7 +538,7 @@ function ChannelRow({
         >
           {detail.label}
         </span>
-        <span className="mt-1.5 block break-words text-[0.97rem] font-medium leading-snug text-foreground">
+        <span className="mt-1.5 block wrap-anywhere text-[0.97rem] font-medium leading-snug text-foreground">
           {detail.value}
         </span>
       </span>
@@ -636,7 +636,7 @@ function LocationPanel({
       </div>
 
       <div
-        className="relative min-h-[240px] flex-1 overflow-hidden sm:min-h-[300px]"
+        className="relative min-h-[200px] flex-1 overflow-hidden sm:min-h-[240px] lg:min-h-[300px]"
         style={MAP_BLUEPRINT}
       >
         <div

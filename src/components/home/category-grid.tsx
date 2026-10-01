@@ -42,8 +42,9 @@ export async function CategoryGrid() {
         </div>
 
         {/* Asymmetric category grid - 2x2 with first card spanning both rows.
-        2 rows of 326px + 20px gap = 672px tall left card; right cards fill each row. */}
-        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 md:grid-rows-[326px_326px]">
+        Mobile: single column, auto-height rows.
+        Tablet+: 2 columns, 2 rows with responsive min heights. */}
+        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 md:grid-rows-[minmax(280px,auto)_minmax(280px,auto)] lg:grid-rows-[minmax(320px,auto)_minmax(320px,auto)]">
           {categories.slice(0, 3).map((category, index) => {
             const isLead = index === 0;
             const isSecond = index === 1;

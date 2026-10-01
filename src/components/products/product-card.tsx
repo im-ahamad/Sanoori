@@ -85,20 +85,20 @@ export function ProductCard({ product }: ProductCardProps) {
           </p>
         )}
 
-        <div className="mt-4 flex flex-1 items-end gap-2">
+        <div className="mt-4 flex gap-2">
           <Link
             href={`/request-quote?product=${product.slug}`}
             aria-label={`Ask for the price of ${product.name}`}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-0 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
           >
             {t.products.askForPrice}
           </Link>
           <Link
             href={detailsHref}
             aria-label={`View details for ${product.name}`}
-            className="inline-flex h-11 shrink-0 items-center justify-center gap-1 rounded-md border border-border bg-background px-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-0 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
           >
-            <span className="hidden sm:inline">{t.products.viewDetails}</span>
+            {t.products.viewDetails}
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>

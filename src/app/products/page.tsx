@@ -115,7 +115,7 @@ export default async function ProductsPage({
             ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_42%,transparent_85%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_40%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_78%,transparent_100%)]"
             : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_84%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_18%,color-mix(in_oklab,var(--navy-dark)_34%,transparent)_42%,color-mix(in_oklab,var(--navy-dark)_10%,transparent)_68%,transparent_84%,transparent_100%)]"
         }
-        objectFit={categorySlug ? undefined : "object-cover"}
+        objectFit="object-cover"
         objectPosition={
           categorySlug ? "object-center" : "object-[50%_0%]"
         }
@@ -123,7 +123,7 @@ export default async function ProductsPage({
         textColor={categorySlug ? "white" : "pureWhite"}
         exactCenter
         className={
-          categorySlug ? "pb-24 lg:pb-28" : "min-h-[calc(100vw/3)] pb-[4px]"
+          categorySlug ? "pb-24 lg:pb-28" : "lg:min-h-[calc(100dvh-5rem)] pb-[4px]"
         }
       />
 
@@ -200,7 +200,7 @@ async function CatalogueView({
             description={t.products.featuredProductsDescription}
             className="[&>h2]:text-xl sm:[&>h2]:text-2xl"
           />
-          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-8">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -211,7 +211,7 @@ async function CatalogueView({
       <section aria-label="Catalogue results" className="mt-12">
         {catalogue.items.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-8">
               {catalogue.items.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -257,7 +257,7 @@ function CatalogueSkeleton({ t }: { t: ReturnType<typeof getServerTranslations> 
   return (
     <div aria-busy="true" aria-label={t.products.loadingProducts}>
       <Skeleton className="h-44 w-full rounded-lg" />
-      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-8">
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}

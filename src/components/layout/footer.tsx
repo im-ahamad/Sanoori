@@ -55,56 +55,80 @@ export async function Footer() {
     navigationConfig.cta,
   ];
 
+  const headingClass =
+    "relative w-fit pb-2.5 font-heading text-[11px] font-semibold uppercase tracking-[0.2em] text-navy-dark dark:text-stone-100";
+  const ruleClass =
+    "absolute bottom-0 left-0 h-px w-7 bg-gold/80";
+  const linkClass =
+    "inline-block text-sm text-stone-600 transition-colors hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm";
+  const contactClass =
+    "group flex items-start gap-2.5 text-sm text-stone-600 transition-colors hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm";
+  const iconClass =
+    "mt-0.5 size-4 shrink-0 text-gold/90 transition-colors group-hover:text-gold-dark dark:group-hover:text-gold";
+  // Break opportunities before and after "@" so the address wraps at a
+  // readable point instead of mid-word when its column is narrow (mobile).
+  const emailAt = businessConfig.email.indexOf("@");
+  const hasEmailParts = emailAt > 0 && emailAt < businessConfig.email.length - 1;
+
   return (
-    <footer className="border-t border-border bg-background/95">
+    <footer className="relative border-t border-stone-200 bg-[#F8F5F0] text-stone-800 dark:border-white/10 dark:bg-[#1B1713] dark:text-stone-200">
+      {/* Hairline accent — echoes the gold strip above the header */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-gold/70 via-gold/25 to-transparent"
+      />
+
       <Container>
-        <div className="section-spacing-sm grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+        {/* ===== UPPER LEVEL — Brand · Quick Links · Products · Contact =====
+            Mobile (<sm): compact two-column rows —
+            brand spans both columns, Quick Links | Products sit side by side,
+            Contact spans both columns and lays its four items out in two
+            columns (WhatsApp | Phone, Email | Address).
+            sm+ layouts are unchanged. */}
+        <div className="grid grid-cols-2 gap-x-5 gap-y-7 py-8 sm:gap-x-8 sm:gap-y-10 sm:py-12 lg:grid-cols-12 lg:gap-6 lg:py-14">
           {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-1">
+          <div className="col-span-2 sm:col-auto lg:col-span-4 lg:pr-6">
             <Link
               href="/"
               aria-label={`${businessConfig.name} — Home`}
               className="inline-flex items-center"
             >
-              <Brand size="md" />
+              <Brand size="md" className="dark:brightness-0 dark:invert" />
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-stone-500 dark:text-stone-400">
               {t.footer.description}
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <div className="w-fit">
-              <h3 className="-translate-x-[16px] text-center font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
-                {t.footer.quickLinks}
-              </h3>
-              <ul className="mt-2 space-y-1">
-                {quickLinks.map((item) => (
-                  <li key={`footer-${item.href}`}>
-                    <Link
-                      href={item.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="lg:col-span-2 lg:border-l lg:border-stone-300/60 lg:pl-6 dark:lg:border-white/10">
+            <h3 className={headingClass}>
+              {t.footer.quickLinks}
+              <span className={ruleClass} aria-hidden="true" />
+            </h3>
+            <ul className="mt-4 space-y-2.5">
+              {quickLinks.map((item) => (
+                <li key={`footer-${item.href}`}>
+                  <Link href={item.href} className={linkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Products */}
-          <div>
-            <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
+          <div className="border-l border-stone-300/60 pl-4 sm:border-l-0 sm:pl-0 lg:col-span-2 lg:border-l lg:border-stone-300/60 lg:pl-6 dark:border-white/10">
+            <h3 className={headingClass}>
               {t.footer.products}
+              <span className={ruleClass} aria-hidden="true" />
             </h3>
             <ul className="mt-4 space-y-2.5">
               {categories.map((category) => (
                 <li key={category.id}>
                   <Link
                     href={`/products?category=${category.slug}`}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                    className={linkClass}
                   >
                     {t.categories[category.slug as keyof typeof t.categories] ?? category.name}
                   </Link>
@@ -113,83 +137,93 @@ export async function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
+          {/* Contact — mobile: spans both columns with a 2-column list
+              (WhatsApp | Phone, Email | Address); sm+ unchanged */}
+          <div className="col-span-2 border-t border-stone-300/60 pt-6 sm:col-auto sm:border-t-0 sm:pt-0 lg:col-span-4 lg:border-l lg:border-stone-300/60 lg:pl-6 dark:border-white/10">
+            <h3 className={headingClass}>
               {t.footer.contactUs}
+              <span className={ruleClass} aria-hidden="true" />
             </h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 grid grid-cols-2 items-start gap-x-4 gap-y-3 sm:block sm:space-y-3">
               {showWhatsApp && (
                 <li>
                   <a
                     href={whatsappHref ?? "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                    className={contactClass}
                   >
-                    <MessageCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                    {t.common.whatsapp}
+                    <MessageCircle className={iconClass} aria-hidden="true" />
+                    <span className="min-w-0 break-words">{t.common.whatsapp}</span>
                   </a>
                 </li>
               )}
               {showPhone && (
                 <li>
-<a
-                      href={`tel:${businessConfig.phone}`}
-                      className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                    >
-                      <Phone className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                      {businessConfig.phone}
-                    </a>
+                  <a href={`tel:${businessConfig.phone}`} className={contactClass}>
+                    <Phone className={iconClass} aria-hidden="true" />
+                    <span className="min-w-0 break-words">{businessConfig.phone}</span>
+                  </a>
                 </li>
               )}
               {showEmail && (
                 <li>
-<a
-                      href={`mailto:${businessConfig.email}`}
-                      className="flex items-start gap-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                    >
-                      <Mail className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                      {businessConfig.email}
-                    </a>
+                  <a href={`mailto:${businessConfig.email}`} className={contactClass}>
+                    <Mail className={iconClass} aria-hidden="true" />
+                    <span className="min-w-0 break-words">
+                      {hasEmailParts ? (
+                        <>
+                          {businessConfig.email.slice(0, emailAt)}
+                          <wbr />
+                          {"@"}
+                          <wbr />
+                          {businessConfig.email.slice(emailAt + 1)}
+                        </>
+                      ) : (
+                        businessConfig.email
+                      )}
+                    </span>
+                  </a>
                 </li>
               )}
               {showAddress && (
-                <li className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                  <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  <span>{businessConfig.address}</span>
+                <li className="flex items-start gap-2.5 text-sm text-stone-600 dark:text-stone-400">
+                  <MapPin className={iconClass} aria-hidden="true" />
+                  <span className="min-w-0 break-words">{businessConfig.address}</span>
                 </li>
               )}
               {!hasContactInfo && (
-                <li className="text-sm text-muted-foreground">
+                <li className="text-sm text-stone-600 dark:text-stone-400">
                   {t.footer.contactDetailsComing}
                 </li>
               )}
             </ul>
           </div>
         </div>
+      </Container>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-border py-6">
-          <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-3">
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:col-start-2">
-              <p className="text-xs text-muted-foreground">
+      {/* ===== LOWER LEVEL — Copyright · Privacy · City · Social ===== */}
+      <div className="border-t border-stone-200 bg-[#F1EBE1] dark:border-white/10 dark:bg-[#161310]">
+        <Container>
+          <div className="flex flex-col items-start gap-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+              <p className="text-xs text-stone-500 dark:text-stone-400">
                 {t.footer.copyright.replace("{year}", currentYear.toString())}
               </p>
               <Link
                 href="/privacy-policy"
-                className="text-xs text-gold-text transition-colors hover:text-gold-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                className="text-xs text-stone-600 transition-colors hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
               >
                 {t.footer.privacyPolicy}
               </Link>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:col-start-3 sm:justify-end">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 sm:justify-end">
               {showCity && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-stone-500 dark:text-stone-400">
                   {t.footer.cityCountry.replace("{city}", businessConfig.city || "").replace("{country}", businessConfig.country || "")}
                 </span>
               )}
-              <ul className="flex items-center gap-4">
+              <ul className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
                 {socialLinks.map((social) =>
                   !isConfigPlaceholder(social.href) ? (
                     <li key={social.key}>
@@ -197,7 +231,7 @@ export async function Footer() {
                         href={social.href || ""}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                        className="text-xs text-stone-600 transition-colors hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                       >
                         {t.footer.social[social.key]}
                       </a>
@@ -207,8 +241,8 @@ export async function Footer() {
               </ul>
             </div>
           </div>
-        </div>
-      </Container>
+        </Container>
+      </div>
     </footer>
   );
 }

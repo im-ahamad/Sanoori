@@ -90,7 +90,7 @@ export default function VerifyAdminPage() {
                       <Label htmlFor="otp" className="sr-only">
                         Verification code
                       </Label>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1.5 sm:gap-2">
                         {Array.from({ length: 6 }).map((_, i) => (
                           <Input
                             key={i}
@@ -129,7 +129,7 @@ export default function VerifyAdminPage() {
                                 setOtp(pasted);
                               }
                             }}
-                            className="w-12 text-center text-2xl font-mono tracking-widest"
+                            className="w-10 sm:w-12 text-center text-xl sm:text-2xl font-mono tracking-widest"
                             aria-label={`Digit ${i + 1} of verification code`}
                           />
                         ))}

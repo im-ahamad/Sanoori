@@ -91,10 +91,11 @@ export default async function RequestQuotePage({
         title={rq.pageTitle}
         description={rq.pageDescription}
         breadcrumbs={[{ label: rq.breadcrumb, href: "/request-quote" }]}
+        objectFit="object-cover"
       />
 
       <Container>
-        <div className="section-spacing grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-12">
+        <div className="section-spacing grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12">
           <div className="lg:col-span-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <div className="flex flex-col gap-6 p-6 sm:p-8 md:flex-row md:items-center">
               {productDetail.primaryImage ? (
@@ -103,8 +104,8 @@ export default async function RequestQuotePage({
                   alt={productDetail.primaryImage.alt ?? productDetail.name}
                   width={320}
                   height={240}
-                  sizes="(max-width: 768px) 100vw, 320px"
-                  className="h-48 w-full flex-shrink-0 rounded-lg bg-muted object-cover md:h-40 md:w-72"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                  className="h-48 w-full flex-shrink-0 rounded-lg bg-muted object-cover sm:h-44 sm:w-[200px] md:h-40 md:w-72 lg:h-44 lg:w-80"
                 />
               ) : (
                 <span className="flex h-48 w-full flex-shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground md:h-40 md:w-72">

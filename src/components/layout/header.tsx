@@ -3,23 +3,21 @@
 import Link from "next/link";
 import { useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Container } from "@/components/layout/container";
 import { Brand } from "@/components/shared/brand";
-import { MobileNav } from "@/components/layout/mobile-nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { LanguageToggle } from "@/components/language/language-toggle";
+import { useLanguage, languageMeta, type SupportedLanguage } from "@/lib/language";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { PublicBusinessSettings } from "@/lib/public/settings";
 
-interface HeaderProps {
-  settings: PublicBusinessSettings;
-}
-
-function DesktopNavLink({
+/**
+ * Single-line header navigation.
+ *
+ * Every link stays directly visible at every breakpoint (no drawer, no
+ * hamburger, no second row) — type scale, padding and gaps simply shrink as
+ * the viewport narrows so the row always fits.
+ */
+function NavLink({
   href,
   label,
   active,
@@ -36,7 +34,7 @@ function DesktopNavLink({
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative inline-flex items-center rounded-sm px-3 py-2 text-[15px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "group relative inline-flex items-center whitespace-nowrap rounded-sm px-0.5 py-1 text-[9px] font-medium leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[10px] sm:px-2 sm:text-[12px] lg:px-2.5 lg:py-1.5 lg:text-[13px]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground"
@@ -46,7 +44,7 @@ function DesktopNavLink({
       <span
         aria-hidden="true"
         className={cn(
-          "absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-gold transition-[transform,opacity] duration-300 ease-out",
+          "absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-gold transition-[transform,opacity] duration-300 ease-out",
           active
             ? "scale-x-100 opacity-100"
             : emphasize
@@ -58,8 +56,40 @@ function DesktopNavLink({
   );
 }
 
-export function Header({ settings }: HeaderProps) {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+/** Compact EN | বাংলা segmented pill — keeps language switching one tap away. */
+function HeaderLanguageToggle() {
+  const { language, setLanguage } = useLanguage();
+
+  return (
+    <div
+      className="flex items-center rounded-full border border-border/80 bg-muted/40 p-0.5"
+      role="group"
+      aria-label="Language"
+    >
+      {(["en", "bn"] as SupportedLanguage[]).map((lang) => {
+        const active = language === lang;
+        return (
+          <button
+            key={lang}
+            type="button"
+            onClick={() => setLanguage(lang)}
+            aria-pressed={active}
+            className={cn(
+              "whitespace-nowrap rounded-full px-1 py-0.5 text-[9px] font-semibold leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[10px] sm:px-2 sm:text-[11px]",
+              active
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {languageMeta[lang].nativeLabel}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const t = useTranslations();
@@ -71,10 +101,6 @@ export function Header({ settings }: HeaderProps) {
       { label: t.header.navigation.products, href: "/products" },
       { label: t.header.navigation.contact, href: "/contact" },
     ] as const,
-    cta: {
-      label: t.header.cta,
-      href: "/products",
-    },
   } as const;
 
   useLayoutEffect(() => {
@@ -94,30 +120,37 @@ export function Header({ settings }: HeaderProps) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full border-b transition-[box-shadow,background-color,border-color,backdrop-filter] duration-300",
+        "sticky top-0 z-50 w-full border-b border-border/60 transition-[box-shadow,background-color,border-color,backdrop-filter] duration-300",
         scrolled
-          ? "border-border bg-background/95 shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-background/90"
-          : "border-border/80 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+          ? "bg-background/95 shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-background/90"
+          : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90"
       )}
     >
-      <Container>
-        <div className="flex h-16 items-center justify-between gap-4 lg:h-20">
+      {/* Gold brand accent strip */}
+      <div className="h-0.5 w-full bg-gold" aria-hidden="true" />
+
+      {/* ONE horizontal row — logo · nav · theme · language */}
+      <Container className="px-2! min-[400px]:px-3! sm:px-6! lg:px-8!">
+        <div className="flex h-9 min-[400px]:h-10 sm:h-11 lg:h-12 items-center justify-between gap-1.5 min-[400px]:gap-3 sm:gap-4">
           {/* Logo */}
           <Link
             href="/"
             aria-label={t.header.ariaLabel.home}
-            className="flex items-center"
+            className="flex shrink-0 items-center"
           >
-            <Brand size="md" className="lg:h-10" />
+            <Brand
+              size="sm"
+              className="h-4 min-[400px]:h-5 sm:h-6 lg:h-7 dark:brightness-0 dark:invert"
+            />
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Navigation — centred in the free space, all links directly visible */}
           <nav
-            className="hidden items-center gap-0.5 lg:flex"
+            className="flex flex-1 items-center justify-center gap-0 min-[400px]:gap-0.5 sm:gap-1 lg:gap-2"
             aria-label="Main navigation"
           >
             {navigationConfig.main.map((item) => (
-              <DesktopNavLink
+              <NavLink
                 key={`header-${item.href}`}
                 href={item.href}
                 label={item.label}
@@ -127,50 +160,14 @@ export function Header({ settings }: HeaderProps) {
             ))}
           </nav>
 
-          {/* Right side — Logo → Nav → Theme → Language → CTA */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Desktop header controls — hidden on mobile to keep header uncluttered */}
-            <div className="hidden items-center gap-2 sm:flex">
-              <ThemeToggle />
-              <LanguageToggle />
-              <span
-                className="hidden h-6 w-px bg-border sm:block"
-                aria-hidden="true"
-              />
-            </div>
-
-            <ButtonLink
-              href={navigationConfig.cta.href}
-              variant="inverse"
-              size="md"
-              className="focus-visible:ring-offset-background min-w-[160px]"
-            >
-              {navigationConfig.cta.label}
-            </ButtonLink>
-
-            {/* Mobile menu toggle */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-10 lg:hidden"
-              onClick={() => setMobileNavOpen(true)}
-              aria-label={t.header.ariaLabel.openMenu}
-              aria-haspopup="dialog"
-              aria-expanded={mobileNavOpen}
-              aria-controls="mobile-nav-panel"
-            >
-              <Menu className="size-5" aria-hidden="true" />
-            </Button>
+          <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
+            {/* Theme toggle — compact */}
+            <ThemeToggle className="size-7 min-[400px]:size-8" />
+            {/* Language toggle — compact pill */}
+            <HeaderLanguageToggle />
           </div>
         </div>
       </Container>
-
-      {/* Mobile Navigation */}
-      <MobileNav
-        open={mobileNavOpen}
-        onClose={() => setMobileNavOpen(false)}
-        settings={settings}
-      />
     </header>
   );
 }

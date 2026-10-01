@@ -1,42 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import { MessageCircle, Phone, X } from "lucide-react";
-import { isConfigPlaceholder } from "@/lib/config";
-import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Brand } from "@/components/shared/brand";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LanguageToggle } from "@/components/language/language-toggle";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { PublicBusinessSettings } from "@/lib/public/settings";
 
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
-  settings: PublicBusinessSettings;
 }
 
-export function MobileNav({ open, onClose, settings }: MobileNavProps) {
+export function MobileNav({ open, onClose }: MobileNavProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
   const t = useTranslations();
-
-  const navigationConfig = {
-    main: [
-      { label: t.mobileNav.navigation.home, href: "/" },
-      { label: t.mobileNav.navigation.about, href: "/about" },
-      { label: t.mobileNav.navigation.products, href: "/products" },
-      { label: t.mobileNav.navigation.contact, href: "/contact" },
-    ] as const,
-    cta: {
-      label: t.mobileNav.cta,
-      href: "/products",
-    },
-  } as const;
 
   useEffect(() => {
     if (open) {
@@ -99,16 +78,6 @@ export function MobileNav({ open, onClose, settings }: MobileNavProps) {
     };
   }, [open, onClose]);
 
-  function isActive(href: string) {
-    if (href === "/") return pathname === "/";
-    return pathname === href || pathname.startsWith(`${href}/`);
-  }
-
-  const whatsappHref = buildWhatsAppLink(settings, GENERAL_ENQUIRY_MESSAGE);
-  const showWhatsApp = Boolean(whatsappHref);
-  const showPhone = !isConfigPlaceholder(settings.phone);
-  const showContactLinks = showWhatsApp || showPhone;
-
   return (
     <>
       {open && (
@@ -125,7 +94,7 @@ export function MobileNav({ open, onClose, settings }: MobileNavProps) {
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-background shadow-2xl outline-none transition-[transform,visibility] duration-300 ease-in-out motion-reduce:transition-none lg:hidden",
+          "fixed inset-y-0 right-0 z-50 flex w-full max-w-[85vw] max-w-sm flex-col bg-background shadow-2xl outline-none transition-[transform,visibility] duration-300 ease-in-out motion-reduce:transition-none lg:hidden",
           open ? "visible translate-x-0" : "invisible translate-x-full"
         )}
         role="dialog"
@@ -133,19 +102,8 @@ export function MobileNav({ open, onClose, settings }: MobileNavProps) {
         aria-label={t.mobileNav.ariaLabel}
         aria-hidden={!open}
       >
-        {/* Brand accent line */}
-        <div className="h-0.5 shrink-0 bg-gold" aria-hidden="true" />
-
-        {/* Top bar */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-          <Link
-            href="/"
-            onClick={onClose}
-            aria-label={t.mobileNav.brandHome.replace("{name}", settings.name)}
-            className="flex items-center"
-          >
-            <Brand size="sm" />
-          </Link>
+        {/* Close */}
+        <div className="flex items-center justify-end border-b border-border px-4 py-3">
           <Button
             variant="ghost"
             size="icon"
@@ -157,85 +115,10 @@ export function MobileNav({ open, onClose, settings }: MobileNavProps) {
           </Button>
         </div>
 
-        {/* Primary CTA — immediately visible */}
-        <div className="border-b border-border px-5 py-4">
-          <Button
-            render={<Link href={navigationConfig.cta.href} onClick={onClose} />}
-            variant="secondary"
-            className="h-11 w-full text-base"
-          >
-            {navigationConfig.cta.label}
-          </Button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label={t.mobileNav.ariaLabel}>
-          <ul className="space-y-1">
-            {navigationConfig.main.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <li key={`mobile-${item.href}`}>
-                  <Link
-                    href={item.href}
-                    onClick={onClose}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "relative flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      active
-                        ? "bg-accent text-primary"
-                        : "text-foreground hover:bg-muted"
-                    )}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "h-5 w-1 rounded-full bg-gold transition-opacity",
-                        active ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* Preferences — theme + language (mobile) */}
-        <div className="space-y-3 border-t border-border px-5 py-4">
+        {/* Preferences — theme + language only */}
+        <div className="flex-1 space-y-6 px-5 py-6">
           <ThemeToggle variant="panel" />
           <LanguageToggle variant="panel" />
-        </div>
-
-        {/* Contact footer */}
-        <div className="space-y-4 border-t border-border px-5 py-5">
-          {showContactLinks && (
-            <div className="flex items-center justify-center gap-5 text-sm text-muted-foreground">
-              {showWhatsApp && (
-                <a
-                  href={whatsappHref ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  <MessageCircle className="size-4" aria-hidden="true" />
-                  {t.mobileNav.whatsapp}
-                </a>
-              )}
-              {showPhone && (
-                <a
-                  href={`tel:${settings.phone}`}
-                  className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  <Phone className="size-4" aria-hidden="true" />
-                  {settings.phone}
-                </a>
-              )}
-            </div>
-          )}
-          <p className="text-center text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            {t.mobileNav.tagline}
-          </p>
         </div>
       </div>
     </>

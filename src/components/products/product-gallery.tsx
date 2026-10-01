@@ -71,7 +71,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const zoomImageUrl = selected.url ? productImageHero(selected.url, 2000) : null;
 
   return (
-    <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start relative">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_72px] lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start relative">
       {/* Main image */}
       <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-muted/50">
         {selected.url ? (
@@ -115,7 +115,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       {/* Zoom panel — appears to the right on desktop when hovering */}
       {!isMobile && isHovering && zoomPosition && zoomImageUrl && (
         <div
-          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-[45vw] max-w-[700px] min-w-[300px] aspect-square overflow-hidden rounded-lg border border-border bg-muted/50 shadow-xl"
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-[45vw] max-w-[700px] min-w-[280px] aspect-square overflow-hidden rounded-lg border border-border bg-muted/50 shadow-xl"
           style={{ maxHeight: "calc(100vh - 2rem)" }}
           aria-label="Zoomed product image detail"
         >
@@ -155,7 +155,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                   aria-label={`Show image ${index + 1} of ${images.length}: ${alt}`}
                   aria-pressed={active}
                   className={cn(
-                    "relative block size-16 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:size-20 lg:size-full lg:aspect-square",
+                    "relative block size-16 rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:size-18 md:size-20 lg:size-full lg:aspect-square",
                     active
                       ? "border-primary ring-1 ring-primary"
                       : "border-border hover:border-primary/50"

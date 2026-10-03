@@ -183,11 +183,10 @@ export interface AdminProductDetail {
   productCode: string | null;
   categoryId: string;
   subcategoryId: string | null;
-  shortDescription: string | null;
   description: string | null;
   features: string[];
-  specifications: Record<string, string> | null;
-  variants: Array<Record<string, string>>;
+  specifications: string[];
+  madeIn: string | null;
   availability: Availability;
   featured: boolean;
   isActive: boolean;
@@ -201,28 +200,6 @@ export interface AdminProductDetail {
   imageCount: number;
   inquiryCount: number;
   images: AdminProductImage[];
-}
-
-function toRecord(
-  value: unknown
-): Record<string, string> | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const record: Record<string, string> = {};
-  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
-    record[key] = typeof item === "string" ? item : JSON.stringify(item);
-  }
-  return record;
-}
-
-function toVariants(value: unknown): Array<Record<string, string>> {
-  if (!Array.isArray(value)) return [];
-  return value
-    .slice(0, 60)
-    .filter(
-      (item): item is Record<string, unknown> =>
-        !!item && typeof item === "object" && !Array.isArray(item)
-    )
-    .map((item) => toRecord(item) ?? {});
 }
 
 export async function getAdminProductDetail(
@@ -256,11 +233,10 @@ export async function getAdminProductDetail(
         productCode: product.productCode,
         categoryId: product.categoryId,
         subcategoryId: product.subcategoryId,
-        shortDescription: product.shortDescription,
         description: product.description,
         features: product.features,
-        specifications: toRecord(product.specifications),
-        variants: toVariants(product.variants),
+        specifications: product.specifications,
+        madeIn: product.madeIn,
         availability: product.availability,
         featured: product.featured,
         isActive: product.isActive,

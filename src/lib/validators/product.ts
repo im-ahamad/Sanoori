@@ -54,36 +54,25 @@ const featureListSchema = z
       .slice(0, 100)
   );
 
-const keyValueEntrySchema = z.object({
-  key: z
-    .string()
-    .trim()
-    .min(1, "Every row needs a name")
-    .max(100, "Row names can be at most 100 characters"),
-  value: z
-    .string()
-    .trim()
-    .max(500, "Values can be at most 500 characters"),
-});
-
-const keyValueListSchema = z
-  .array(keyValueEntrySchema)
-  .max(60, "Too many rows (max 60)");
+const specificationListSchema = z
+  .array(z.string().trim())
+  .max(60, "Too many specifications (max 60)")
+  .transform((list) =>
+    list
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .slice(0, 60)
+  );
 
 const featuresField = parseJsonField<string[]>(
   "Feature list is invalid. Please refresh the page and try again.",
   []
 ).pipe(featureListSchema);
 
-const specificationsField = parseJsonField<KeyValueEntry[]>(
+const specificationsField = parseJsonField<string[]>(
   "Specifications are invalid. Please refresh the page and try again.",
   []
-).pipe(keyValueListSchema);
-
-const variantsField = parseJsonField<KeyValueEntry[]>(
-  "Variants are invalid. Please refresh the page and try again.",
-  []
-).pipe(keyValueListSchema);
+).pipe(specificationListSchema);
 
 const slugField = z
   .string()
@@ -120,11 +109,6 @@ export const productFormSchema = z.object({
     .optional()
     .transform((value) => (value === "" || value === undefined ? null : value))
     .default(null),
-  shortDescription: z
-    .string()
-    .trim()
-    .max(300, "Short description is too long (max 300 characters)")
-    .transform((value) => (value === "" ? null : value)),
   description: z
     .string()
     .trim()
@@ -132,7 +116,13 @@ export const productFormSchema = z.object({
     .transform((value) => (value === "" ? null : value)),
   features: featuresField,
   specifications: specificationsField,
-  variants: variantsField,
+  madeIn: z
+    .string()
+    .trim()
+    .max(200, "Made in is too long (max 200 characters)")
+    .transform((value) => (value === "" ? null : value))
+    .optional()
+    .default(""),
   availability: availabilitySchema,
   featured: z
     .string()

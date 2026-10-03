@@ -39,11 +39,10 @@ export interface ProductFormInitialValues {
   productCode: string;
   categoryId: string;
   subcategoryId: string;
-  shortDescription: string;
   description: string;
   features: string[];
-  specifications: Record<string, string> | null;
-  variants: Array<Record<string, string>>;
+  specifications: string[];
+  madeIn: string;
   availability: Availability;
   featured: boolean;
   isActive: boolean;
@@ -65,46 +64,23 @@ interface ProductFormProps {
   initial?: ProductFormInitialValues | null;
 }
 
-interface KeyValueRow {
-  key: string;
-  value: string;
-}
-
-function entriesToRows(entries: Record<string, string> | null): KeyValueRow[] {
-  if (!entries) return [];
-  return Object.entries(entries).map(([key, value]) => ({ key, value }));
-}
-
-function variantsToRows(variants: Array<Record<string, string>>): KeyValueRow[] {
-  return variants.flatMap((variant) =>
-    Object.entries(variant).map(([key, value]) => ({ key, value }))
-  );
-}
-
-function FieldError({ errors }: { errors?: string[] }) {
-  if (!errors || errors.length === 0) return null;
-  return (
-    <p role="alert" className="text-xs font-medium text-destructive">
-      {errors[0]}
-    </p>
-  );
-}
-
-interface KeyValueEditorProps {
+interface StringArrayEditorProps {
   label: string;
   hint: string;
-  rows: KeyValueRow[];
-  onChange: (rows: KeyValueRow[]) => void;
+  placeholder: string;
+  rows: string[];
+  onChange: (rows: string[]) => void;
   errors?: string[];
 }
 
-function KeyValueEditor({
+function StringArrayEditor({
   label,
   hint,
+  placeholder,
   rows,
   onChange,
   errors,
-}: KeyValueEditorProps) {
+}: StringArrayEditorProps) {
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
@@ -113,44 +89,34 @@ function KeyValueEditor({
           type="button"
           variant="outline"
           size="xs"
-          onClick={() => onChange([...rows, { key: "", value: "" }])}
+          onClick={() => onChange([...rows, ""])}
         >
           <Plus className="size-3" aria-hidden="true" />
-          Add row
+          Add
         </Button>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
 
       {rows.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          No {label.toLowerCase()} yet. Add a row to get started.
+          No {label.toLowerCase()} yet. Add one to get started.
         </p>
       ) : (
         <ul className="mt-3 space-y-2">
           {rows.map((row, index) => (
             <li
               key={index}
-              className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)_auto]"
+              className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]"
             >
               <Input
-                value={row.key}
+                value={row}
                 onChange={(event) => {
                   const next = [...rows];
-                  next[index] = { ...row, key: event.target.value };
+                  next[index] = event.target.value;
                   onChange(next);
                 }}
-                placeholder={index === 0 ? `e.g. Material` : undefined}
-                aria-label={`${label} row ${index + 1} name`}
-              />
-              <Input
-                value={row.value}
-                onChange={(event) => {
-                  const next = [...rows];
-                  next[index] = { ...row, value: event.target.value };
-                  onChange(next);
-                }}
-                placeholder={index === 0 ? `e.g. Porcelain` : undefined}
-                aria-label={`${label} row ${index + 1} value`}
+                placeholder={index === 0 ? placeholder : undefined}
+                aria-label={`${label} ${index + 1}`}
               />
               <Button
                 type="button"
@@ -161,7 +127,7 @@ function KeyValueEditor({
                   const next = rows.filter((_, itemIndex) => itemIndex !== index);
                   onChange(next);
                 }}
-                aria-label={`Remove ${label} row ${index + 1}`}
+                aria-label={`Remove ${label} ${index + 1}`}
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -172,6 +138,15 @@ function KeyValueEditor({
 
       <FieldError errors={errors} />
     </div>
+  );
+}
+
+function FieldError({ errors }: { errors?: string[] }) {
+  if (!errors || errors.length === 0) return null;
+  return (
+    <p role="alert" className="text-xs font-medium text-destructive">
+      {errors[0]}
+    </p>
   );
 }
 
@@ -191,17 +166,12 @@ export function ProductForm({
   const [subcategoryId, setSubcategoryId] = useState(
     initial?.subcategoryId ?? ""
   );
-  const [shortDescription, setShortDescription] = useState(
-    initial?.shortDescription ?? ""
-  );
   const [description, setDescription] = useState(initial?.description ?? "");
   const [features, setFeatures] = useState(initial?.features ?? []);
-  const [specifications, setSpecifications] = useState<KeyValueRow[]>(
-    entriesToRows(initial?.specifications ?? null)
+  const [specifications, setSpecifications] = useState<string[]>(
+    initial?.specifications ?? []
   );
-  const [variants, setVariants] = useState<KeyValueRow[]>(
-    variantsToRows(initial?.variants ?? [])
-  );
+  const [madeIn, setMadeIn] = useState(initial?.madeIn ?? "");
   const [availability, setAvailability] = useState<Availability>(
     initial?.availability ?? "ON_REQUEST"
   );
@@ -367,7 +337,7 @@ export function ProductForm({
               id="section-listing"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Category &amp; availability
+              Category & availability
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
               Where the product sits in the catalogue and how it can be ordered.
@@ -547,40 +517,18 @@ export function ProductForm({
           </div>
         </section>
 
-        {/* ===== Descriptions ===== */}
+        {/* ===== Description ===== */}
         <section aria-labelledby="section-description" className="space-y-4">
           <div>
             <h2
               id="section-description"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Descriptions
+              Description
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              A short summary for listings and a full description for the
-              product page.
+              Full product details. Plain text is fine — rich formatting comes later.
             </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="short-description">Short description</Label>
-            <Textarea
-              id="short-description"
-              name="shortDescription"
-              value={shortDescription}
-              onChange={(event) => setShortDescription(event.target.value)}
-              placeholder="A one or two sentence summary of the product."
-              rows={3}
-              maxLength={300}
-              disabled={pending}
-              aria-invalid={Boolean(stateErrors?.shortDescription)}
-            />
-            <div className="flex items-center justify-between gap-2">
-              <FieldError errors={stateErrors?.shortDescription} />
-              <p className="ml-auto text-right text-xs text-muted-foreground">
-                {shortDescription.length}/300
-              </p>
-            </div>
           </div>
 
           <div className="space-y-2">
@@ -659,6 +607,21 @@ export function ProductForm({
               />
               <FieldError errors={stateErrors?.colorFinish} />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="made-in">Made in</Label>
+              <Input
+                id="made-in"
+                name="madeIn"
+                value={madeIn}
+                onChange={(event) => setMadeIn(event.target.value)}
+                placeholder="e.g. Bangladesh"
+                maxLength={200}
+                disabled={pending}
+                aria-invalid={Boolean(stateErrors?.madeIn)}
+              />
+              <FieldError errors={stateErrors?.madeIn} />
+            </div>
           </div>
         </section>
 
@@ -669,7 +632,7 @@ export function ProductForm({
               id="section-structured"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Features, specifications &amp; variants
+              Features & Specifications
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
               Structured data shown readably across the catalogue.
@@ -697,20 +660,13 @@ export function ProductForm({
             </div>
           </div>
 
-          <KeyValueEditor
+          <StringArrayEditor
             label="Specifications"
-            hint="Key/value pairs such as Material → Porcelain."
+            hint="One specification per box, e.g. Material: Ceramic"
+            placeholder="e.g. Material: Ceramic"
             rows={specifications}
             onChange={setSpecifications}
             errors={stateErrors?.specifications}
-          />
-
-          <KeyValueEditor
-            label="Variants"
-            hint="Options such as Color → Grey. Each row becomes a variant."
-            rows={variants}
-            onChange={setVariants}
-            errors={stateErrors?.variants}
           />
         </section>
 
@@ -754,11 +710,7 @@ export function ProductForm({
           name="specifications"
           value={JSON.stringify(specifications)}
         />
-        <input
-          type="hidden"
-          name="variants"
-          value={JSON.stringify(variants)}
-        />
+        <input type="hidden" name="madeIn" value={madeIn} />
         <input type="hidden" name="availability" value={availability} />
         <input type="hidden" name="featured" value={featured ? "on" : "off"} />
         <input type="hidden" name="isActive" value={isActive ? "on" : "off"} />

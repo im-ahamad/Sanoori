@@ -13,7 +13,6 @@ type ProductCardVariant = "default" | "grid" | "showcase";
 interface ProductCardProps {
   product: PublicProductSummary;
   hideAvailabilityBadge?: boolean;
-  hideShortDescription?: boolean;
   variant?: ProductCardVariant;
 }
 
@@ -23,7 +22,7 @@ interface ProductCardProps {
  * prefer the real product photo and fall back to a branded navy/gold tile so a
  * missing image never renders broken.
  */
-export function ProductCard({ product, hideAvailabilityBadge = false, hideShortDescription = false, variant = "default" }: ProductCardProps) {
+export function ProductCard({ product, hideAvailabilityBadge = false, variant = "default" }: ProductCardProps) {
   const t = useTranslations();
   const detailsHref = `/products/${product.slug}`;
   const cardImage = product.image;
@@ -96,12 +95,6 @@ export function ProductCard({ product, hideAvailabilityBadge = false, hideShortD
             {product.name}
           </Link>
         </h3>
-
-        {!hideShortDescription && product.shortDescription && (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-            {product.shortDescription}
-          </p>
-        )}
 
         <div className="mt-4 flex gap-2">
           <Link

@@ -65,10 +65,10 @@ export interface PublicProductSummary {
   categorySlug: string;
   subcategoryName: string | null;
   subcategorySlug: string | null;
-  shortDescription: string | null;
   availability: Availability;
   featured: boolean;
   image: PublicProductCardImage | null;
+  madeIn: string | null;
 }
 
 export interface PublicProductImage {
@@ -87,11 +87,10 @@ export interface PublicProductDetail {
   categorySlug: string;
   subcategoryName: string | null;
   subcategorySlug: string | null;
-  shortDescription: string | null;
   description: string | null;
   features: string[];
-  specifications: Record<string, string> | null;
-  variants: Array<Record<string, string>>;
+  specifications: string[];
+  madeIn: string | null;
   availability: Availability;
   featured: boolean;
   images: PublicProductImage[];
@@ -161,12 +160,12 @@ function toProductSummary(product: {
   name: string;
   slug: string;
   productCode: string | null;
-  shortDescription: string | null;
   availability: Availability;
   featured: boolean;
   category: { name: string; slug: string };
   subcategory: { name: string; slug: string } | null;
   images: { url: string; alt: string | null }[];
+  madeIn: string | null;
 }): PublicProductSummary {
   return {
     id: product.id,
@@ -177,7 +176,6 @@ function toProductSummary(product: {
     categorySlug: product.category.slug,
     subcategoryName: product.subcategory?.name ?? null,
     subcategorySlug: product.subcategory?.slug ?? null,
-    shortDescription: product.shortDescription,
     availability: product.availability,
     featured: product.featured,
     image:
@@ -187,6 +185,7 @@ function toProductSummary(product: {
             alt: product.images[0].alt,
           }
         : null,
+    madeIn: product.madeIn,
   };
 }
 
@@ -261,7 +260,7 @@ export const getPublicProducts = unstable_cache(
                 { name: { contains: q, mode: "insensitive" as const } },
                 { slug: { contains: q, mode: "insensitive" as const } },
                 { productCode: { contains: q, mode: "insensitive" as const } },
-                { shortDescription: { contains: q, mode: "insensitive" as const } },
+                { description: { contains: q, mode: "insensitive" as const } },
                 { category: { name: { contains: q, mode: "insensitive" as const } } },
                 { subcategory: { name: { contains: q, mode: "insensitive" as const } } },
               ],
@@ -333,7 +332,7 @@ export const getPublicProductsShowcase = unstable_cache(
                 { name: { contains: q, mode: "insensitive" as const } },
                 { slug: { contains: q, mode: "insensitive" as const } },
                 { productCode: { contains: q, mode: "insensitive" as const } },
-                { shortDescription: { contains: q, mode: "insensitive" as const } },
+                { description: { contains: q, mode: "insensitive" as const } },
                 { category: { name: { contains: q, mode: "insensitive" as const } } },
                 { subcategory: { name: { contains: q, mode: "insensitive" as const } } },
               ],
@@ -673,11 +672,10 @@ export const getPublicProductBySlug = unstable_cache(
       categorySlug: product.category.slug,
       subcategoryName: product.subcategory?.name ?? null,
       subcategorySlug: product.subcategory?.slug ?? null,
-      shortDescription: product.shortDescription,
       description: product.description,
       features: product.features,
-      specifications: toSpecifications(product.specifications),
-      variants: toVariants(product.variants),
+      specifications: product.specifications,
+      madeIn: product.madeIn,
       availability: product.availability,
       featured: product.featured,
       images,
@@ -713,7 +711,6 @@ export const getFeaturedProducts = unstable_cache(
       categorySlug: product.category.slug,
       subcategoryName: product.subcategory?.name ?? null,
       subcategorySlug: product.subcategory?.slug ?? null,
-      shortDescription: product.shortDescription,
       availability: product.availability,
       featured: true,
       image:
@@ -723,6 +720,7 @@ export const getFeaturedProducts = unstable_cache(
               alt: product.images[0].alt,
             }
           : null,
+      madeIn: product.madeIn,
     }));
   },
   ["public-featured-products"],
@@ -845,35 +843,9 @@ export const getPublicProductOptions = unstable_cache(
 );
 
 // ---------------------------------------------------------------------------
-// Structured data normalization (mirrors the admin detail mapper)
+// Optimized URLs for the detail page gallery.
 // ---------------------------------------------------------------------------
 
-function toSpecifications(value: unknown): Record<string, string> | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const record: Record<string, string> = {};
-  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
-    record[key] = typeof item === "string" ? item : JSON.stringify(item);
-  }
-  return record;
-}
-
-function toVariants(value: unknown): Array<Record<string, string>> {
-  if (!Array.isArray(value)) return [];
-  return value
-    .slice(0, 60)
-    .filter(
-      (item): item is Record<string, unknown> =>
-        !!item && typeof item === "object" && !Array.isArray(item)
-    )
-    .map((item) => toSpecifications(item) ?? {});
-}
-
-/**
- * Optimized URLs for the detail page gallery.
- *
- * - hero: up to ~1080px wide, keeps the original proportions (no crop).
- * - thumb: small square crop for the thumbnail strip.
- */
 export function heroImageUrl(url: string): string {
   return productImageHero(url, 1080);
 }

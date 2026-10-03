@@ -259,7 +259,6 @@ async function CatalogueView({
                     key={product.id}
                     product={product}
                     hideAvailabilityBadge
-                    hideShortDescription
                   />
                 ))}
               </div>
@@ -271,7 +270,6 @@ async function CatalogueView({
                       key={product.id}
                       product={product}
                       hideAvailabilityBadge
-                      hideShortDescription
                     />
                   ))}
                 </div>

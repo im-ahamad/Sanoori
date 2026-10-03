@@ -9,7 +9,7 @@
  */
 export function buildImageUrl(
   deliveryUrl: string,
-  options?: { width?: number; height?: number; format?: "auto" | "webp" | "jpg" | "png"; quality?: "auto" | number; crop?: "fill" | "limit" }
+  options?: { width?: number; height?: number; format?: "auto" | "webp" | "jpg" | "png"; quality?: "auto" | number; crop?: "c_fill" | "c_limit" }
 ): string {
   if (!deliveryUrl) return deliveryUrl;
 
@@ -37,5 +37,5 @@ export function productImageHero(
   width = 1200,
   quality: "auto" | number = "auto"
 ): string {
-  return buildImageUrl(deliveryUrl, { width, height: width, crop: "limit", format: "auto", quality });
+  return buildImageUrl(deliveryUrl, { width, height: width, crop: "c_limit", format: "auto", quality });
 }

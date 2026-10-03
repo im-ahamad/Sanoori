@@ -105,24 +105,6 @@ async function ensureUniqueSlug(
   return currentProductId !== null && existing.id === currentProductId;
 }
 
-function serializeSpecifications(
-  entries: Array<{ key: string; value: string }>
-): Record<string, string> {
-  const record: Record<string, string> = {};
-  for (const entry of entries) {
-    if (entry.key) record[entry.key] = entry.value;
-  }
-  return record;
-}
-
-function serializeVariants(
-  entries: Array<{ key: string; value: string }>
-): Array<Record<string, string>> {
-  return entries
-    .filter((entry) => entry.key)
-    .map((entry) => ({ [entry.key]: entry.value }));
-}
-
 async function writeProduct(
   formData: FormData,
   expectedProductId: string | "create"
@@ -179,11 +161,10 @@ async function writeProduct(
     productCode: input.productCode,
     categoryId: input.categoryId,
     subcategoryId: input.subcategoryId,
-    shortDescription: input.shortDescription,
     description: input.description,
     features: input.features,
-    specifications: serializeSpecifications(input.specifications),
-    variants: serializeVariants(input.variants),
+    specifications: input.specifications,
+    madeIn: input.madeIn,
     availability: input.availability as Availability,
     featured: input.featured,
     isActive: input.isActive,

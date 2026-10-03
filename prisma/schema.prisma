@@ -58,11 +58,10 @@ model Product {
   productCode      String?        @unique
   categoryId       String
   subcategoryId    String?
-  shortDescription String?
   description      String?
   features         String[]
-  specifications   Json?
-  variants         Json?
+  specifications   String[]
+  madeIn           String?
   availability     Availability   @default(ON_REQUEST)
   featured         Boolean        @default(false)
   isActive         Boolean        @default(true)

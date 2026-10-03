@@ -230,6 +230,8 @@ export const en = {
     materialLabel: "Material",
     sizeLabel: "Size",
     colorFinishLabel: "Color / Finish",
+    productNameLabel: "Product Name",
+    madeInLabel: "Made In",
   },
   about: {
     pageTitle: "About",

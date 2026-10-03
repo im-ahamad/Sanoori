@@ -230,6 +230,8 @@ products: {
     materialLabel: "উপাদান",
     sizeLabel: "আকার",
     colorFinishLabel: "রং / ফিনিশ",
+    productNameLabel: "পণ্যের নাম",
+    madeInLabel: "উৎপাদনস্থল",
   },
   about: {
     pageTitle: "আমাদের সম্পর্কে",

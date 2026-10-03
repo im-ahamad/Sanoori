@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
-import { ArrowLeft, BadgeCheck, ListChecks, Ruler } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Ruler, Globe } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
@@ -43,7 +43,7 @@ export async function generateMetadata({
   return generatePageMetadata({
     title: product.name,
     description:
-      product.shortDescription ?? product.description ?? siteConfig.description,
+      product.description ?? siteConfig.description,
     path: `/products/${product.slug}`,
     image: product.primaryImage
       ? {
@@ -97,7 +97,7 @@ export default async function ProductDetailPage({
     generateProductSchema({
       name: product.name,
       description:
-        product.description ?? product.shortDescription ?? siteConfig.description,
+        product.description ?? siteConfig.description,
       slug: product.slug,
       images: product.images.map((image) => productImageHero(image.url, 1200)),
       productCode: product.productCode,
@@ -113,20 +113,11 @@ export default async function ProductDetailPage({
     ])
   );
 
-  const specificationsEntries = product.specifications
-    ? Object.entries(product.specifications).filter(
-        ([key]) =>
-          !["material", "size", "color", "color finish", "colour", "colour finish"].includes(
-            key.toLowerCase()
-          )
-      )
-    : [];
-
   return (
     <main className="flex-1">
       <PageHeader
         title={product.name}
-        description={product.shortDescription ?? undefined}
+        description={undefined}
         breadcrumbs={[
           { label: products.breadcrumb, href: "/products" },
           { label: product.name, href: detailUrl },
@@ -136,12 +127,19 @@ export default async function ProductDetailPage({
 
       <Container>
         <div className="section-spacing">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
-            {/* Gallery */}
-            <ProductGallery images={galleryImages} productName={product.name} />
+          {/* ============================================================
+                TOP PRODUCT AREA — 2-column: Image (left) | Info (right)
+                Single unified bordered container
+           ============================================================ */}
+          <div className="flex flex-col lg:flex-row rounded-2xl border border-border overflow-hidden bg-white">
+            {/* Product Image — LEFT */}
+            <div className="flex-1 min-w-0 lg:rounded-l-2xl">
+              <ProductGallery images={galleryImages} productName={product.name} hideThumbnails />
+            </div>
 
-            {/* Buy rail */}
-            <div className="space-y-6">
+            {/* Right-side — Information SECTION */}
+            <div className="flex-1 min-w-0 bg-gradient-to-b from-rose-50 to-white p-5 lg:p-6 space-y-4 overflow-hidden h-[560px] lg:h-[580px] flex flex-col">
+              {/* Category badges */}
               <div className="flex flex-wrap items-center gap-2.5">
                 <AvailabilityBadge availability={product.availability} />
                 <Link
@@ -160,9 +158,13 @@ export default async function ProductDetailPage({
                 )}
               </div>
 
-              <div className="space-y-2">
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {product.description || product.shortDescription}
+              {/* Basic Product Information */}
+              <div className="space-y-2.5 pb-2">
+                <p className="text-sm text-muted-foreground">
+                  {pd.productNameLabel}:{" "}
+                  <span className="font-semibold text-foreground">
+                    {product.name}
+                  </span>
                 </p>
                 {product.productCode && (
                   <p className="text-sm text-muted-foreground">
@@ -196,126 +198,86 @@ export default async function ProductDetailPage({
                     </span>
                   </p>
                 )}
+                {product.madeIn && (
+                  <p className="text-sm text-muted-foreground">
+                    {pd.madeInLabel}:{" "}
+                    <span className="font-semibold text-foreground">
+                      {product.madeIn}
+                    </span>
+                  </p>
+                )}
               </div>
 
-              <BuyPanel
-                productName={product.name}
-                productId={product.id}
-                productCode={product.productCode}
-                productUrl={productUrl}
-                productSlug={product.slug}
-                phoneChannel={phoneChannel}
-                businessSettings={businessSettings}
-              />
+              {/* "More about this product" heading */}
+              <div className="space-y-1 pt-2">
+                <h2 className="font-heading text-lg font-bold tracking-tight text-foreground">
+                  {pd.moreAboutTitle}
+                </h2>
+                <p className="text-sm text-rose-700 font-medium">
+                  {pd.moreAboutDescription}
+                </p>
+              </div>
+
+              {/* Description, Key Features, Specifications — unified flow */}
+              <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
+                {/* Description */}
+                {product.description && (
+                  <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
+                    <h3 className="font-heading text-lg font-bold text-foreground flex-shrink-0">
+                      Description
+                    </h3>
+                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                      {product.description}
+                    </div>
+                  </div>
+                )}
+
+                {/* Key Features */}
+                {product.features.length > 0 && (
+                  <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
+                    <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground flex-shrink-0">
+                      <BadgeCheck className="size-4 text-rose-600" aria-hidden="true" />
+                      {pd.keyFeaturesTitle}
+                    </h3>
+                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                      {product.features.map((feature, index) => (index > 0 ? "\n" : "") + feature).join("")}
+                    </div>
+                  </div>
+                )}
+
+                {/* Specifications */}
+                <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
+                  <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground flex-shrink-0">
+                    <Ruler className="size-4 text-rose-600" aria-hidden="true" />
+                    {pd.specificationsTitle}
+                  </h3>
+                  <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                    {product.specifications.length > 0 ? (
+                      product.specifications.map((spec, index) => (index > 0 ? "\n" : "") + spec).join("")
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">No specifications available.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Description */}
-          {product.description && (
-            <section aria-labelledby="description-heading" className="mt-14">
-              <SectionHeader
-                title={pd.moreAboutTitle}
-                description={pd.moreAboutDescription}
-              />
-              <div className="mt-5 max-w-3xl whitespace-pre-line rounded-lg border border-border bg-card p-6 text-base leading-relaxed text-muted-foreground">
-                {product.description}
-              </div>
-            </section>
-          )}
-
-          {/* Features */}
-          {product.features.length > 0 && (
-            <section aria-labelledby="features-heading" className="mt-14">
-              <h2
-                id="features-heading"
-                className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
-              >
-                <BadgeCheck className="size-5 text-primary" aria-hidden="true" />
-                {pd.keyFeaturesTitle}
-              </h2>
-              <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {product.features.map((feature, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 text-sm leading-relaxed text-foreground"
-                  >
-                    <BadgeCheck
-                      className="mt-0.5 size-4 shrink-0 text-primary"
-                      aria-hidden="true"
-                    />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Specifications */}
-          {specificationsEntries.length > 0 && (
-            <section aria-labelledby="specs-heading" className="mt-14">
-              <h2
-                id="specs-heading"
-                className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
-              >
-                <Ruler className="size-5 text-primary" aria-hidden="true" />
-                {pd.specificationsTitle}
-              </h2>
-              <dl className="mt-5 max-w-3xl overflow-hidden rounded-lg border border-border">
-                {specificationsEntries.map(([key, value], index) => (
-                  <div
-                    key={key}
-                    className={
-                      index % 2 === 0
-                        ? "grid grid-cols-1 gap-1 bg-background p-4 sm:grid-cols-[1fr_2fr] sm:gap-4"
-                        : "grid grid-cols-1 gap-1 bg-card p-4 sm:grid-cols-[1fr_2fr] sm:gap-4"
-                    }
-                  >
-                    <dt className="text-sm font-semibold text-foreground">
-                      {key}
-                    </dt>
-                    <dd className="text-sm leading-relaxed text-muted-foreground">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-          )}
-
-          {/* Variants */}
-          {product.variants.length > 0 && (
-            <section aria-labelledby="variants-heading" className="mt-14">
-              <h2
-                id="variants-heading"
-                className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
-              >
-                <ListChecks className="size-5 text-primary" aria-hidden="true" />
-                {pd.variantsTitle}
-              </h2>
-              <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {product.variants.map((variant, index) => (
-                  <li
-                    key={index}
-                    className="rounded-lg border border-border bg-card p-4"
-                  >
-                    <dl className="space-y-1.5">
-                      {Object.entries(variant).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex items-baseline justify-between gap-3 text-sm"
-                        >
-                          <dt className="text-muted-foreground">{key}</dt>
-                          <dd className="text-right font-medium text-foreground">
-                            {value}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          {/* ============================================================
+               GET A PRICE SECTION — Moved below top area, full width
+               (Existing BuyPanel component, NOT redesigned)
+          ============================================================ */}
+          <div className="mt-10 lg:mt-12">
+            <BuyPanel
+              productName={product.name}
+              productId={product.id}
+              productCode={product.productCode}
+              productUrl={productUrl}
+              productSlug={product.slug}
+              phoneChannel={phoneChannel}
+              businessSettings={businessSettings}
+            />
+          </div>
 
           {/* Related Products */}
           {relatedProducts.length > 0 && (
@@ -331,14 +293,13 @@ export default async function ProductDetailPage({
                     product={relatedProduct}
                     variant="grid"
                     hideAvailabilityBadge
-                    hideShortDescription
                   />
                 ))}
               </div>
             </section>
           )}
 
-          {/* Helpful actions */}
+          {/* Helpful actions — Back to products + Get Price link */}
           <div className="mt-14 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-muted/40 p-6 sm:flex-row sm:items-center">
             <div>
               <h2 className="font-heading text-lg font-semibold text-foreground">

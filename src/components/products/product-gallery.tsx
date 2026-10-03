@@ -15,6 +15,7 @@ export interface GalleryImage {
 interface ProductGalleryProps {
   images: GalleryImage[];
   productName: string;
+  hideThumbnails?: boolean;
 }
 
 /**
@@ -23,7 +24,7 @@ interface ProductGalleryProps {
  * - Right: Zoomed detail panel that follows cursor position
  * - Mobile: Normal image behavior (no zoom panel)
  */
-export function ProductGallery({ images, productName }: ProductGalleryProps) {
+export function ProductGallery({ images, productName, hideThumbnails }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomPosition, setZoomPosition] = useState<{ x: number; y: number } | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -73,7 +74,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_72px] lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start relative">
       {/* Main image */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-muted/50">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
         {selected.url ? (
           <div
             ref={mainImageRef}
@@ -140,11 +141,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       )}
 
       {/* Thumbnails — horizontal scroll on mobile, vertical column on desktop */}
-      <ul
-        className="order-first flex gap-2 overflow-x-auto pb-1 lg:order-none lg:col-start-2 lg:row-start-1 lg:flex-col lg:overflow-visible"
-        aria-label="Product image gallery"
-      >
-{images.map((image, index) => {
+      {!hideThumbnails && (
+        <ul
+          className="order-first flex gap-2 overflow-x-auto pb-1 lg:order-none lg:col-start-2 lg:row-start-1 lg:flex-col lg:overflow-visible"
+          aria-label="Product image gallery"
+        >
+          {images.map((image, index) => {
             const alt = image.alt ?? `${productName} image ${index + 1}`;
             const active = index === selectedIndex;
             return (
@@ -175,7 +177,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               </li>
             );
           })}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }

@@ -280,17 +280,59 @@
   .reveal-d2 { animation-delay: 0.2s; }
   .reveal-d3 { animation-delay: 0.3s; }
 
+  /* Hero arrow controls — always-on ambient glow + slow light sweep */
+  @keyframes hero-arrow-glow {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes hero-arrow-sheen {
+    0% {
+      transform: translateX(-60%);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    45% {
+      opacity: 1;
+    }
+    62%,
+    100% {
+      transform: translateX(420%);
+      opacity: 0;
+    }
+  }
+
+  .hero-arrow-glow {
+    animation: hero-arrow-glow 3.6s ease-in-out infinite;
+  }
+
+  .hero-arrow-sheen {
+    animation: hero-arrow-sheen 7s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .backdrop-zoom,
     .hero-intro,
     .reveal {
       animation: none;
     }
+
+    .hero-arrow-glow,
+    .hero-arrow-sheen {
+      animation: none;
+    }
   }
 
   /* Container utility */
   .container-sanoori {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[1500px] px-4 sm:px-6 lg:px-8;
   }
 
   /* Hero heading clamp utility */

@@ -16,8 +16,10 @@ import { generatePageMetadata, generateBreadcrumbSchema } from "@/lib/seo";
 import {
   getPublicCategories,
   getPublicProducts,
+  getPublicProductsShowcase,
   getFeaturedProducts,
   type PublicCategory,
+  type PublicProductFilters,
 } from "@/lib/public/catalogue";
 import { Availability } from "@/generated/prisma";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
@@ -115,7 +117,7 @@ export default async function ProductsPage({
             ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_42%,transparent_85%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_40%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_78%,transparent_100%)]"
             : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_84%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_18%,color-mix(in_oklab,var(--navy-dark)_34%,transparent)_42%,color-mix(in_oklab,var(--navy-dark)_10%,transparent)_68%,transparent_84%,transparent_100%)]"
         }
-        objectFit="object-cover"
+        objectFit={categorySlug ? undefined : "object-cover"}
         objectPosition={
           categorySlug ? "object-center" : "object-[50%_0%]"
         }
@@ -123,7 +125,7 @@ export default async function ProductsPage({
         textColor={categorySlug ? "white" : "pureWhite"}
         exactCenter
         className={
-          categorySlug ? "pb-24 lg:pb-28" : "lg:min-h-[calc(100dvh-5rem)] pb-[4px]"
+          categorySlug ? "pb-24 lg:pb-28" : "min-h-[calc(100vw/3)] pb-[4px]"
         }
       />
 
@@ -174,7 +176,7 @@ async function CatalogueView({
   );
 
   const [catalogue, featuredProducts] = await Promise.all([
-    getPublicProducts({ ...filters, page }),
+    getPublicProducts({ ...filters, page, pageSize: (filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials") ? 32 : undefined }),
     getFeaturedProducts(4),
   ]);
 
@@ -189,6 +191,45 @@ async function CatalogueView({
     featured: filters.featured ? "true" : "",
   };
 
+  // For the default all products view (no active filters), fetch products in the specific category order:
+  // Rows 1-2: Sanitary Ware (8 products)
+  // Rows 3-4: Tiles (8 products)
+  // Rows 5-6: Building Materials (8 products)
+  // Rows 7-8: Sanitary Ware (8 products)
+  // Rows 9-10: Building Materials (8 products)
+  // Rows 11-12: Sanitary Ware (8 products)
+  // Total: 48 products in 4 columns × 12 rows
+  let allProducts: Awaited<ReturnType<typeof getPublicProductsShowcase>> = [];
+  if (!hasActiveFilters) {
+    const [sanitaryWareProducts, tilesProducts, buildingMaterialsProducts] = await Promise.all([
+      getPublicProductsShowcase({ ...filters, categorySlug: "sanitary-ware" }, 24),
+      getPublicProductsShowcase({ ...filters, categorySlug: "tiles" }, 8),
+      getPublicProductsShowcase({ ...filters, categorySlug: "building-materials" }, 16),
+    ]);
+
+    // Arrange in the exact order:
+    // First 8 Sanitary Ware (rows 1-2)
+    // Next 8 Tiles (rows 3-4)
+    // Next 8 Building Materials (rows 5-6)
+    // Next 8 Sanitary Ware (rows 7-8)
+    // Next 8 Building Materials (rows 9-10)
+    // Last 8 Sanitary Ware (rows 11-12)
+    const sanitaryWareFirst8 = sanitaryWareProducts.slice(0, 8);
+    const sanitaryWareRows7_8 = sanitaryWareProducts.slice(8, 16);
+    const sanitaryWareRows11_12 = sanitaryWareProducts.slice(16, 24);
+    const buildingMaterialsRows5_6 = buildingMaterialsProducts.slice(0, 8);
+    const buildingMaterialsRows9_10 = buildingMaterialsProducts.slice(8, 16);
+    
+    allProducts = [
+      ...sanitaryWareFirst8,
+      ...tilesProducts.slice(0, 8),
+      ...buildingMaterialsRows5_6,
+      ...sanitaryWareRows7_8,
+      ...buildingMaterialsRows9_10,
+      ...sanitaryWareRows11_12,
+    ];
+  }
+
   return (
     <>
       <CatalogueFilters categories={categories} values={filters} t={t} />
@@ -200,7 +241,7 @@ async function CatalogueView({
             description={t.products.featuredProductsDescription}
             className="[&>h2]:text-xl sm:[&>h2]:text-2xl"
           />
-          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-8">
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -209,24 +250,44 @@ async function CatalogueView({
       )}
 
       <section aria-label="Catalogue results" className="mt-12">
-        {catalogue.items.length > 0 ? (
+        {(!hasActiveFilters ? allProducts : catalogue.items).length > 0 ? (
           <>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-8">
-              {catalogue.items.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-            <div className="mt-10">
-              <Pagination
-                state={{
-                  page: safePage,
-                  totalPages: catalogue.totalPages,
-                  total: catalogue.total,
-                  queryParams: paginationQuery,
-                }}
-                t={t}
-              />
-            </div>
+            {!hasActiveFilters ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+                {allProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    hideAvailabilityBadge
+                    hideShortDescription
+                  />
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8 ${filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials" ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+                  {catalogue.items.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      hideAvailabilityBadge
+                      hideShortDescription
+                    />
+                  ))}
+                </div>
+                <div className="mt-10">
+                  <Pagination
+                    state={{
+                      page: safePage,
+                      totalPages: catalogue.totalPages,
+                      total: catalogue.total,
+                      queryParams: paginationQuery,
+                    }}
+                    t={t}
+                  />
+                </div>
+              </>
+            )}
           </>
         ) : (
           <div className="mt-4 rounded-lg border border-dashed border-border py-16">
@@ -257,8 +318,8 @@ function CatalogueSkeleton({ t }: { t: ReturnType<typeof getServerTranslations> 
   return (
     <div aria-busy="true" aria-label={t.products.loadingProducts}>
       <Skeleton className="h-44 w-full rounded-lg" />
-      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 lg:gap-8">
-        {Array.from({ length: 6 }).map((_, index) => (
+      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        {Array.from({ length: 48 }).map((_, index) => (
           <div
             key={index}
             className="overflow-hidden rounded-lg border border-border bg-card"

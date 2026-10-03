@@ -222,13 +222,17 @@ export function ContactPageContent({
         description={contact.pageDescription}
         breadcrumbs={[{ label: contact.breadcrumb, href: "/contact" }]}
         breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
+        // Plain path on purpose: the image optimizer rejects a "?v=" query on a
+        // local /public src (400), and its disk cache already tracks the file —
+        // purge .next/**/cache/images to pick up a replaced file.
         backgroundImage="/images/contact-hero.png"
-        backdropOverlay="bg-[radial-gradient(ellipse_120%_75%_at_50%_-15%,color-mix(in_oklab,var(--navy-dark)_74%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_30%,transparent_72%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_92%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_22%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_40%,transparent)_64%,color-mix(in_oklab,var(--navy-dark)_16%,transparent)_84%,transparent_98%)]"
-        objectFit="object-cover lg:object-contain"
+        backdropOverlay=""
+        objectFit="object-cover"
+        objectPosition="object-center"
         noZoom
-        textColor="pureWhite"
+        textColor="white"
         exactCenter
-        className="lg:min-h-[calc(100dvh-5rem)]"
+        className="lg:aspect-[3/1] lg:box-content lg:min-h-fit"
       />
 
       {/* ================================================================

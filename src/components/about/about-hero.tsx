@@ -2,56 +2,32 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { ButtonLink } from "@/components/ui/button-link";
+import { Container } from "@/components/layout/container";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 
-/**
- * Manual hero gallery — always starts on `main-hero.png` and only advances
- * when the visitor presses an arrow button. There is no timer and no
- * automatic rotation.
- *
- * Order: main-hero → hero-2 → hero-3 → hero-4 → hero-5 → main-hero …
- */
-const HERO_SLIDES = [
-  "/images/main-hero.png",
+const ABOUT_HERO_SLIDES = [
+  "/images/about-hero.png",
   "/images/hero-2.png",
   "/images/hero-3.png",
   "/images/hero-4.png",
   "/images/hero-5.png",
 ];
 
-/** Milliseconds of the crossfade between two slides. */
 const CROSSFADE_MS = 700;
 
 const wrapSlide = (index: number) =>
-  ((index % HERO_SLIDES.length) + HERO_SLIDES.length) % HERO_SLIDES.length;
+  ((index % ABOUT_HERO_SLIDES.length) + ABOUT_HERO_SLIDES.length) %
+  ABOUT_HERO_SLIDES.length;
 
-/**
- * Horizontal focal point per breakpoint.
- *
- * Below lg the backdrop box matches the slides' own 1942:809 ratio, so there
- * is no slack to align into and the percentage positions are inert. At lg+ the
- * box becomes 3:1 (the /about hero geometry), which is wider than the ~2.4:1
- * slides: `object-contain` keeps every slide whole and undistorted and centres
- * it, leaving symmetric navy margins. A `60%/64%` horizontal anchor would
- * shove the contained image off-centre in that margin, so lg/xl centre.
- */
-const HERO_OBJECT_POSITION =
-  "object-center sm:object-[60%_center] md:object-[55%_center] lg:object-center xl:object-center";
+const HERO_OBJECT_POSITION = "object-center";
 
-const HERO_OVERLAY =
-  "bg-[linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_28%,transparent)_30%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_58%,transparent_80%)]";
-
-/** Aspect ratio matching the About hero (3:1) for consistent vertical space at lg+. */
-const HERO_ASPECT = "aspect-[3/1]";
+const HERO_OVERLAY = "";
 
 type SlideState = { active: number; previous: number };
 
-/**
- * State for the manual gallery.
- */
 function useManualSlider() {
   const [slides, setSlides] = useState<SlideState>({ active: 0, previous: 0 });
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -121,10 +97,7 @@ function useManualSlider() {
   };
 }
 
-/**
- * Full-width hero image band at the images' own 1942:809 ratio.
- */
-function HeroBackdrop({
+function AboutHeroBackdrop({
   active,
   previous,
   reducedMotion,
@@ -134,10 +107,10 @@ function HeroBackdrop({
       <div
         aria-hidden="true"
         role="presentation"
-        className="pointer-events-none relative aspect-[1942/809] w-full overflow-hidden lg:aspect-[3/1] lg:col-start-1 lg:row-start-1 lg:self-center"
+        className="pointer-events-none relative aspect-[3/1] w-full overflow-hidden"
         style={{ isolation: "isolate" }}
       >
-        {HERO_SLIDES.map((src, index) => {
+        {ABOUT_HERO_SLIDES.map((src, index) => {
           const isActive = index === active;
           const isPrevious = index === previous;
           return (
@@ -151,7 +124,7 @@ function HeroBackdrop({
               preload={index === 0}
               loading={index === 0 ? undefined : "eager"}
               className={cn(
-                "object-contain lg:object-cover",
+                "object-cover",
                 HERO_OBJECT_POSITION,
                 isActive || isPrevious ? "opacity-100" : "opacity-0"
               )}
@@ -174,10 +147,7 @@ function HeroBackdrop({
   );
 }
 
-/**
- * Navigation arrows pinned to the hero image edges.
- */
-function HeroNav({
+function AboutHeroNav({
   onPrevious,
   onNext,
   reducedMotion,
@@ -188,18 +158,6 @@ function HeroNav({
 }) {
   const t = useTranslations();
 
-  /**
-   * Arrows keep their original footprint (`size-9` → `sm:size-10` → `lg:size-12`)
-   * and position. Only the surface colour and interaction feedback change.
-   *
-   * Surface: solid brand gold (`--gold`, the same token the Browse Products CTA
-   * uses) with a metallic `gold-light → gold → gold-dark` gradient and a navy
-   * icon, so the control is opaque and unmistakable against any hero image.
-   *
-   * Always-on life: a breathing gold halo plus a slow diagonal light sweep.
-   * Both are decorative, hidden below `sm`, and disabled by
-   * `prefers-reduced-motion` in `globals.css`.
-   */
   const controlClass = cn(
     "pointer-events-auto relative flex size-9 cursor-pointer items-center justify-center rounded-full select-none",
     "bg-linear-to-br from-gold-light via-gold to-gold-dark text-navy-dark",
@@ -214,15 +172,12 @@ function HeroNav({
     !reducedMotion && "hover:scale-[1.06] active:scale-[0.94]"
   );
 
-  /** Breathing gold halo — the ambient "live" cue. */
   const glowClass =
     "pointer-events-none absolute -inset-1.5 hidden rounded-full bg-gold/60 blur-lg sm:block hero-arrow-glow";
 
-  /** Wider halo that only appears on hover, so hover reads as more glow. */
   const glowHoverClass =
     "pointer-events-none absolute -inset-3 hidden rounded-full bg-gold/50 blur-xl opacity-0 transition-opacity duration-300 sm:block group-hover:opacity-100";
 
-  /** Slow diagonal light sweep across the gold surface. */
   const sheenClass =
     "pointer-events-none absolute inset-0 hidden overflow-hidden rounded-full sm:block";
 
@@ -230,7 +185,7 @@ function HeroNav({
     "absolute inset-y-0 -left-1/3 w-1/3 bg-linear-to-r from-transparent via-white/20 to-transparent hero-arrow-sheen";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex aspect-[1942/809] items-center justify-between px-4 sm:px-6 lg:aspect-[3/1] lg:px-8">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex aspect-[3/1] items-center justify-between px-4 sm:px-6 lg:px-8">
       <button
         type="button"
         onClick={onPrevious}
@@ -261,98 +216,123 @@ function HeroNav({
   );
 }
 
+interface AboutHeroProps {
+  title: string;
+  description: string;
+  breadcrumbs?: Array<{ label: string; href: string }>;
+  breadcrumbLinkClassName?: string;
+}
 
-export function Hero() {
+export function AboutHero({
+  title,
+  description,
+  breadcrumbs,
+  breadcrumbLinkClassName,
+}: AboutHeroProps) {
   const t = useTranslations();
   const { active, previous, reducedMotion, showPrevious, showNext } =
     useManualSlider();
 
   const motion = reducedMotion ? "duration-0" : "duration-700";
 
+  const toneClass = {
+    breadcrumb: "text-white",
+    hover: "hover:text-white",
+    current: "text-white",
+    heading: "text-white",
+    description: "text-white",
+    glow: "[text-shadow:0_1px_1px_rgba(12,10,8,0.5),0_0_3px_rgba(12,10,8,0.35),0_0_8px_rgba(12,10,8,0.28)]",
+  };
+
   return (
     <section className="relative overflow-hidden bg-navy-dark text-white lg:grid lg:aspect-[3/1] lg:box-content lg:min-h-fit">
-      {/* Full-width hero image (natural ratio, manual navigation) + navy wash */}
-      <HeroBackdrop
+      <AboutHeroBackdrop
         active={active}
         previous={previous}
         reducedMotion={reducedMotion}
       />
 
-      {/* Overlays the image on desktop; stacks below it on narrow screens */}
-      <div className="relative h-full w-full px-4 sm:px-6 lg:px-8 lg:col-start-1 lg:row-start-1">
-        <div className={cn("flex h-full items-start pt-10 sm:pt-12 lg:pt-6 transition-all", motion)}>
-          <div className={cn("w-full max-w-7xl lg:ml-20 transition-all", motion)}>
-            <div className={cn("transition-all", motion, "max-w-[48rem]")}>
-              <p
-                className={cn(
-                  "hero-intro flex items-center gap-3 font-bold uppercase tracking-[0.14em] text-gold transition-all",
-                  motion,
-                  "lg:gap-2 xl:gap-3",
-                  active !== 0
-                    ? "text-[calc(0.7rem_-_3px)] sm:text-[calc(0.72rem_-_3px)] lg:text-[calc(0.7rem_-_3px)] xl:text-[calc(0.78rem_-_3px)]"
-                    : "text-[0.7rem] sm:text-[0.72rem] lg:text-[0.7rem] xl:text-[0.78rem]"
-                )}
-              >
-                <span className={cn("h-px w-8 bg-gold/60", "lg:w-6 xl:w-8")} aria-hidden="true" />
-                {t.hero.eyebrow}
-              </p>
+      {/* Content positioned absolute to hero section top-left */}
+      <div className="pointer-events-none absolute top-0 left-0 z-10">
+        <div className="pointer-events-auto pl-[110px] pt-[30px] pb-3 pr-4 sm:pl-[110px] sm:pt-[30px] sm:pb-3 sm:pr-6 lg:pl-[110px] lg:pt-[30px] lg:pb-3 lg:pr-8">
+          <div className="relative">
+              {/* Breadcrumbs */}
+              {breadcrumbs && breadcrumbs.length > 0 && (
+                <nav aria-label="Breadcrumb" className="mb-1">
+                  <ol
+                    className={cn(
+                      "flex items-center gap-1.5 text-xs sm:text-sm",
+                      toneClass.breadcrumb,
+                      toneClass.glow
+                    )}
+                  >
+                    <li>
+                      <Link
+                        href="/"
+                        className={cn(
+                          "transition-colors",
+                          toneClass.hover,
+                          breadcrumbLinkClassName
+                        )}
+                      >
+                        Home
+                      </Link>
+                    </li>
+                    {breadcrumbs.map((crumb, index) => (
+                      <li key={`breadcrumb-${crumb.href}`} className="flex items-center gap-1.5">
+                        <span aria-hidden="true">/</span>
+                        {index === breadcrumbs.length - 1 ? (
+                          <span
+                            className={cn(
+                              toneClass.current,
+                              breadcrumbLinkClassName
+                            )}
+                          >
+                            {crumb.label}
+                          </span>
+                        ) : (
+                          <Link
+                            href={crumb.href}
+                            className={cn(
+                              "transition-colors",
+                              toneClass.hover,
+                              breadcrumbLinkClassName
+                            )}
+                          >
+                            {crumb.label}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
 
               <h1
                 className={cn(
-                  "hero-intro hero-intro-d1 font-heading font-semibold tracking-tight text-white transition-all",
-                  motion,
-                  "mt-4 leading-[0.98]",
-                  active === 0
-                    ? "clamp-text-4xl-6xl"
-                    : "clamp-text-4xl-6xl [font-size:clamp(calc(2.5rem_-_1px),calc(6vw_-_15px),calc(5.5rem_-_16px))]"
+                  "font-heading font-bold tracking-tight text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]",
+                  toneClass.heading,
+                  toneClass.glow
                 )}
               >
-                {t.hero.title}
+                {title}
               </h1>
-
-              <div className={cn("transition-all", motion, "max-h-80 opacity-100")}>
+              {description && (
                 <p
                   className={cn(
-                    "hero-intro hero-intro-d2 mt-5 max-w-[32rem] leading-[1.7] text-white/85 sm:leading-[1.8] lg:leading-[2rem] transition-all",
-                    motion,
-                    active !== 0
-                      ? "text-[calc(0.875rem_-_3px)] sm:text-[calc(1rem_-_3px)] lg:text-[calc(1.125rem_-_3px)]"
-                      : "text-sm sm:text-base lg:text-lg"
+                    "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg",
+                    toneClass.description,
+                    toneClass.glow
                   )}
                 >
-                  {t.hero.description}
+                  {description}
                 </p>
-              </div>
-
-              <div
-                className={cn(
-                  "hero-intro hero-intro-d3 flex transition-all",
-                  motion,
-                  "mt-8 flex-wrap gap-2 sm:items-center",
-                  active === 0 ? "pe-[111px]" : "pe-[170px]"
-                )}
-              >
-                <ButtonLink
-                  href="/products"
-                  variant="inverse"
-                  size="lg"
-                  className="w-full sm:w-auto min-w-0 flex-1"
-                >
-                  {t.hero.cta}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </ButtonLink>
-              </div>
-
-              <div className="hidden md:block absolute bottom-0 left-0 border-t border-r border-white/10 bg-navy-dark/50 px-5 py-4 text-xs text-white/60">
-                {t.hero.footer}
-              </div>
+              )}
             </div>
-          </div>
         </div>
       </div>
 
-      {/* Manual prev/next arrows — last child so they sit above the wash */}
-      <HeroNav
+      <AboutHeroNav
         onPrevious={showPrevious}
         onNext={showNext}
         reducedMotion={reducedMotion}

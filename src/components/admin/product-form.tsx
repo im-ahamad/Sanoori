@@ -47,6 +47,11 @@ export interface ProductFormInitialValues {
   availability: Availability;
   featured: boolean;
   isActive: boolean;
+  material: string;
+  size: string;
+  colorFinish: string;
+  showOnHome: boolean;
+  showOnProducts: boolean;
   images?: AdminProductImage[];
 }
 
@@ -202,6 +207,13 @@ export function ProductForm({
   );
   const [featured, setFeatured] = useState(initial?.featured ?? false);
   const [isActive, setIsActive] = useState(initial?.isActive ?? true);
+  const [material, setMaterial] = useState(initial?.material ?? "");
+  const [size, setSize] = useState(initial?.size ?? "");
+  const [colorFinish, setColorFinish] = useState(initial?.colorFinish ?? "");
+  const [showOnHome, setShowOnHome] = useState(initial?.showOnHome ?? true);
+  const [showOnProducts, setShowOnProducts] = useState(
+    initial?.showOnProducts ?? true
+  );
 
   const selectedCategory = categories.find(
     (category) => category.id === categoryId
@@ -498,6 +510,40 @@ export function ProductForm({
                 disabled={pending}
               />
             </div>
+
+            <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Show on Home
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Include this product in the Home page showcase.
+                </p>
+                <FieldError errors={stateErrors?.showOnHome} />
+              </div>
+              <Switch
+                checked={showOnHome}
+                onCheckedChange={setShowOnHome}
+                disabled={pending}
+              />
+            </div>
+
+            <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Show on Products
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Include this product in the main Products listing.
+                </p>
+                <FieldError errors={stateErrors?.showOnProducts} />
+              </div>
+              <Switch
+                checked={showOnProducts}
+                onCheckedChange={setShowOnProducts}
+                disabled={pending}
+              />
+            </div>
           </div>
         </section>
 
@@ -551,6 +597,68 @@ export function ProductForm({
               aria-invalid={Boolean(stateErrors?.description)}
             />
             <FieldError errors={stateErrors?.description} />
+          </div>
+        </section>
+
+        {/* ===== Physical attributes ===== */}
+        <section aria-labelledby="section-physical" className="space-y-4">
+          <div>
+            <h2
+              id="section-physical"
+              className="font-heading text-base font-bold tracking-tight text-foreground"
+            >
+              Physical attributes
+            </h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Optional structured attributes used for filtering and display.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="material">Material</Label>
+              <Input
+                id="material"
+                name="material"
+                value={material}
+                onChange={(event) => setMaterial(event.target.value)}
+                placeholder="e.g. Porcelain"
+                maxLength={200}
+                disabled={pending}
+                aria-invalid={Boolean(stateErrors?.material)}
+              />
+              <FieldError errors={stateErrors?.material} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="size">Size</Label>
+              <Input
+                id="size"
+                name="size"
+                value={size}
+                onChange={(event) => setSize(event.target.value)}
+                placeholder="e.g. 600×600 mm"
+                maxLength={200}
+                disabled={pending}
+                aria-invalid={Boolean(stateErrors?.size)}
+              />
+              <FieldError errors={stateErrors?.size} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="color-finish">Color / Finish</Label>
+              <Input
+                id="color-finish"
+                name="colorFinish"
+                value={colorFinish}
+                onChange={(event) => setColorFinish(event.target.value)}
+                placeholder="e.g. White Gloss"
+                maxLength={200}
+                disabled={pending}
+                aria-invalid={Boolean(stateErrors?.colorFinish)}
+              />
+              <FieldError errors={stateErrors?.colorFinish} />
+            </div>
           </div>
         </section>
 
@@ -654,6 +762,15 @@ export function ProductForm({
         <input type="hidden" name="availability" value={availability} />
         <input type="hidden" name="featured" value={featured ? "on" : "off"} />
         <input type="hidden" name="isActive" value={isActive ? "on" : "off"} />
+        <input type="hidden" name="material" value={material} />
+        <input type="hidden" name="size" value={size} />
+        <input type="hidden" name="colorFinish" value={colorFinish} />
+        <input type="hidden" name="showOnHome" value={showOnHome ? "on" : "off"} />
+        <input
+          type="hidden"
+          name="showOnProducts"
+          value={showOnProducts ? "on" : "off"}
+        />
 
         {/* ===== Actions ===== */}
         <div className="flex flex-col-reverse gap-2 border-t border-border pt-6 sm:flex-row sm:justify-end">

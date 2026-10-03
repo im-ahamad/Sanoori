@@ -187,6 +187,11 @@ async function writeProduct(
     availability: input.availability as Availability,
     featured: input.featured,
     isActive: input.isActive,
+    material: input.material,
+    size: input.size,
+    colorFinish: input.colorFinish,
+    showOnHome: input.showOnHome,
+    showOnProducts: input.showOnProducts,
   };
 
   let createdId: string | null = null;

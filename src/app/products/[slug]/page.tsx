@@ -12,6 +12,7 @@ import {
   ProductGallery,
   type GalleryImage,
 } from "@/components/products/product-gallery";
+import { ProductCard } from "@/components/products/product-card";
 import { BuyPanel } from "@/components/products/buy-panel";
 import { siteConfig } from "@/config/site";
 import { getContactChannels } from "@/lib/contact-channels";
@@ -21,7 +22,7 @@ import {
   generateProductSchema,
   generateBreadcrumbSchema,
 } from "@/lib/seo";
-import { getPublicProductBySlug } from "@/lib/public/catalogue";
+import { getPublicProductBySlug, getRelatedProducts } from "@/lib/public/catalogue";
 import { getPublicBusinessSettings } from "@/lib/public/settings";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
@@ -62,14 +63,16 @@ export default async function ProductDetailPage({
   const pd = t.productDetails;
   const products = t.products;
 
-  const [product, businessSettings] = await Promise.all([
-    getPublicProductBySlug(slug),
-    getPublicBusinessSettings(),
-  ]);
+  const product = await getPublicProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
+
+  const [businessSettings, relatedProducts] = await Promise.all([
+    getPublicBusinessSettings(),
+    getRelatedProducts(product.categorySlug, product.subcategorySlug, product.id, 4),
+  ]);
 
   const galleryImages: GalleryImage[] = product.images.map((image) => ({
     id: image.id,
@@ -111,7 +114,12 @@ export default async function ProductDetailPage({
   );
 
   const specificationsEntries = product.specifications
-    ? Object.entries(product.specifications)
+    ? Object.entries(product.specifications).filter(
+        ([key]) =>
+          !["material", "size", "color", "color finish", "colour", "colour finish"].includes(
+            key.toLowerCase()
+          )
+      )
     : [];
 
   return (
@@ -161,6 +169,30 @@ export default async function ProductDetailPage({
                     {pd.productCodeLabel}:{" "}
                     <span className="font-semibold text-foreground">
                       {product.productCode}
+                    </span>
+                  </p>
+                )}
+                {product.material && (
+                  <p className="text-sm text-muted-foreground">
+                    {pd.materialLabel}:{" "}
+                    <span className="font-semibold text-foreground">
+                      {product.material}
+                    </span>
+                  </p>
+                )}
+                {product.size && (
+                  <p className="text-sm text-muted-foreground">
+                    {pd.sizeLabel}:{" "}
+                    <span className="font-semibold text-foreground">
+                      {product.size}
+                    </span>
+                  </p>
+                )}
+                {product.colorFinish && (
+                  <p className="text-sm text-muted-foreground">
+                    {pd.colorFinishLabel}:{" "}
+                    <span className="font-semibold text-foreground">
+                      {product.colorFinish}
                     </span>
                   </p>
                 )}
@@ -282,6 +314,27 @@ export default async function ProductDetailPage({
                   </li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          {/* Related Products */}
+          {relatedProducts.length > 0 && (
+            <section aria-labelledby="related-products-heading" className="mt-14">
+              <SectionHeader
+                title={pd.relatedProductsTitle}
+                description={pd.relatedProductsDescription}
+              />
+              <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+                {relatedProducts.map((relatedProduct) => (
+                  <ProductCard
+                    key={relatedProduct.id}
+                    product={relatedProduct}
+                    variant="grid"
+                    hideAvailabilityBadge
+                    hideShortDescription
+                  />
+                ))}
+              </div>
             </section>
           )}
 

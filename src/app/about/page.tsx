@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/shared/page-header";
 import { Reveal } from "@/components/shared/reveal";
 import { ButtonLink } from "@/components/ui/button-link";
 import { generatePageMetadata, generateOrganizationSchema } from "@/lib/seo";
@@ -9,6 +8,7 @@ import { getCategoryIconElement } from "@/lib/category-icons";
 import { getPublicCategories } from "@/lib/public/catalogue";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
+import { AboutHero } from "@/components/about/about-hero";
 
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
@@ -34,17 +34,11 @@ export default async function AboutPage() {
 
   return (
     <main className="flex-1">
-      <PageHeader
+      <AboutHero
         title={t.about.heroTitle}
         description={t.about.heroDescription}
-        breadcrumbs={[{ label: t.about.breadcrumb, href: "/about" }]}
+        breadcrumbs={[{ label: "about", href: "/about" }]}
         breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
-        backgroundImage="/images/about-hero.png"
-        objectFit="object-cover lg:object-contain"
-        backdropOverlay="bg-[radial-gradient(ellipse_125%_80%_at_16%_-18%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_32%,transparent_78%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_90%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_80%,transparent)_20%,color-mix(in_oklab,var(--navy-dark)_60%,transparent)_44%,color-mix(in_oklab,var(--navy-dark)_36%,transparent)_66%,color-mix(in_oklab,var(--navy-dark)_14%,transparent)_84%,transparent_98%)]"
-        placement="top-left"
-        textColor="pureWhite"
-        className="lg:min-h-[calc(100dvh-5rem)]"
       />
 
       <div className="section-spacing">

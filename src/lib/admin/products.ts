@@ -191,6 +191,11 @@ export interface AdminProductDetail {
   availability: Availability;
   featured: boolean;
   isActive: boolean;
+  material: string | null;
+  size: string | null;
+  colorFinish: string | null;
+  showOnHome: boolean;
+  showOnProducts: boolean;
   createdAt: Date;
   updatedAt: Date;
   imageCount: number;
@@ -259,6 +264,11 @@ export async function getAdminProductDetail(
         availability: product.availability,
         featured: product.featured,
         isActive: product.isActive,
+        material: product.material,
+        size: product.size,
+        colorFinish: product.colorFinish,
+        showOnHome: product.showOnHome,
+        showOnProducts: product.showOnProducts,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
         imageCount: product._count.images,

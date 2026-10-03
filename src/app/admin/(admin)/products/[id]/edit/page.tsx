@@ -98,6 +98,11 @@ export default async function AdminEditProductPage(
             availability: product.availability,
             featured: product.featured,
             isActive: product.isActive,
+            material: product.material ?? "",
+            size: product.size ?? "",
+            colorFinish: product.colorFinish ?? "",
+            showOnHome: product.showOnHome ?? true,
+            showOnProducts: product.showOnProducts ?? true,
             images: product.images,
           }}
         />

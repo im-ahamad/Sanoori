@@ -49,7 +49,10 @@ export const bn = {
     title: "স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস",
     description: "সানুরি ট্রেডিং বাংলাদেশ भर ঘর ও বাণিজ্যিক প্রজেক্টের জন্য প্রিমিয়াম স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস সরবরাহ করে।",
     cta: "পণ্য দেখুন",
+    quoteCta: "কোটেশন নিন",
     footer: "Sanoori Trading — ২০১৮ সাল থেকে",
+    prevImage: "আগের ছবি",
+    nextImage: "পরবর্তী ছবি",
   },
   categoryGrid: {
     eyebrow: "বিভাগগুলো খুঁজুন",
@@ -163,7 +166,7 @@ products: {
       "সানুরি ট্রেডিং ক্যাটালগ ব্রাউজ করুন — স্যানিটারি ওয়্যার, টাইলস এবং বিল্ডিং ম্যাটেরিয়ালস। অনুসন্ধান, ফিল্টার করুন এবং ওয়াহটসঅ্যাপে অর্ডার দিন।",
     heroTitle: "পণ্য",
     heroDescription:
-      "অনুসন্ধান করুন বা বিভাগ অনুযায়ী ব্রাউজ করুন। ওয়াহটসঅ্যাপে আমাদের মেসেজ করুন, আমরা দাম ও উপলব্ধতা নিশ্চিত করে দিব।",
+      "বিভাগ অনুযায়ী আমাদের পণ্য দেখুন এবং আপনার প্রয়োজনীয় পণ্যটি খুঁজুন।",
     breadcrumb: "পণ্য",
     browseByCategory: "বিভাগ অনুযায়ী ব্রাউজ করুন",
     allProducts: "সব পণ্য",
@@ -205,6 +208,8 @@ products: {
     keyFeaturesTitle: "প্রধান বৈশিষ্ট্যসমূহ",
     specificationsTitle: "স্পেসিফিকেশন",
     variantsTitle: "উপলব্ধ অপশন",
+    relatedProductsTitle: "আপনার পছন্দের আরও পণ্য",
+    relatedProductsDescription: "এই বিভাগ থেকে আরও কিছু পণ্য।",
     needDifferentTitle: "আরও কিছু দরকার?",
     needDifferentDescription: "আপনার যা দরকার সেটি আমাদের জানান, আমরা সেটি খুঁজে দিব।",
     getPriceButton: "মূল্য জানুন",
@@ -222,6 +227,9 @@ products: {
     projectOrderDescription: "পণ্যের তালিকা পাঠান, আমরা সবকিছুর দাম জানিয়ে দিব।",
     sendProjectList: "প্রজেক্টের তালিকা পাঠান",
     productCodeLabel: "পণ্য কোড",
+    materialLabel: "উপাদান",
+    sizeLabel: "আকার",
+    colorFinishLabel: "রং / ফিনিশ",
   },
   about: {
     pageTitle: "আমাদের সম্পর্কে",

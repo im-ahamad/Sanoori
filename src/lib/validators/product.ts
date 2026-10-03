@@ -117,7 +117,9 @@ export const productFormSchema = z.object({
     .string()
     .trim()
     .max(100, "Subcategory value is invalid")
-    .transform((value) => (value === "" ? null : value)),
+    .optional()
+    .transform((value) => (value === "" || value === undefined ? null : value))
+    .default(null),
   shortDescription: z
     .string()
     .trim()
@@ -137,6 +139,35 @@ export const productFormSchema = z.object({
     .default("off")
     .transform((value) => value === "on"),
   isActive: z
+    .string()
+    .default("on")
+    .transform((value) => value !== "off"),
+  material: z
+    .string()
+    .trim()
+    .max(200, "Material is too long (max 200 characters)")
+    .transform((value) => (value === "" ? null : value))
+    .optional()
+    .default(""),
+  size: z
+    .string()
+    .trim()
+    .max(200, "Size is too long (max 200 characters)")
+    .transform((value) => (value === "" ? null : value))
+    .optional()
+    .default(""),
+  colorFinish: z
+    .string()
+    .trim()
+    .max(200, "Color/Finish is too long (max 200 characters)")
+    .transform((value) => (value === "" ? null : value))
+    .optional()
+    .default(""),
+  showOnHome: z
+    .string()
+    .default("on")
+    .transform((value) => value !== "off"),
+  showOnProducts: z
     .string()
     .default("on")
     .transform((value) => value !== "off"),

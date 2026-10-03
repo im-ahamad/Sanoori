@@ -8,8 +8,13 @@ import { AvailabilityBadge } from "@/components/products/availability-badge";
 import { getCategoryIconElement } from "@/lib/category-icons";
 import { useTranslations } from "@/lib/i18n";
 
+type ProductCardVariant = "default" | "grid" | "showcase";
+
 interface ProductCardProps {
   product: PublicProductSummary;
+  hideAvailabilityBadge?: boolean;
+  hideShortDescription?: boolean;
+  variant?: ProductCardVariant;
 }
 
 /**
@@ -18,13 +23,26 @@ interface ProductCardProps {
  * prefer the real product photo and fall back to a branded navy/gold tile so a
  * missing image never renders broken.
  */
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, hideAvailabilityBadge = false, hideShortDescription = false, variant = "default" }: ProductCardProps) {
   const t = useTranslations();
   const detailsHref = `/products/${product.slug}`;
   const cardImage = product.image;
 
+  const isGrid = variant === "grid";
+  const isShowcase = variant === "showcase";
+
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-gold-dark/40 hover:shadow-lg">
+    <article
+      className={`
+        group flex h-full flex-col overflow-hidden transition-[transform,box-shadow,border-color] duration-300
+        ${isShowcase
+          ? "rounded-xl bg-white/80 dark:bg-[oklch(0.18_0.015_15)] shadow-sm hover:-translate-y-1 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] hover:border-gold/30"
+          : isGrid
+          ? "border-b border-r border-border bg-card"
+          : "rounded-lg border border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-gold-dark/40 hover:shadow-lg"
+        }
+      `}
+    >
       <Link
         href={detailsHref}
         className="relative block aspect-[4/3] overflow-hidden bg-navy-dark"
@@ -67,7 +85,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             {t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
           </p>
-          <AvailabilityBadge availability={product.availability} />
+          {!hideAvailabilityBadge && <AvailabilityBadge availability={product.availability} />}
         </div>
 
         <h3 className="mt-2 font-heading text-base font-semibold text-foreground sm:text-lg">
@@ -79,7 +97,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </Link>
         </h3>
 
-        {product.shortDescription && (
+        {!hideShortDescription && product.shortDescription && (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {product.shortDescription}
           </p>

@@ -31,7 +31,7 @@ interface PageHeaderProps {
    * picked for the /products hero over its dark-leaning stone photograph,
    * sharing the same dark halo as ivory for separation. Takes precedence
    * over `navyText`. */
-  textColor?: "white" | "navy" | "slate" | "green" | "pureWhite";
+  textColor?: "white" | "navy" | "slate" | "green" | "pureWhite" | "gold";
   /** Position the header copy inside the section. "center" uses the shared
    * centered container; "top-left" anchors the content to the top-left edge
    * with the hero content's gutter, like the home hero. Defaults to "center". */
@@ -43,6 +43,9 @@ interface PageHeaderProps {
   /** Override the vertical top inset for the "top-left" placement. Defaults
    * to the standard "pt-16 sm:pt-20 lg:pt-24" padding (used by About). */
   topPadding?: string;
+  /** Override the horizontal left inset for the "top-left" placement.
+   * Defaults to the standard negative margin "lg:-ml-32". */
+  leftPadding?: string;
   /** Extra classes for the breadcrumb link/crumb text (font size, etc.).
    * Applied to the crumb text while keeping its existing color and spacing. */
   breadcrumbLinkClassName?: string;
@@ -66,6 +69,7 @@ export function PageHeader({
   placement = "center",
   exactCenter = false,
   topPadding,
+  leftPadding,
   breadcrumbLinkClassName,
   textColor,
   className,
@@ -74,7 +78,7 @@ export function PageHeader({
     textColor ?? (navyText ? "navy" : "white");
 
   const toneClasses: Record<
-    "white" | "navy" | "slate" | "green" | "pureWhite",
+    "white" | "navy" | "slate" | "green" | "pureWhite" | "gold",
     {
       breadcrumb: string;
       hover: string;
@@ -116,13 +120,25 @@ export function PageHeader({
       description: "text-[#10B981]/90",
       glow: "[text-shadow:0_1px_1px_rgba(12,10,8,0.5),0_0_3px_rgba(12,10,8,0.35),0_0_8px_rgba(12,10,8,0.28)]",
     },
+    /** Brand gold — the same `--gold` token that surfaces the Home hero
+     *  navigation arrow buttons (`from-gold-light via-gold to-gold-dark`),
+     *  reused verbatim so both heroes share one exact value. Keeps the
+     *  `pureWhite` dark halo so gold copy stays legible over bright imagery. */
+    gold: {
+      breadcrumb: "text-gold",
+      hover: "hover:text-gold",
+      current: "text-gold",
+      heading: "text-gold",
+      description: "text-gold",
+      glow: "[text-shadow:0_1px_1px_rgba(12,10,8,0.5),0_0_3px_rgba(12,10,8,0.35),0_0_8px_rgba(12,10,8,0.28)]",
+    },
   pureWhite: {
       breadcrumb: "text-white",
       hover: "hover:text-white",
       current: "text-white",
       heading: "text-white",
       description: "text-white",
-      glow: "[text-shadow:0_1px_1px_rgba(12,10,8,0.5),0_0_3px_rgba(12,10,8,0.35),0_0_8px_rgba(12,10,8,0.28)]",
+      glow: "",
     },
   };
   const toneClass = toneClasses[tone];
@@ -146,9 +162,9 @@ export function PageHeader({
         className={backdropClassName}
         imageClassName={imageClassName}
       />
-      <Container className="relative">
-        {placement === "top-left" ? (
-          <div className="relative w-full pr-4 sm:pr-6 lg:-ml-32 lg:pr-8">
+      {placement === "top-left" ? (
+        <div className="relative w-full">
+          <div className={cn("relative w-full pr-4 sm:pr-6 lg:pr-8", leftPadding ?? "lg:-ml-32")}>
             <div className={cn(topPadding ?? "pt-16 sm:pt-20 lg:pt-24", "pb-10")}>
               <div className="relative">
                 {textScrim && (
@@ -159,16 +175,134 @@ export function PageHeader({
                 )}
                 {/* Breadcrumbs */}
                 {breadcrumbs && breadcrumbs.length > 0 && (
-                <nav aria-label="Breadcrumb" className="mb-4">
+                  <nav aria-label="Breadcrumb" className="mb-2">
+                    <ol
+                      className={cn(
+                        "flex items-center gap-1.5 text-xs sm:text-sm",
+                        textColor
+                          ? toneClass.breadcrumb
+                          : navyText
+                            ? "text-navy-dark/75"
+                            : "text-gold-light/70",
+                        textColor ? toneClass.glow : ""
+                      )}
+                    >
+                      <li>
+                        <Link
+                          href="/"
+                          className={cn(
+                            "transition-colors",
+                            textColor
+                              ? toneClass.hover
+                              : navyText
+                                ? "hover:text-navy-dark"
+                                : "hover:text-gold-light",
+                            breadcrumbLinkClassName
+                          )}
+                        >
+                          Home
+                        </Link>
+                      </li>
+                      {breadcrumbs.map((crumb, index) => (
+                        <li key={`breadcrumb-${crumb.href}`} className="flex items-center gap-1.5">
+                          <span aria-hidden="true">/</span>
+                          {index === breadcrumbs.length - 1 ? (
+                            <span
+                              className={cn(
+                                textColor
+                                  ? toneClass.current
+                                  : navyText
+                                    ? "text-navy-dark"
+                                    : "text-gold-light",
+                                breadcrumbLinkClassName
+                              )}
+                            >
+                              {crumb.label}
+                            </span>
+                          ) : (
+                            <Link
+                              href={crumb.href}
+                              className={cn(
+                                "transition-colors",
+                                textColor
+                                  ? toneClass.hover
+                                  : "hover:text-gold-light",
+                                breadcrumbLinkClassName
+                              )}
+                            >
+                              {crumb.label}
+                            </Link>
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                )}
+
+                <h1
+                  className={cn(
+                    "font-heading font-bold tracking-tight text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]",
+                    textColor
+                      ? toneClass.heading
+                      : navyText
+                        ? "text-navy-dark"
+                        : "text-gold-light",
+                    textColor ? toneClass.glow : ""
+                  )}
+                >
+                  {title}
+                </h1>
+                {description && (
+                  <p
+                    className={cn(
+                      "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg whitespace-pre-wrap",
+                      textColor
+                        ? toneClass.description
+                        : navyText
+                          ? "text-navy-dark/85"
+                          : "text-gold-light/85",
+                      textColor ? toneClass.glow : ""
+                    )}
+                  >
+                    {description}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Container className="relative">
+          <div
+            className={cn(
+              exactCenter
+                ? "flex w-full justify-center"
+                : "py-12 sm:py-16 lg:py-20"
+            )}
+            style={exactCenter ? { transform: "translateY(30px)" } : undefined}
+          >
+            <div
+              className={cn(
+                exactCenter
+                  ? "flex w-fit flex-col items-center justify-center text-center pt-6 sm:pt-8"
+                  : "",
+                topPadding
+              )}
+            >
+              {textScrim && (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-0 -top-12 -bottom-8 w-[46rem] max-w-full -ml-2 bg-[radial-gradient(ellipse_80%_85%_at_18%_42%,color-mix(in_oklab,var(--navy-dark)_18%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_7%,transparent)_50%,transparent_76%)]"
+                />
+              )}
+              {/* Breadcrumbs */}
+              {breadcrumbs && breadcrumbs.length > 0 && (
+                <nav aria-label="Breadcrumb" className="mb-1">
                   <ol
                     className={cn(
                       "flex items-center gap-1.5 text-xs sm:text-sm",
-                      textColor
-                        ? toneClass.breadcrumb
-                        : navyText
-                          ? "text-navy-dark/75"
-                          : "text-gold-light/70",
-                      textColor ? toneClass.glow : ""
+                      toneClass.breadcrumb,
+                      toneClass.glow
                     )}
                   >
                     <li>
@@ -176,11 +310,7 @@ export function PageHeader({
                         href="/"
                         className={cn(
                           "transition-colors",
-                          textColor
-                            ? toneClass.hover
-                            : navyText
-                              ? "hover:text-navy-dark"
-                              : "hover:text-gold-light",
+                          toneClass.hover,
                           breadcrumbLinkClassName
                         )}
                       >
@@ -193,11 +323,7 @@ export function PageHeader({
                         {index === breadcrumbs.length - 1 ? (
                           <span
                             className={cn(
-                              textColor
-                                ? toneClass.current
-                                : navyText
-                                  ? "text-navy-dark"
-                                  : "text-gold-light",
+                              toneClass.current,
                               breadcrumbLinkClassName
                             )}
                           >
@@ -208,9 +334,7 @@ export function PageHeader({
                             href={crumb.href}
                             className={cn(
                               "transition-colors",
-                              textColor
-                                ? toneClass.hover
-                                : "hover:text-gold-light",
+                              toneClass.hover,
                               breadcrumbLinkClassName
                             )}
                           >
@@ -226,12 +350,8 @@ export function PageHeader({
               <h1
                 className={cn(
                   "font-heading font-bold tracking-tight text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]",
-                  textColor
-                    ? toneClass.heading
-                    : navyText
-                      ? "text-navy-dark"
-                      : "text-gold-light",
-                  textColor ? toneClass.glow : ""
+                  toneClass.heading,
+                  toneClass.glow
                 )}
               >
                 {title}
@@ -239,118 +359,18 @@ export function PageHeader({
               {description && (
                 <p
                   className={cn(
-                    "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg",
-                    textColor
-                      ? toneClass.description
-                      : navyText
-                        ? "text-navy-dark/85"
-                        : "text-gold-light/85",
-                    textColor ? toneClass.glow : ""
+                    "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg whitespace-pre-wrap",
+                    toneClass.description,
+                    toneClass.glow
                   )}
                 >
                   {description}
                 </p>
               )}
-              </div>
             </div>
           </div>
-        ) : (
-        <div
-          className={cn(
-            exactCenter
-              ? "flex w-full justify-center pt-6 sm:pt-8"
-              : "py-12 sm:py-16 lg:py-20"
-          )}
-        >
-          <div
-            className={cn(
-              "relative",
-              exactCenter &&
-                "flex w-fit flex-col items-center justify-center text-center"
-            )}
-          >
-            {textScrim && (
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 -top-12 -bottom-8 w-[46rem] max-w-full -ml-2 bg-[radial-gradient(ellipse_80%_85%_at_18%_42%,color-mix(in_oklab,var(--navy-dark)_18%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_7%,transparent)_50%,transparent_76%)]"
-              />
-            )}
-            {/* Breadcrumbs */}
-            {breadcrumbs && breadcrumbs.length > 0 && (
-            <nav aria-label="Breadcrumb" className="mb-4">
-              <ol
-                className={cn(
-                  "flex items-center gap-1.5 text-xs sm:text-sm",
-                  toneClass.breadcrumb,
-                  toneClass.glow
-                )}
-              >
-                <li>
-                  <Link
-                    href="/"
-                    className={cn(
-                      "transition-colors",
-                      toneClass.hover,
-                      breadcrumbLinkClassName
-                    )}
-                  >
-                    Home
-                  </Link>
-                </li>
-                {breadcrumbs.map((crumb, index) => (
-                  <li key={`breadcrumb-${crumb.href}`} className="flex items-center gap-1.5">
-                    <span aria-hidden="true">/</span>
-                    {index === breadcrumbs.length - 1 ? (
-                      <span
-                        className={cn(
-                          toneClass.current,
-                          breadcrumbLinkClassName
-                        )}
-                      >
-                        {crumb.label}
-                      </span>
-                    ) : (
-                      <Link
-                        href={crumb.href}
-                        className={cn(
-                          "transition-colors",
-                          toneClass.hover,
-                          breadcrumbLinkClassName
-                        )}
-                      >
-                        {crumb.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
-
-          <h1
-            className={cn(
-              "font-heading font-bold tracking-tight text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]",
-              toneClass.heading,
-              toneClass.glow
-            )}
-          >
-            {title}
-          </h1>
-          {description && (
-            <p
-              className={cn(
-                "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg",
-                toneClass.description,
-                toneClass.glow
-              )}
-            >
-              {description}
-            </p>
-          )}
-          </div>
-        </div>
-        )}
-      </Container>
+        </Container>
+      )}
     </section>
   );
 }

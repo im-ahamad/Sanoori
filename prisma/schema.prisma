@@ -66,6 +66,11 @@ model Product {
   availability     Availability   @default(ON_REQUEST)
   featured         Boolean        @default(false)
   isActive         Boolean        @default(true)
+  material         String?
+  size             String?
+  colorFinish      String?
+  showOnHome       Boolean        @default(true)
+  showOnProducts   Boolean        @default(true)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   inquiries        Inquiry[]
@@ -143,8 +148,8 @@ model AdminVerification {
 }
 
 enum UserRole {
-  SUPER_ADMIN
   ADMIN
+  SUPER_ADMIN
   JUNIOR_ADMIN
   STAFF
 }

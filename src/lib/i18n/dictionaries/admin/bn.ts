@@ -462,5 +462,128 @@ deleteProduct: "পণ্য মুছুন",
     permissionAdminUsersWrite: "অ্যাডমিন ইউজার তৈরি/সম্পাদনা",
     permissionAdminUsersDelete: "অ্যাডমিন ইউজার মুছে ফেলা",
     permissionAdminUsersManageRoles: "অ্যাডমিন ভূমিকা পরিচালনা",
+
+    // New Product page
+    backToProducts: "পণ্যগুলোর পসে ফিরুন",
+    newProduct: "নতুন পণ্য",
+    newProductDesc: "আপনার ক্যাটালগে একটি নতুন পণ্য যোগ করুন। সব কিছুরপরেও পরে পরিবর্তন করা যাবে।",
+    couldNotLoadCategoriesDesc: "আপনার বিভাগগুলো লোড করা যায়নি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।",
+    noCategoriesYetDesc: "পণ্য যোগ করার আগে কমপক্ষে একটি বিভাগ থাকতে হবে। বিভাগ ব্যবস্থাপনা পরবর্তী ধাপে যোগ হবে।",
+
+    // Product Form - Basic Information
+    basicInformationDesc: "পণ্যের নাম ও স্লাগ ক্যাটালগ জুড়ে এবং পণ্যের URL-এ ব্যবহার হয়।",
+    namePlaceholder: "যেমন: দেয়াল-মাউন্ট কমোড",
+    slugPlaceholder: "যেমন: দেওয়াল-মাউন্ট-কমোড",
+    productCodePlaceholder: "ঐচ্ছিক, যেমন: SW-100",
+
+    // Product Form - Category & Availability
+    categoryAvailabilityDesc: "পণ্য ক্যাটালগে কোথায় থাকবে এবং কীভাবে অর্ডার করা যাবে।",
+    selectCategory: "একটি বিভাগ নির্বাচন করুন",
+    noSubcategories: "এই বিভাগে কোনো উপ-বিভাগ নেই",
+    selectCategoryFirst: "প্রথমে একটি বিভাগ নির্বাচন করুন",
+    subcategoryHint: "নির্বাচিত বিভাগের শুধু উপ-বিভাগগুলোই উপলব্ধ।",
+    featuredProductDesc: "এই পণ্যকে পাবলিক ক্যাটালগে হাইলাইট করুন।",
+    productActiveDesc: "নিষ্ক্রিয় পণ্য পাবলিক ক্যাটালগে লুকানো থাকে।",
+    showOnHome: "হোম পেজে দেখান",
+    showOnHomeDesc: "এই পণ্যকে হোম পেজের শোকেসতে যোগ করুন।",
+    showOnProducts: "পণ্য পেজে দেখান",
+    showOnProductsDesc: "এই পণ্যকে মূল পণ্য তালিকাতে যোগ করুন।",
+
+    // Product Form - Description
+    descriptionPlaceholder: "পূর্ণ পণ্য বিবরণ। সাদা টেক্সট বাড়তি — রিচ ফরম্যাটিং পরে আসবে।",
+
+    // Product Form - Physical Attributes
+    physicalAttributes: "শারীরিক বৈশিষ্ট্য",
+    physicalAttributesDesc: "ফিল্টারিং ও প্রদর্শনের জন্য ঐচ্ছিক কাঠামোবদ্ধ বৈশিষ্ট্য।",
+    material: "ম‍্যাটেরিয়াল",
+    materialPlaceholder: "যেমন: পর্সিলেইন",
+    size: "সাইজ",
+    sizePlaceholder: "যেমন: ৬০০×৬০০ মিমি",
+    colorFinish: "রঙ / ফিনিশ",
+    colorFinishPlaceholder: "যেমন: সাদা গ্লস",
+    madeIn: "তৈরি হয়েছে",
+    madeInPlaceholder: "যেমন: বাংলাদেশ",
+
+    // Product Form - Features & Specifications
+    featuresSpecifications: "বিশেষত্ব ও স্পেসিফিকেশন",
+    featuresSpecificationsDesc: "ক্যাটালগ জুড়ে পঠনযোগ্যভাবে দেখানো কাঠামোবদ্ধ ডেটা।",
+    featuresPlaceholder: "প্রতি লাইনে একটি বৈশিষ্ট্য, যেমন\nজল-প্রতিরোধী গ্লেজ\nসহজ পরিষ্কার সারফেস",
+    specificationsPlaceholder: "যেমন ম‍্যাটেরিয়াল: সেরামিক",
+    noItemsYet: "এখনো কোনো {label} নেই। শুরু করতে একটি যোগ করুন।",
+    addItem: "যোগ করুন",
+
+    // Product Form - Images
+    imagesSectionDesc: "পণ্যের ছবি। প্রথম ছবি ক্যাটালগ জুড়ে প্রধান ছবি হিসেবে দেখানো হয়।",
+    addProductImages: "পণ্যের ছবি যোগ করুন",
+    dropImagesHint: "এখানে ছবি টেনে আনুন বা ব্রাউজ করতে ক্লিক করুন। JPG, PNG বা WebP, প্রতি ছবি সর্বোচ্চ {size} MB, মোট {max} ছবি।",
+    primaryLabel: "প্রধান",
+    imageLimitReached: "ছবির লিমিট পৌঁছেছে",
+
+    // Category forms
+    backToCategories: "বিভাগগুলোর পসে ফিরুন",
+    newCategory: "নতুন বিভাগ",
+    newCategoryDesc: "পণ্য সংগঠিত করার জন্য একটি নতুন বিভাগ তৈরি করুন।",
+    editCategoryTitle: "বিভাগ সম্পাদনা করুন",
+    editCategoryDesc: "নিচে বিভাগের বিবরণ আপডেট করুন।",
+    categoryNamePlaceholder: "যেমন: স্যানিটারি ওয়্যার",
+    categorySlugPlaceholder: "যেমন: sanitary-ware",
+    categorySlugHint: "ছোট হাতের অক্ষর, সংখ্যা এবং হাইফেন মাত্র। URL-এ ব্যবহৃত হয়।",
+    categoryDescriptionPlaceholder: "এই বিভাগের জন্য ঐচ্ছিক বিবরণ",
+    categoryImageLabel: "ছবির URL",
+    categoryImagePlaceholder: "https://example.com/image.jpg",
+    categoryImageHint: "বিভাগ প্রদর্শনের জন্য ঐচ্ছিক ছবি।",
+    categoryDisplayOrderLabel: "প্রদর্শন ক্রম",
+    categoryDisplayOrderHint: "কম সংখ্যা আগে দেখাবে।",
+    categoryActiveHint: "নিষ্ক্রিয় বিভাগ পাবলিক ক্যাটালগে লুকানো থাকে।",
+    createCategory: "বিভাগ তৈরি করুন",
+    savingCategory: "তैयরি হচ্ছে…",
+
+    // Subcategory forms
+    backToSubcategories: "উপ-বিভাগগুলোর পসে ফিরুন",
+    newSubcategory: "নতুন উপ-বিভাগ",
+    newSubcategoryDesc: "বিভাগের মধ্যে পণ্য সংগঠিত করার জন্য একটি নতুন উপ-বিভাগ তৈরি করুন।",
+    editSubcategoryTitle: "উপ-বিভাগ সম্পাদনা করুন",
+    editSubcategoryDesc: "নিচে উপ-বিভাগের বিবরণ আপডেট করুন।",
+    selectCategoryPlaceholder: "একটি বিভাগ নির্বাচন করুন",
+    noCategoriesAvailable: "কোনো সক্রিয় বিভাগ উপলব্ধ নেই",
+    createSubcategory: "উপ-বিভাগ তৈরি করুন",
+    savingSubcategory: "তैयরি হচ্ছে…",
+
+    // Admin Users new/edit
+    backToAdminUsers: "অ্যাডমিন ইউজারগুলোর পসে ফিরুন",
+    newAdminTitle: "নতুন অ্যাডমিন",
+    newAdminDesc: "অ্যাডমিন প্যানেলের জন্য একটি নতুন অ্যাডমিনিস্ট্রেটর যোগ করুন। їহন দিয়ে ADMIN ভূমিকা পাবেন।",
+    editAdminTitle: "অ্যাডমিন সম্পাদনা করুন",
+    editAdminDesc: "অ্যাডমিনিস্ট্রেটর অ্যাকাউন্টের বিবরণ আপডেট করুন। পাসওয়ার্ড এখানে থেকে পরিবর্তন করা যাবে না।",
+    adminNamePlaceholder: "যেমন: জন ডো",
+    adminEmailPlaceholder: "admin@example.com",
+    adminStatusHint: "নিষ্ক্রিয় অ্যাডমিন অ্যাডমিন প্যানেলে সাইন ইন করতে পারবেন না।",
+
+    // Product Edit page
+    editProductTitle: "পণ্য সম্পাদনা করুন",
+    editProductDesc: "“{name}”-এর বিবরণ আপডেট করুন। পরিবর্তনগুলো পাবলিক ক্যাটালগে পরে দেখায়।",
+    productUpdatedFlash: "পণ্য সফলভাবে আপডেট হয়েছে।",
+
+    // Order Detail page
+    backToOrders: "অর্ডারগুলোর পসে ফিরুন",
+    orderDetailsTitle: "অর্ডার বিবরণ",
+    customerNameLabel: "নাম",
+    customerSectionTitle: "গ্রাহক",
+    productSectionTitle: "পণ্য",
+    contactSectionTitle: "যোগাযোগ",
+    updateStatusTitle: "স্ট্যাটাস আপডেট করুন",
+    emailNotProvided: "দেয়া নেই",
+
+    // Inquiry Status
+    updateStatusButton: "স্ট্যাটাস আপডেট করুন",
+    updatingStatus: "আপডেট হচ্ছে…",
+
+    // Inquiry Contact Actions
+    callButton: "কল করুন",
+    emailButton: "ইমেইল",
+    whatsappButton: "ওয়াহটসঅ্যাপ",
+
+    // Placeholder page
+    comingSoonTitle: "শীঘ্রই আসছে",
   },
 } as const;

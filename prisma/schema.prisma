@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  name          String?
-  email         String   @unique
-  passwordHash  String
-  role          UserRole @default(ADMIN)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  emailVerified Boolean  @default(false)
-  permissions   Json     @default("[]")
+  id              String           @id @default(cuid())
+  name            String?
+  email           String           @unique
+  passwordHash    String
+  role            UserRole         @default(ADMIN)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  emailVerified   Boolean          @default(false)
+  permissions     Json             @default("[]")
+  loginChallenges LoginChallenge[]
 
   @@map("users")
 }
@@ -52,30 +53,30 @@ model Subcategory {
 }
 
 model Product {
-  id               String         @id @default(cuid())
-  name             String
-  slug             String         @unique
-  productCode      String?        @unique
-  categoryId       String
-  subcategoryId    String?
-  description      String?
-  features         String[]
-  specifications   String[]
-  madeIn           String?
-  availability     Availability   @default(ON_REQUEST)
-  featured         Boolean        @default(false)
-  isActive         Boolean        @default(true)
-  material         String?
-  size             String?
-  colorFinish      String?
-  showOnHome       Boolean        @default(true)
-  showOnProducts   Boolean        @default(true)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  inquiries        Inquiry[]
-  images           ProductImage[]
-  category         Category       @relation(fields: [categoryId], references: [id])
-  subcategory      Subcategory?   @relation(fields: [subcategoryId], references: [id])
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  productCode    String?        @unique
+  categoryId     String
+  subcategoryId  String?
+  description    String?
+  features       String[]
+  availability   Availability   @default(ON_REQUEST)
+  featured       Boolean        @default(false)
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  colorFinish    String?
+  material       String?
+  showOnHome     Boolean        @default(true)
+  showOnProducts Boolean        @default(true)
+  size           String?
+  madeIn         String?
+  specifications String[]
+  inquiries      Inquiry[]
+  images         ProductImage[]
+  category       Category       @relation(fields: [categoryId], references: [id])
+  subcategory    Subcategory?   @relation(fields: [subcategoryId], references: [id])
 
   @@index([categoryId])
   @@index([subcategoryId])
@@ -144,6 +145,22 @@ model AdminVerification {
   createdAt DateTime @default(now())
 
   @@map("admin_verifications")
+}
+
+model LoginChallenge {
+  id              String    @id @default(cuid())
+  userId          String
+  otpHash         String
+  expiresAt       DateTime
+  attempts        Int       @default(0)
+  verifiedAt      DateTime?
+  sessionIssuedAt DateTime?
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("login_challenges")
 }
 
 enum UserRole {

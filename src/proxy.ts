@@ -3,40 +3,46 @@ import { NextResponse } from "next/server";
 import { authConfig } from "@/lib/auth.config";
 
 /**
- * Edge runtime — optimistic auth gate for /admin (defense in depth only).
+ * Edge runtime — security headers only.
  *
- * The real security boundary is the admin layout (src/app/admin/layout.tsx),
- * which validates the session again server-side on the Node.js runtime.
- * This proxy only upgrades UX: unauthenticated visitors are redirected to the
- * login page before the dashboard shell has a chance to render.
+ * Sets X-Frame-Options per route:
+ * - DENY for /admin/* and /secure-admin
+ * - SAMEORIGIN for public routes
+ *
+ * Auth checks and redirects are handled by the admin layout (server-side)
+ * and /secure-admin page — this middleware is defense in depth for headers only.
  */
 const { auth } = NextAuth(authConfig);
 
+function isAdminRoute(pathname: string): boolean {
+  return pathname === "/secure-admin" || pathname.startsWith("/admin/");
+}
+
+const adminFrameOptions = { "X-Frame-Options": "DENY" };
+const publicFrameOptions = { "X-Frame-Options": "SAMEORIGIN" };
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
+  const isAdmin = isAdminRoute(pathname);
 
-  if (pathname === "/admin/login") {
-    return new NextResponse(null, { status: 404 });
+  // Only set security headers — auth/redirects handled by pages/layout
+  if (isAdmin) {
+    return NextResponse.next({ headers: { "X-Frame-Options": "DENY" } });
   }
 
-  if (pathname === "/secure-admin") {
-    if (req.auth) {
-      return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
-    }
-    const res = NextResponse.next();
-    res.headers.set("X-Frame-Options", "DENY");
-    return res;
-  }
-
-  if (!req.auth) {
-    return NextResponse.redirect(new URL("/secure-admin", req.nextUrl.origin));
-  }
-
-  const res = NextResponse.next();
-  res.headers.set("X-Frame-Options", "DENY");
-  return res;
+  // Public routes — allow same-origin framing
+  return NextResponse.next({ headers: { "X-Frame-Options": "SAMEORIGIN" } });
 });
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, robots.txt (static files)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt).*)",
+  ],
 };

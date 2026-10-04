@@ -126,6 +126,11 @@
   --gold-dark: oklch(0.60 0.15 75);
   --gold-text: oklch(0.30 0.15 80);
 
+  /* Scrollbars — visible but subtle on light surfaces */
+  --scrollbar-track: oklch(0.95 0.005 260);
+  --scrollbar-thumb: oklch(0.70 0.006 260);
+  --scrollbar-thumb-hover: oklch(0.58 0.006 260);
+
   /* Logo colors — adapt to theme for visibility */
   --logo-navy: #082D55;
   --logo-wordmark: #082B50;
@@ -157,29 +162,35 @@
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.13 0.02 250);
-  --foreground: oklch(0.96 0.005 260);
-  --card: oklch(0.17 0.025 250);
-  --card-foreground: oklch(0.96 0.005 260);
-  --primary: oklch(0.55 0.12 250);
+  /* Soft dark theme - not pure black. Soft charcoal/warm grey palette */
+  --background: oklch(0.16 0.02 250);
+  --foreground: oklch(0.97 0.005 260);
+  --card: oklch(0.20 0.02 250);
+  --card-foreground: oklch(0.97 0.005 260);
+  --primary: oklch(0.60 0.13 250);
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.65 0.12 75);
-  --secondary-foreground: oklch(0.12 0.01 260);
-  --muted: oklch(0.18 0.02 250);
-  --muted-foreground: oklch(0.70 0.01 260);
-  --accent: oklch(0.22 0.03 250);
-  --accent-foreground: oklch(0.96 0.005 260);
+  --secondary: oklch(0.68 0.12 75);
+  --secondary-foreground: oklch(0.14 0.01 260);
+  --muted: oklch(0.22 0.02 250);
+  --muted-foreground: oklch(0.78 0.01 260);
+  --accent: oklch(0.25 0.03 250);
+  --accent-foreground: oklch(0.97 0.005 260);
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.25 0.02 250);
-  --input: oklch(0.22 0.02 250);
-  --ring: oklch(0.65 0.12 75);
-  --navy: oklch(0.28 0.05 250);
-  --navy-light: oklch(0.35 0.045 250);
-  --navy-dark: oklch(0.10 0.02 250);
-  --gold: oklch(0.68 0.13 80);
-  --gold-light: oklch(0.78 0.10 85);
-  --gold-dark: oklch(0.58 0.14 75);
-  --gold-text: oklch(0.68 0.13 80);
+  --border: oklch(0.30 0.02 250);
+  --input: oklch(0.25 0.02 250);
+  --ring: oklch(0.68 0.12 75);
+  --navy: oklch(0.32 0.05 250);
+  --navy-light: oklch(0.40 0.045 250);
+  --navy-dark: oklch(0.14 0.02 250);
+  --gold: oklch(0.70 0.13 80);
+  --gold-light: oklch(0.80 0.10 85);
+  --gold-dark: oklch(0.60 0.15 75);
+  --gold-text: oklch(0.70 0.13 80);
+
+  /* Scrollbars — clearly visible against dark surfaces */
+  --scrollbar-track: oklch(0.23 0.02 250);
+  --scrollbar-thumb: oklch(0.55 0.04 250);
+  --scrollbar-thumb-hover: oklch(0.65 0.045 250);
 
   /* Logo colors — light mode values for dark background visibility */
   --logo-navy: #FFFFFF;
@@ -189,19 +200,19 @@
   --logo-gradient-mid: #FFFFFF;
   --logo-gradient-end: #FFFFFF;
 
-  --chart-1: oklch(0.55 0.12 250);
-  --chart-2: oklch(0.65 0.12 75);
-  --chart-3: oklch(0.45 0.03 250);
-  --chart-4: oklch(0.78 0.10 85);
-  --chart-5: oklch(0.40 0.04 250);
-  --sidebar: oklch(0.14 0.02 250);
-  --sidebar-foreground: oklch(0.96 0.005 260);
-  --sidebar-primary: oklch(0.65 0.12 75);
-  --sidebar-primary-foreground: oklch(0.12 0.02 250);
-  --sidebar-accent: oklch(0.20 0.025 250);
-  --sidebar-accent-foreground: oklch(0.96 0.005 260);
-  --sidebar-border: oklch(0.25 0.02 250);
-  --sidebar-ring: oklch(0.65 0.12 75);
+  --chart-1: oklch(0.58 0.12 250);
+  --chart-2: oklch(0.68 0.12 75);
+  --chart-3: oklch(0.48 0.03 250);
+  --chart-4: oklch(0.80 0.10 85);
+  --chart-5: oklch(0.42 0.04 250);
+  --sidebar: oklch(0.18 0.02 250);
+  --sidebar-foreground: oklch(0.97 0.005 260);
+  --sidebar-primary: oklch(0.68 0.12 75);
+  --sidebar-primary-foreground: oklch(0.14 0.02 260);
+  --sidebar-accent: oklch(0.23 0.025 250);
+  --sidebar-accent-foreground: oklch(0.97 0.005 260);
+  --sidebar-border: oklch(0.30 0.02 250);
+  --sidebar-ring: oklch(0.68 0.12 75);
 }
 
 @layer base {
@@ -320,7 +331,11 @@
   @media (prefers-reduced-motion: reduce) {
     .backdrop-zoom,
     .hero-intro,
-    .reveal {
+    .reveal,
+    .fx-float,
+    .fx-glow-pulse,
+    .fx-particle-float,
+    .floating-bubble {
       animation: none;
     }
 
@@ -328,6 +343,91 @@
     .hero-arrow-sheen {
       animation: none;
     }
+  }
+
+  /* === Floating Bubbles Keyframes === */
+  /* Simple, smooth bubble float animations using transform + opacity.
+     Three variants for organic, non-synchronized movement. */
+
+  @keyframes fx-bubble-float-0 {
+    0%   { transform: translate(0, 0) scale(1); opacity: var(--bubble-opacity-base); }
+    25%  { transform: translate(var(--bubble-drift-x), var(--bubble-drift-y)) scale(1.02); opacity: calc(var(--bubble-opacity-base) * 1.15); }
+    50%  { transform: translate(calc(var(--bubble-drift-x) * -0.5), calc(var(--bubble-drift-y) * 0.3)) scale(0.98); opacity: var(--bubble-opacity-base); }
+    75%  { transform: translate(calc(var(--bubble-drift-x) * 0.3), calc(var(--bubble-drift-y) * -0.4)) scale(1.01); opacity: calc(var(--bubble-opacity-base) * 1.1); }
+    100% { transform: translate(0, 0) scale(1); opacity: var(--bubble-opacity-base); }
+  }
+
+  @keyframes fx-bubble-float-1 {
+    0%   { transform: translate(0, 0) scale(1); opacity: var(--bubble-opacity-base); }
+    25%  { transform: translate(calc(var(--bubble-drift-x) * -0.7), calc(var(--bubble-drift-y) * 1.2)) scale(1.03); opacity: calc(var(--bubble-opacity-base) * 1.1); }
+    50%  { transform: translate(var(--bubble-drift-x), calc(var(--bubble-drift-y) * -0.5)) scale(0.97); opacity: calc(var(--bubble-opacity-base) * 0.9); }
+    75%  { transform: translate(calc(var(--bubble-drift-x) * 0.5), var(--bubble-drift-y)) scale(1.02); opacity: var(--bubble-opacity-base); }
+    100% { transform: translate(0, 0) scale(1); opacity: var(--bubble-opacity-base); }
+  }
+
+  @keyframes fx-bubble-float-2 {
+    0%   { transform: translate(0, 0) scale(1); opacity: var(--bubble-opacity-base); }
+    25%  { transform: translate(var(--bubble-drift-x), calc(var(--bubble-drift-y) * 0.8)) scale(0.99); opacity: calc(var(--bubble-opacity-base) * 1.05); }
+    50%  { transform: translate(calc(var(--bubble-drift-x) * -1.1), calc(var(--bubble-drift-y) * -0.3)) scale(1.02); opacity: var(--bubble-opacity-base); }
+    75%  { transform: translate(calc(var(--bubble-drift-x) * 0.6), calc(var(--bubble-drift-y) * 1.1)) scale(1.01); opacity: calc(var(--bubble-opacity-base) * 1.1); }
+    100% { transform: translate(0, 0) scale(1); opacity: var(--bubble-opacity-base); }
+  }
+
+  /* Floating bubble element — renders as a soft translucent bubble with inner glow */
+  .floating-bubble {
+    border-radius: 50%;
+    /* Translucent bubble body with subtle border */
+    background:
+      radial-gradient(
+        ellipse 60% 55% at 35% 35%,
+        hsl(var(--bubble-glow) / 0.35) 0%,
+        hsl(var(--bubble-color) / var(--bubble-opacity-base)) 45%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        transparent 0%,
+        hsl(var(--bubble-border) / 0.15) 100%
+      );
+    /* Subtle inner highlight for "light inside" effect */
+    box-shadow:
+      inset 0 -8px 24px -4px hsl(var(--bubble-glow) / 0.12),
+      inset 0 4px 12px -2px hsl(var(--bubble-glow) / 0.08),
+      0 2px 8px -2px hsl(var(--bubble-color) / 0.05);
+    will-change: transform, opacity;
+  }
+
+  /* Theme-aware scrollbar for the Product View scroll panes
+     (Description / Key Features / Specifications). Colors resolve from
+     --scrollbar-* tokens so they follow light ↔ dark automatically. */
+  .product-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  .product-scroll::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .product-scroll::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track);
+    border-radius: 999px;
+  }
+
+  .product-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .product-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+
+  .product-scroll::-webkit-scrollbar-corner {
+    background-color: transparent;
   }
 
   /* Container utility */

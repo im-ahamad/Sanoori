@@ -1,12 +1,14 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { PackageSearch } from "lucide-react";
 import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/shared/page-header";
 import { SectionHeader } from "@/components/shared/section-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductCard } from "@/components/products/product-card";
+import { VisualBackdrop } from "@/components/shared/visual-backdrop";
+import { cn } from "@/lib/utils";
 import {
   CatalogueFilters,
   type CatalogueFilterValues,
@@ -99,35 +101,89 @@ export default async function ProductsPage({
   const categories = await getPublicCategories();
 
   return (
-    <main className="flex-1">
-      <PageHeader
-        title={t.products.heroTitle}
-        description={t.products.heroDescription}
-        breadcrumbs={[{ label: t.products.breadcrumb, href: "/products" }]}
-        breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
-        backgroundImage={
+    <main className="flex-1 relative">
+      {/* Hero with text centered in left 35% of image */}
+      <section
+        className={cn(
+          "relative overflow-hidden border-b border-white/10 bg-navy-dark text-white",
           categorySlug
-            ? CATEGORY_HERO_IMAGES[categorySlug]
-            : "/images/product-hero.png"
-        }
-        backdropOverlay={
-          categorySlug === "sanitary-ware" || categorySlug === "tiles" || categorySlug === "building-materials"
-            ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_72%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_42%,transparent)_42%,transparent_88%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_76%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_42%,transparent)_45%,color-mix(in_oklab,var(--navy-dark)_8%,transparent)_70%,transparent_82%,transparent_100%)]"
-            : categorySlug
-            ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_42%,transparent_85%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_40%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_78%,transparent_100%)]"
-            : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_84%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_18%,color-mix(in_oklab,var(--navy-dark)_34%,transparent)_42%,color-mix(in_oklab,var(--navy-dark)_10%,transparent)_68%,transparent_84%,transparent_100%)]"
-        }
-        objectFit={categorySlug ? undefined : "object-cover"}
-        objectPosition={
-          categorySlug ? "object-center" : "object-[50%_0%]"
-        }
-        noZoom={!categorySlug}
-        textColor={categorySlug ? "white" : "pureWhite"}
-        exactCenter
-        className={
-          categorySlug ? "pb-24 lg:pb-28" : "min-h-[calc(100vw/3)] pb-[4px]"
-        }
-      />
+            ? "min-h-[20rem] lg:min-h-[28rem] pb-24 lg:pb-28"
+            : "min-h-[calc(100vw/3)] pb-[4px]"
+        )}
+        aria-labelledby="products-hero-heading"
+      >
+        <VisualBackdrop
+          variant="header"
+          src={
+            categorySlug
+              ? CATEGORY_HERO_IMAGES[categorySlug]
+              : "/images/product-hero.png"
+          }
+          overlayClassName={
+            categorySlug === "sanitary-ware" || categorySlug === "tiles" || categorySlug === "building-materials"
+              ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_36%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_21%,transparent)_42%,transparent_88%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_38%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_21%,transparent)_45%,color-mix(in_oklab,var(--navy-dark)_4%,transparent)_70%,transparent_82%,transparent_100%)]"
+              : categorySlug
+              ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_78%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_48%,transparent)_42%,transparent_85%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_82%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_52%,transparent)_40%,color-mix(in_oklab,var(--navy-dark)_12%,transparent)_78%,transparent_100%)]"
+              : "bg-[radial-gradient(ellipse_115%_70%_at_50%_-12%,color-mix(in_oklab,var(--navy-dark)_62%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_44%,transparent)_30%,transparent_68%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_84%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_64%,transparent)_18%,color-mix(in_oklab,var(--navy-dark)_34%,transparent)_42%,color-mix(in_oklab,var(--navy-dark)_10%,transparent)_68%,transparent_84%,transparent_100%)]"
+          }
+          objectFit="object-cover"
+          objectPosition={categorySlug ? "object-center" : "object-[50%_0%]"}
+          noZoom={!categorySlug}
+          priority
+        />
+
+        {/* Hero text block - centered in left 35% of hero */}
+        <div
+          className="absolute inset-0 flex items-center"
+          style={{ width: "35%" }}
+          aria-hidden="true"
+        >
+          <div
+            className="w-full flex flex-col items-center justify-center h-full px-6 text-center"
+            style={categorySlug ? { marginTop: '-100px' } : { marginTop: '-230px' }}
+          >
+            <nav aria-label="Breadcrumb" className="mb-2">
+              <ol className="flex items-center gap-1.5 text-xs sm:text-sm text-white/70 hover:text-white transition-colors">
+                <li>
+                  <Link
+                    href="/"
+                    className="transition-colors hover:text-white"
+                  >
+                    {t.common.home}
+                  </Link>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span aria-hidden="true">/</span>
+                  <span className="text-white">
+                    {categorySlug === "sanitary-ware"
+                      ? t.categories["sanitary-ware"]
+                      : categorySlug === "tiles"
+                      ? t.categories.tiles
+                      : categorySlug === "building-materials"
+                      ? t.categories["building-materials"]
+                      : t.products.breadcrumb}
+                  </span>
+                </li>
+              </ol>
+            </nav>
+            <h1
+              id="products-hero-heading"
+              className="font-heading font-bold tracking-tight text-white text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]"
+            >
+              {categorySlug === "sanitary-ware"
+                ? t.categories["sanitary-ware"]
+                : categorySlug === "tiles"
+                ? t.categories.tiles
+                : categorySlug === "building-materials"
+                ? t.categories["building-materials"]
+                : t.products.heroTitle}
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed sm:text-lg text-white/80 whitespace-pre-wrap">
+              {t.products.heroDescription}
+            </p>
+          </div>
+        </div>
+      </section>
 
       <Container>
         <div className="section-spacing">

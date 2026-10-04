@@ -33,7 +33,7 @@ export default async function AboutPage() {
   const organizationSchema = JSON.stringify(generateOrganizationSchema());
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 relative">
       <AboutHero
         title={t.about.heroTitle}
         description={t.about.heroDescription}

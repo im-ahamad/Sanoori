@@ -43,6 +43,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 interface UploadEntry {
   localKey: string;
@@ -60,30 +61,13 @@ interface ProductImageManagerProps {
   maxImages?: number;
 }
 
-const statusLabel = {
-  signing: "Preparing…",
-  uploading: "Uploading…",
-  saving: "Saving…",
-  done: "Image added",
-  error: "Failed",
-} as const;
-
-function validateFile(file: File): string | null {
-  if (!(IMAGE_ACCEPTED_MIME as readonly string[]).includes(file.type)) {
-    return "Only JPG, PNG, and WebP images are allowed.";
-  }
-  if (file.size > IMAGE_MAX_SIZE_BYTES) {
-    return `Images must be smaller than ${IMAGE_MAX_SIZE_MB} MB.`;
-  }
-  return null;
-}
-
 export function ProductImageManager({
   productId,
   productName,
   initialImages,
   maxImages = IMAGE_MAX_PER_PRODUCT,
 }: ProductImageManagerProps) {
+  const t = useAdminTranslations();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -167,12 +151,12 @@ export function ProductImageManager({
           } else {
             resolve({
               ok: false,
-              error: body?.error?.message ?? "The image upload failed. Please try again.",
+              error: body?.error?.message ?? t.common.uploadError,
             });
           }
         });
         xhr.addEventListener("error", () =>
-          resolve({ ok: false, error: "The image upload failed. Please try again." })
+          resolve({ ok: false, error: t.common.uploadError })
         );
         xhr.open("POST", signed.data.endpoint);
         xhr.send(form);
@@ -226,7 +210,7 @@ export function ProductImageManager({
     const excessErrors: string[] = [];
     if (excess.length > 0) {
       excessErrors.push(
-        `Only ${maxImages} images are allowed per product. ${excess.length} file${excess.length === 1 ? "" : "s"} skipped.`
+        t.common.maxImages.replace("{max}", String(maxImages)) + ` ${excess.length} file${excess.length === 1 ? "" : "s"} ${t.common.filesSkipped}.`
       );
       for (const file of excess) {
         addEntries([
@@ -238,7 +222,7 @@ export function ProductImageManager({
             progress: 0,
             error:
               images.length + activeUploads.length >= maxImages
-                ? `The ${maxImages}-image limit has been reached.`
+                ? t.common.limitReached.replace("{max}", String(maxImages))
                 : excessErrors[0],
           },
         ]);
@@ -310,6 +294,24 @@ export function ProductImageManager({
     if (event.dataTransfer.files) handleFiles(event.dataTransfer.files);
   };
 
+  function validateFile(file: File): string | null {
+    if (!(IMAGE_ACCEPTED_MIME as readonly string[]).includes(file.type)) {
+      return t.common.onlyImagesAllowed;
+    }
+    if (file.size > IMAGE_MAX_SIZE_BYTES) {
+      return t.common.maxSize.replace("{size}", String(IMAGE_MAX_SIZE_MB));
+    }
+    return null;
+  }
+
+  const statusLabel = {
+    signing: t.common.preparing,
+    uploading: t.common.uploading,
+    saving: t.common.savingAlt,
+    done: t.common.imageAdded,
+    error: t.common.error,
+  } as const;
+
   return (
     <div className="space-y-4">
       {notice ? (
@@ -359,12 +361,14 @@ export function ProductImageManager({
           </span>
           <span className="min-w-0">
             <span className="block text-sm font-medium text-foreground">
-              {atLimit ? "Image limit reached" : "Add product images"}
+              {atLimit ? t.common.imageLimitReached : t.common.addProductImages}
             </span>
             <span className="mt-0.5 block text-xs text-muted-foreground">
               {atLimit
-                ? `This product already has ${maxImages} images. Delete one to add another.`
-                : `Drop images here or click to browse. JPG, PNG or WebP, max ${IMAGE_MAX_SIZE_MB} MB each, up to ${maxImages} images.`}
+                ? t.common.maxImages.replace("{max}", String(maxImages)) + `. ${t.common.addProductImages}.`
+                : t.common.dropImagesHint
+                    .replace("{size}", String(IMAGE_MAX_SIZE_MB))
+                    .replace("{max}", String(maxImages))}
             </span>
           </span>
           {!atLimit && !isPending ? (
@@ -431,7 +435,7 @@ export function ProductImageManager({
                   size="icon-sm"
                   className="shrink-0 text-muted-foreground"
                   onClick={() => removeEntry(entry.localKey)}
-                  aria-label={`Dismiss upload error for ${entry.name}`}
+                  aria-label={t.common.dismissError}
                 >
                   <X className="size-4" />
                 </Button>
@@ -448,8 +452,7 @@ export function ProductImageManager({
             <Package className="size-4" aria-hidden="true" />
           </span>
           <p className="text-sm text-muted-foreground">
-            No images yet. Upload the first photo of {productName} above. The
-            first image becomes the product&rsquo;s primary image.
+            {t.common.noImagesYet.replace("{name}", productName)}
           </p>
         </div>
       ) : (
@@ -478,18 +481,20 @@ export function ProductImageManager({
                   )}
                   {image.sortOrder === 0 ? (
                     <span className="absolute left-1 top-1 rounded-md bg-foreground px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-background">
-                      Primary
+                      {t.common.primaryLabel}
                     </span>
                   ) : null}
                 </div>
 
                 <div className="min-w-0 flex-1 space-y-1.5">
-                  <Label htmlFor={`image-alt-${image.id}`}>Image {index + 1} alt text</Label>
+                  <Label htmlFor={`image-alt-${image.id}`}>
+                    {t.common.imageAltLabel.replace("{index}", String(index + 1))}
+                  </Label>
                   <Input
                     id={`image-alt-${image.id}`}
                     value={altValue}
                     maxLength={200}
-                    placeholder={`${productName}`}
+                    placeholder={t.common.imageAltPlaceholder}
                     disabled={Boolean(savingAltIds[image.id])}
                     onChange={(event) =>
                       setAltValues((prev) => ({
@@ -509,8 +514,8 @@ export function ProductImageManager({
                     className="text-xs text-muted-foreground"
                   >
                     {savingAltIds[image.id]
-                      ? "Saving…"
-                      : "Short description for screen readers and search engines."}
+                      ? t.common.savingAlt
+                      : t.common.altTextHint}
                   </p>
                 </div>
 
@@ -521,7 +526,7 @@ export function ProductImageManager({
                     size="icon-sm"
                     disabled={isPending || index === 0}
                     onClick={() => moveImage(index, -1)}
-                    aria-label={`Move image ${index + 1} earlier`}
+                    aria-label={t.common.moveImageEarlier}
                   >
                     <ArrowLeft className="size-4" />
                   </Button>
@@ -531,7 +536,7 @@ export function ProductImageManager({
                     size="icon-sm"
                     disabled={isPending || index === images.length - 1}
                     onClick={() => moveImage(index, 1)}
-                    aria-label={`Move image ${index + 1} later`}
+                    aria-label={t.common.moveImageLater}
                   >
                     <ArrowRight className="size-4" />
                   </Button>
@@ -566,15 +571,13 @@ export function ProductImageManager({
               <AlertDialogMedia>
                 <TriangleAlert className="size-6 text-destructive" aria-hidden="true" />
               </AlertDialogMedia>
-              <AlertDialogTitle>Delete this image?</AlertDialogTitle>
+              <AlertDialogTitle>{t.common.deleteImageConfirm}</AlertDialogTitle>
               <AlertDialogDescription>
-                This permanently removes the image from {productName} and from the
-                image storage. The other images are unaffected. This action cannot
-                be undone.
+                {t.common.deleteImageDesc.replace("{name}", productName)}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isPending}>{t.common.cancel}</AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
@@ -587,7 +590,7 @@ export function ProductImageManager({
                     Deleting…
                   </>
                 ) : (
-                  "Delete image"
+                  t.common.deleteImageAction
                 )}
               </Button>
             </AlertDialogFooter>

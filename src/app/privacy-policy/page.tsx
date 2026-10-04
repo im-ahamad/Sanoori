@@ -30,12 +30,15 @@ export default async function PrivacyPolicyPage() {
   const sections = pp.sections;
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 relative">
       <PageHeader
         title={pp.headerTitle}
         description={pp.headerDescription}
         breadcrumbs={[{ label: pp.breadcrumb, href: "/privacy-policy" }]}
+        backgroundImage="/images/privecy-hero.png"
+        backdropOverlay="bg-black/20"
         objectFit="object-cover"
+        objectPosition="object-[50%_70%]"
       />
 
       <div className="section-spacing">

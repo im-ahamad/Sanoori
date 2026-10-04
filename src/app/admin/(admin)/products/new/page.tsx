@@ -7,6 +7,7 @@ import { SectionError } from "@/components/admin/section-error";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getServerAdminTranslations } from "@/lib/i18n/server-translations";
 
 export const metadata = {
   title: "New Product",
@@ -14,6 +15,7 @@ export const metadata = {
 
 export default async function AdminNewProductPage() {
   const result = await getAdminProductOptions();
+  const t = getServerAdminTranslations();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-6 lg:p-8">
@@ -26,31 +28,31 @@ export default async function AdminNewProductPage() {
           )}
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
-          Back to products
+          {t.common.backToProducts}
         </Link>
         <h1 className="mt-3 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          New product
+          {t.common.newProduct}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add a new product to your catalogue. Everything can be edited later.
+          {t.common.newProductDesc}
         </p>
       </div>
 
       {!result.ok ? (
         <SectionError
-          title="Could not load categories"
-          description="We could not load your categories. Please try again in a moment."
+          title={t.common.couldNotLoadCategories}
+          description={t.common.couldNotLoadCategoriesDesc}
         />
       ) : result.data.length === 0 ? (
         <div className="rounded-lg border border-border bg-background">
           <EmptyState
-            title="No categories yet"
-            description="You need at least one category before you can add products. Category management arrives in a later step."
+            title={t.common.noCategoriesYet}
+            description={t.common.noCategoriesYetDesc}
             icon={<FolderOpen className="size-8 text-muted-foreground" />}
           />
           <div className="flex justify-center pb-10">
             <Button variant="outline" render={<Link href="/admin/products" />}>
-              Back to products
+              {t.common.backToProducts}
             </Button>
           </div>
         </div>

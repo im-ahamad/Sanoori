@@ -86,12 +86,14 @@ export default async function RequestQuotePage({
   }
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 relative">
       <PageHeader
         title={rq.pageTitle}
         description={rq.pageDescription}
         breadcrumbs={[{ label: rq.breadcrumb, href: "/request-quote" }]}
+        backgroundImage="/images/about-hero.png"
         objectFit="object-cover"
+        backdropOverlay="bg-gradient-to-b from-navy-dark/48 via-navy-dark/40 to-navy-dark/33"
       />
 
       <Container>

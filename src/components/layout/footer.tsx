@@ -71,7 +71,7 @@ export async function Footer() {
   const hasEmailParts = emailAt > 0 && emailAt < businessConfig.email.length - 1;
 
   return (
-    <footer className="relative border-t border-stone-200 bg-[#F8F5F0] text-stone-800 dark:border-white/10 dark:bg-[#1B1713] dark:text-stone-200">
+    <footer className="relative border-t border-stone-200 bg-[#F8F5F0] text-stone-800 dark:border-white/10 dark:bg-background dark:text-foreground">
       {/* Hairline accent — echoes the gold strip above the header */}
       <div
         aria-hidden="true"
@@ -203,7 +203,7 @@ export async function Footer() {
       </Container>
 
       {/* ===== LOWER LEVEL — Copyright · Privacy · City · Social ===== */}
-      <div className="border-t border-stone-200 bg-[#F1EBE1] dark:border-white/10 dark:bg-[#161310]">
+      <div className="border-t border-stone-200 bg-[#F1EBE1] dark:border-white/10 dark:bg-muted">
         <Container>
           <div className="flex flex-col items-start gap-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">

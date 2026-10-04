@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
     ].join("; ");
 
     return [
+      // All routes — security headers except X-Frame-Options (set by middleware per-route)
       {
         source: "/:path*",
         headers: [
@@ -37,7 +38,6 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
           },
-          { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
         ],
       },

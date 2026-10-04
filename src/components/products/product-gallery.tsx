@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { productImageHero, productImageThumb } from "@/lib/cloudinary-url";
@@ -18,63 +18,353 @@ interface ProductGalleryProps {
   hideThumbnails?: boolean;
 }
 
+/** Gap kept between the original image and the magnifier panel. */
+const ZOOM_GAP = 12;
+/** Space kept between the panel and the viewport / clipping edges. */
+const ZOOM_EDGE = 16;
+/** Panel width bounds — the panel shrinks when the right side gets tight. */
+const ZOOM_MAX_PANEL = 720;
+const ZOOM_MIN_PANEL = 200;
+/** Preferred magnification, clamped to what the high-resolution source allows. */
+const ZOOM_MAGNIFICATION = 2.5;
+/** Opacity fade only — the zoom movement itself is never animated. */
+const ZOOM_FADE_MS = 150;
+
+/** One magnifier frame, all measurements taken from the rendered `<img>`. */
+interface ZoomFrame {
+  /** Panel position relative to the gallery root. */
+  panelLeft: number;
+  panelTop: number;
+  panelWidth: number;
+  panelHeight: number;
+  /** Lens position relative to the image box. */
+  lensLeft: number;
+  lensTop: number;
+  lensWidth: number;
+  lensHeight: number;
+  /** Magnified source placement inside the panel. */
+  imageLeft: number;
+  imageTop: number;
+  imageWidth: number;
+  imageHeight: number;
+  src: string;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (!(max > min)) return min;
+  return value < min ? min : value > max ? max : value;
+}
+
 /**
- * Responsive image gallery with Amazon-style two-panel magnifier.
- * - Left: Original image at normal size
- * - Right: Zoomed detail panel that follows cursor position
- * - Mobile: Normal image behavior (no zoom panel)
+ * Responsive image gallery with an Amazon-style two-panel magnifier.
+ * - Left: Original image at normal size (unchanged)
+ * - Right: Magnified preview panel overlaying the free space beside the image
+ * - Desktop (fine pointer only): hover to zoom, lens tracks the cursor
+ * - Mobile / touch: normal image behavior (no zoom panel, no lens)
  */
 export function ProductGallery({ images, productName, hideThumbnails }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [zoomPosition, setZoomPosition] = useState<{ x: number; y: number } | null>(null);
-  const [isHovering, setIsHovering] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [canUseZoom, setCanUseZoom] = useState(false);
+  const [zoomFrame, setZoomFrame] = useState<ZoomFrame | null>(null);
+  const [isZoomVisible, setIsZoomVisible] = useState(false);
+
+  const rootRef = useRef<HTMLDivElement>(null);
   const mainImageRef = useRef<HTMLDivElement>(null);
+  const pointerRef = useRef<{ x: number; y: number } | null>(null);
+  const activeRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const fadeRafRef = useRef<number | null>(null);
+  const hideTimerRef = useRef<number | null>(null);
+  const clipElRef = useRef<HTMLElement | null>(null);
+  const headerElRef = useRef<HTMLElement | null>(null);
+  const hiResRef = useRef<{ width: number; height: number } | null>(null);
+
   const selected =
     images[selectedIndex] ?? { id: "fallback", url: "", alt: null };
 
   const selectedAlt =
     selected.alt ?? `${productName} product image ${selectedIndex + 1} of ${images.length}`;
 
-  // Detect mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+  const displayImageUrl = selected.url ? productImageHero(selected.url, 1080) : "";
+  const zoomImageUrl = selected.url ? productImageHero(selected.url, 2000) : "";
+
+  /**
+   * Locate the elements that bound the panel: the nearest clipping ancestor
+   * (so the overlay is never cut off) and the sticky header.
+   */
+  const findAnchors = useCallback(() => {
+    let clipEl: HTMLElement | null = null;
+    let node: HTMLElement | null = rootRef.current;
+    while (node && node !== document.body) {
+      const style = window.getComputedStyle(node);
+      if (
+        /(hidden|clip|auto|scroll)/.test(style.overflowX) ||
+        /(hidden|clip|auto|scroll)/.test(style.overflowY)
+      ) {
+        clipEl = node;
+        break;
+      }
+      node = node.parentElement;
+    }
+    clipElRef.current = clipEl;
+    headerElRef.current = document.querySelector<HTMLElement>("header");
   }, []);
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    setZoomPosition({ x, y });
-    setIsHovering(true);
+  /** Build the next magnifier frame from the live layout. */
+  const computeFrame = useCallback((): ZoomFrame | null => {
+    const root = rootRef.current;
+    const imageBox = mainImageRef.current;
+    const pointer = pointerRef.current;
+    if (!root || !imageBox || !pointer || !displayImageUrl) return null;
+
+    // Measure the actual rendered <img> bounding rectangle — never the container.
+    const imageEl = imageBox.querySelector("img");
+    if (!imageEl) return null;
+    const rect = imageEl.getBoundingClientRect();
+    if (rect.width <= 1 || rect.height <= 1) return null;
+    const rootRect = root.getBoundingClientRect();
+    const boxRect = imageBox.getBoundingClientRect();
+
+    // object-fit: contain → the real image content inside the <img> box.
+    const naturalWidth = imageEl.naturalWidth;
+    const naturalHeight = imageEl.naturalHeight;
+    let contentWidth = rect.width;
+    let contentHeight = rect.height;
+    let contentLeft = 0;
+    let contentTop = 0;
+    if (naturalWidth > 0 && naturalHeight > 0) {
+      const scale = Math.min(rect.width / naturalWidth, rect.height / naturalHeight);
+      contentWidth = naturalWidth * scale;
+      contentHeight = naturalHeight * scale;
+      contentLeft = (rect.width - contentWidth) / 2;
+      contentTop = (rect.height - contentHeight) / 2;
+    }
+    if (contentWidth <= 0 || contentHeight <= 0) return null;
+
+    // Space available to the right: never overflow the page or a clipped ancestor.
+    const clipRect = clipElRef.current?.getBoundingClientRect();
+    const headerRect = headerElRef.current?.getBoundingClientRect();
+    const rightLimit = Math.min(
+      window.innerWidth - ZOOM_EDGE,
+      (clipRect ? clipRect.right : Number.POSITIVE_INFINITY) - ZOOM_EDGE
+    );
+    const bottomLimit = Math.min(
+      window.innerHeight - ZOOM_EDGE,
+      (clipRect ? clipRect.bottom : Number.POSITIVE_INFINITY) - ZOOM_EDGE
+    );
+    const topLimit = Math.max(
+      headerRect ? Math.max(0, headerRect.bottom) : 0,
+      clipRect ? clipRect.top : Number.NEGATIVE_INFINITY
+    );
+
+    // Panel sits immediately right of the image, top aligned with the image.
+    const aspect = contentWidth / contentHeight;
+    const panelWidth = Math.min(
+      rightLimit - rect.right - ZOOM_GAP,
+      (bottomLimit - rect.top) * aspect,
+      (bottomLimit - topLimit) * aspect,
+      ZOOM_MAX_PANEL
+    );
+    if (!Number.isFinite(panelWidth) || panelWidth < ZOOM_MIN_PANEL) return null;
+    const panelHeight = panelWidth / aspect;
+    const panelTopViewport = clamp(rect.top, topLimit, bottomLimit - panelHeight);
+    const panelLeft = rect.right - rootRect.left + ZOOM_GAP;
+
+    // Pointer position inside the real content, clamped at all four edges.
+    const pointerX = clamp(pointer.x - rect.left - contentLeft, 0, contentWidth);
+    const pointerY = clamp(pointer.y - rect.top - contentTop, 0, contentHeight);
+
+    // Magnification: fills the panel, never exceeds the highest-res source.
+    const hiRes = hiResRef.current;
+    const sourceWidth = hiRes ? hiRes.width : naturalWidth;
+    const sourceHeight = hiRes ? hiRes.height : naturalHeight;
+    const source = hiRes && zoomImageUrl ? zoomImageUrl : displayImageUrl;
+    const minMagnitude = Math.max(panelWidth / contentWidth, panelHeight / contentHeight);
+    const maxMagnitude =
+      sourceWidth > 0 && sourceHeight > 0
+        ? Math.min(sourceWidth / contentWidth, sourceHeight / contentHeight)
+        : Number.POSITIVE_INFINITY;
+    const magnitude = Math.max(minMagnitude, Math.min(ZOOM_MAGNIFICATION, maxMagnitude));
+
+    // Lens shares the panel aspect ratio and always fits inside the image.
+    const lensWidth = panelWidth / magnitude;
+    const lensHeight = panelHeight / magnitude;
+    const lensX = clamp(pointerX - lensWidth / 2, 0, contentWidth - lensWidth);
+    const lensY = clamp(pointerY - lensHeight / 2, 0, contentHeight - lensHeight);
+
+    return {
+      panelLeft,
+      panelTop: panelTopViewport - rootRect.top,
+      panelWidth,
+      panelHeight,
+      lensLeft: contentLeft + lensX - (boxRect.left - rect.left),
+      lensTop: contentTop + lensY - (boxRect.top - rect.top),
+      lensWidth,
+      lensHeight,
+      imageLeft: -lensX * magnitude,
+      imageTop: -lensY * magnitude,
+      imageWidth: contentWidth * magnitude,
+      imageHeight: contentHeight * magnitude,
+      src: source,
+    };
+  }, [displayImageUrl, zoomImageUrl]);
+
+  const runUpdate = useCallback(() => {
+    if (!activeRef.current) return;
+    setZoomFrame(computeFrame());
+  }, [computeFrame]);
+
+  /** Coalesce pointer/scroll/resize events into one measurement per frame. */
+  const scheduleUpdate = useCallback(() => {
+    if (rafRef.current !== null) return;
+    rafRef.current = window.requestAnimationFrame(() => {
+      rafRef.current = null;
+      runUpdate();
+    });
+  }, [runUpdate]);
+
+  const stopTracking = useCallback(() => {
+    if (rafRef.current !== null) {
+      window.cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    activeRef.current = false;
+    pointerRef.current = null;
+    stopTracking();
+    if (fadeRafRef.current !== null) {
+      window.cancelAnimationFrame(fadeRafRef.current);
+      fadeRafRef.current = null;
+    }
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    setIsZoomVisible(false);
+    setZoomFrame(null);
+  }, [stopTracking]);
+
+  const activateZoom = (clientX: number, clientY: number) => {
+    pointerRef.current = { x: clientX, y: clientY };
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    if (activeRef.current) {
+      scheduleUpdate();
+      return;
+    }
+    activeRef.current = true;
+    findAnchors();
+    scheduleUpdate();
+    // Fade in only after the first (transparent) panel frame has painted.
+    fadeRafRef.current = window.requestAnimationFrame(() => {
+      fadeRafRef.current = window.requestAnimationFrame(() => {
+        fadeRafRef.current = null;
+        if (activeRef.current) setIsZoomVisible(true);
+      });
+    });
   };
 
-  const handleMouseEnter = () => {
-    if (!isMobile) setIsHovering(true);
+  const deactivateZoom = () => {
+    activeRef.current = false;
+    pointerRef.current = null;
+    stopTracking();
+    if (fadeRafRef.current !== null) {
+      window.cancelAnimationFrame(fadeRafRef.current);
+      fadeRafRef.current = null;
+    }
+    setIsZoomVisible(false);
+    if (hideTimerRef.current !== null) window.clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = window.setTimeout(() => {
+      hideTimerRef.current = null;
+      if (!activeRef.current) setZoomFrame(null);
+    }, ZOOM_FADE_MS + 40);
+  };
+
+  // Zoom only on desktop-class viewports with a fine (mouse/trackpad) pointer —
+  // mobile and touch devices keep the original non-zooming behavior.
+  useEffect(() => {
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => {
+      setCanUseZoom(window.innerWidth >= 1024 && finePointer.matches);
+    };
+    sync();
+    window.addEventListener("resize", sync);
+    finePointer.addEventListener("change", sync);
+    return () => {
+      window.removeEventListener("resize", sync);
+      finePointer.removeEventListener("change", sync);
+    };
+  }, []);
+
+  // Warm up the highest-resolution source so the first hover is instant.
+  useEffect(() => {
+    hiResRef.current = null;
+    if (!zoomImageUrl) return;
+    const loader = new window.Image();
+    loader.decoding = "async";
+    loader.onload = () => {
+      if (loader.naturalWidth === 0) return;
+      hiResRef.current = { width: loader.naturalWidth, height: loader.naturalHeight };
+      if (activeRef.current) scheduleUpdate();
+    };
+    loader.src = zoomImageUrl;
+    return () => {
+      loader.onload = null;
+    };
+  }, [zoomImageUrl, scheduleUpdate]);
+
+  // Keep the magnifier exact while the page scrolls or the viewport changes.
+  useEffect(() => {
+    const onScroll = () => {
+      if (activeRef.current) scheduleUpdate();
+    };
+    const onResize = () => {
+      if (!activeRef.current) return;
+      findAnchors();
+      scheduleUpdate();
+    };
+    window.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("resize", onResize);
+    };
+  }, [findAnchors, scheduleUpdate]);
+
+  // A changed product image (or zoom capability) starts from a clean state.
+  useEffect(() => {
+    return () => resetZoom();
+  }, [selectedIndex, canUseZoom, resetZoom]);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!canUseZoom) return;
+    activateZoom(event.clientX, event.clientY);
+  };
+
+  const handleMouseEnter = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!canUseZoom) return;
+    activateZoom(event.clientX, event.clientY);
   };
 
   const handleMouseLeave = () => {
-    setIsHovering(false);
-    setZoomPosition(null);
+    deactivateZoom();
   };
 
   const handleTouchStart = () => {
-    setIsHovering(false);
-    setZoomPosition(null);
+    deactivateZoom();
   };
 
-  const zoomImageUrl = selected.url ? productImageHero(selected.url, 2000) : null;
-
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_72px] lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start relative">
+    <div
+      ref={rootRef}
+      className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_72px] lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start relative"
+    >
       {/* Main image */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white dark:bg-background">
         {selected.url ? (
           <div
             ref={mainImageRef}
@@ -85,24 +375,26 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
             onTouchStart={handleTouchStart}
           >
             <Image
-              src={productImageHero(selected.url, 1080)}
+              src={displayImageUrl}
               alt={selectedAlt}
               fill
               sizes="(max-width: 1024px) 100vw, 640px"
               unoptimized
               className="object-contain"
+              style={{ objectFit: 'contain' }}
               priority
             />
-            {/* Lens overlay on main image */}
-            {isHovering && zoomPosition && !isMobile && (
+            {/* Lens overlay marking the exact magnified region */}
+            {zoomFrame && (
               <div
-                className="absolute pointer-events-none border-2 border-primary/50 bg-primary/10 rounded"
+                className="absolute pointer-events-none border border-primary/50 bg-primary/10 rounded-[2px]"
                 style={{
-                  width: "100px",
-                  height: "100px",
-                  left: `calc(${zoomPosition.x}% - 50px)`,
-                  top: `calc(${zoomPosition.y}% - 50px)`,
-                  transformOrigin: "center center",
+                  left: zoomFrame.lensLeft,
+                  top: zoomFrame.lensTop,
+                  width: zoomFrame.lensWidth,
+                  height: zoomFrame.lensHeight,
+                  opacity: isZoomVisible ? 1 : 0,
+                  transition: `opacity ${ZOOM_FADE_MS}ms ease-out`,
                 }}
                 aria-hidden="true"
               />
@@ -113,30 +405,39 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
         )}
       </div>
 
-      {/* Zoom panel — appears to the right on desktop when hovering */}
-      {!isMobile && isHovering && zoomPosition && zoomImageUrl && (
+      {/* Zoom panel — overlays the space to the right of the image (desktop only) */}
+      {zoomFrame && (
         <div
-          className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-[45vw] max-w-[700px] min-w-[280px] aspect-square overflow-hidden rounded-lg border border-border bg-muted/50 shadow-xl"
-          style={{ maxHeight: "calc(100vh - 2rem)" }}
-          aria-label="Zoomed product image detail"
+          className="absolute z-40 pointer-events-none overflow-hidden rounded-lg bg-muted/40 shadow-xl"
+          style={{
+            left: zoomFrame.panelLeft,
+            top: zoomFrame.panelTop,
+            width: zoomFrame.panelWidth,
+            height: zoomFrame.panelHeight,
+            opacity: isZoomVisible ? 1 : 0,
+            transition: `opacity ${ZOOM_FADE_MS}ms ease-out`,
+          }}
+          aria-hidden="true"
         >
-          <div className="relative w-full h-full">
-            <Image
-              src={zoomImageUrl}
-              alt={selectedAlt}
-              fill
-              sizes="50vw"
-              unoptimized
-              className={cn(
-                "object-contain transition-transform duration-150 ease-out",
-                "scale-300"
-              )}
-              style={{
-                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-              }}
-              priority
-            />
-          </div>
+          <Image
+            src={zoomFrame.src}
+            alt=""
+            width={Math.max(1, Math.round(zoomFrame.imageWidth))}
+            height={Math.max(1, Math.round(zoomFrame.imageHeight))}
+            sizes="50vw"
+            unoptimized
+            loading="eager"
+            className="absolute max-w-none"
+            style={{
+              left: zoomFrame.imageLeft,
+              top: zoomFrame.imageTop,
+              width: zoomFrame.imageWidth,
+              height: zoomFrame.imageHeight,
+            }}
+          />
+          {/* Outline drawn over the image so the magnified pixels can reach
+              every edge of the panel (a real border would inset them by 1px). */}
+          <div className="absolute inset-0 rounded-lg border border-border" />
         </div>
       )}
 

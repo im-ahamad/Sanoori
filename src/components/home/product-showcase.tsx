@@ -14,16 +14,16 @@ async function getLang(): Promise<"en" | "bn"> {
 }
 
 /**
- * Home page product catalogue preview — premium 4×3 grid system.
+ * Home page product catalogue preview — premium card grid.
  *
  * Structure (desktop lg: 1024px+):
  * 1. SectionHeader - existing intro (eyebrow, title, description)
- * 2. Three category sections (H3 + 4×3 product grid in pink catalogue box)
+ * 2. Three category sections (H3 + 4×3 product grid)
  *    - Sanitary Ware
  *    - Tiles
  *    - Building Materials
  *
- * Mobile/Tablet: preserves original category-block behavior exactly
+ * Mobile/Tablet: cards with name below, consistent styling
  */
 export async function ProductShowcase() {
   const lang = await getLang();
@@ -75,11 +75,11 @@ export async function ProductShowcase() {
                 {categoryLabels[group.category.slug] ?? group.category.name}
               </h3>
 
-              {/* 4×3 Product Grid - continuous subtle grid lines, edge-to-edge */}
-              <div className="grid gap-0 grid-cols-4 border border-[oklch(0.88_0.015_15)] dark:border-[oklch(0.30_0.02_15)] bg-white/80 dark:bg-[oklch(0.17_0.015_15)] rounded-xl overflow-hidden">
+              {/* 4×3 Product Grid - cards wrap tightly around images */}
+              <div className="grid gap-4 lg:gap-5 grid-cols-2 sm:grid-cols-4 items-start">
                 {group.products.slice(0, 12).map((product, productIndex) => (
                   <Reveal key={product.id} delay={productIndex * 0.02}>
-                    <ProductGridCell product={product} />
+                    <ProductCard product={product} />
                   </Reveal>
                 ))}
               </div>
@@ -87,14 +87,14 @@ export async function ProductShowcase() {
           ))}
         </div>
 
-        {/* MOBILE/TABLET: Preserve existing behavior exactly */}
+        {/* MOBILE/TABLET: Cards with names below, consistent styling */}
         <div className="lg:hidden mt-10 space-y-12">
           {orderedBlocks.map((block, groupIndex) => {
             const categorySlug = block.category.slug;
             const CATEGORY_BACKGROUNDS: Record<string, string> = {
-              "sanitary-ware": "bg-[oklch(0.985_0.008_15)] dark:bg-[oklch(0.18_0.015_15)]",
-              tiles: "bg-[oklch(0.99_0.003_85)] dark:bg-[oklch(0.17_0.008_85)]",
-              "building-materials": "bg-[oklch(0.98_0.005_60)] dark:bg-[oklch(0.175_0.01_60)]",
+              "sanitary-ware": "bg-[oklch(0.985_0.008_15)] dark:bg-accent",
+              tiles: "bg-[oklch(0.99_0.003_85)] dark:bg-accent",
+              "building-materials": "bg-[oklch(0.98_0.005_60)] dark:bg-accent",
             };
             const backgroundClass = CATEGORY_BACKGROUNDS[categorySlug] ?? "bg-muted/30";
             const translatedCategoryName =
@@ -108,34 +108,10 @@ export async function ProductShowcase() {
                   </h3>
                   <span className="h-1 w-10 bg-gold/60 shrink-0" aria-hidden="true" />
                 </div>
-                <div className="grid gap-3 lg:gap-4 grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 items-start">
                   {block.productShelf.map((product, productIndex) => (
                     <Reveal key={product.id} delay={productIndex * 0.03}>
-                      <article className="group relative flex-shrink-0">
-                        <Link
-                          href={`/products/${product.slug}`}
-                          className="block overflow-hidden bg-white border border-border rounded-lg shadow-sm transition-all duration-200 hover:shadow-lg hover:border-gold/40 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none motion-reduce:hover:border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                          aria-label={`View ${product.name}`}
-                        >
-                          <div className="relative aspect-[3/4] overflow-hidden bg-muted p-3" aria-hidden="true">
-                            {product.image ? (
-                              // eslint-disable-next-line @next/next/no-img-element -- native img retained for responsive object-contain in padded container; Image fill would alter layout
-                              <img
-                                src={product.image.url}
-                                alt={product.image.alt ?? product.name}
-                                className="object-contain object-center w-full h-full transition-transform duration-300 group-hover:scale-[1.02]"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy via-navy-dark to-navy-dark">
-                                <span className="text-navy-light/50 text-center px-2" aria-hidden="true">
-                                  {product.name}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </Link>
-                      </article>
+                      <ProductCard product={product} />
                     </Reveal>
                   ))}
                 </div>
@@ -164,7 +140,7 @@ export async function ProductShowcase() {
   );
 }
 
-interface ProductGridCellProps {
+interface ProductCardProps {
   product: {
     id: string;
     name: string;
@@ -173,26 +149,36 @@ interface ProductGridCellProps {
   };
 }
 
-function ProductGridCell({ product }: ProductGridCellProps) {
+/**
+ * Product card — thin soft frame wrapping tightly around the image.
+ * - Card: 4px padding, 18px radius, background #F5F6F4 (extremely light)
+ * - Image: 14px radius, object-fit: contain, NO cropping, natural aspect ratio
+ * - No visible border, no heavy shadow
+ * - Name below card, left-aligned, 14px, #1A1A1A, normal weight, 6px gap
+ */
+function ProductCard({ product }: ProductCardProps) {
   return (
-    <article className="group relative flex-shrink-0">
+    <article className="group">
       <Link
         href={`/products/${product.slug}`}
-        className="block overflow-hidden bg-[oklch(0.995_0.003_15)] dark:bg-[oklch(0.16_0.01_15)] transition-all duration-300 hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.08)] hover:border-[oklch(0.72_0.15_80)]/40 motion-reduce:transition-none motion-reduce:hover:shadow-none motion-reduce:hover:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="block group"
         aria-label={`View ${product.name}`}
       >
-        {/* Image container - minimal padding so images reach grid boundaries */}
-        <div className="relative aspect-square overflow-hidden bg-[oklch(0.985_0.004_15)] dark:bg-[oklch(0.17_0.01_15)] p-1" aria-hidden="true">
+        {/* Card frame - thin soft frame wrapping the image */}
+        <div
+          className="relative overflow-hidden rounded-[18px] bg-[#F5F6F4] dark:bg-card p-1 transition-all duration-300 group-hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.04)] motion-reduce:transition-none motion-reduce:hover:shadow-none"
+          aria-hidden="true"
+        >
           {product.image ? (
             // eslint-disable-next-line @next/next/no-img-element -- native img retained for responsive object-contain in padded container; Image fill would alter layout
             <img
               src={product.image.url}
               alt={product.image.alt ?? product.name}
-              className="object-contain object-center w-full h-full transition-transform duration-500 group-hover:scale-[1.02]"
+              className="object-contain object-center w-full h-auto block rounded-[14px] transition-transform duration-500 group-hover:scale-[1.01]"
               loading="lazy"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-navy/5 via-transparent to-navy/5">
+            <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-navy/5 via-transparent to-navy/5 rounded-[14px]">
               <span className="text-navy-light/40 text-center px-3 text-sm leading-snug" aria-hidden="true">
                 {product.name}
               </span>
@@ -200,14 +186,14 @@ function ProductGridCell({ product }: ProductGridCellProps) {
           )}
 
           {/* Subtle warm overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true" />
-        </div>
-
-        {/* Product name - subtle, appears on hover only */}
-        <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <p className="text-xs font-medium text-white truncate">{product.name}</p>
+          <div className="absolute inset-0 bg-gradient-to-t from-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-[14px]" aria-hidden="true" />
         </div>
       </Link>
+
+      {/* Product name - outside the card, below, left-aligned */}
+      <p className="mt-1.5 text-[14px] font-normal text-[#1A1A1A] dark:text-foreground/90 leading-snug truncate max-w-full">
+        {product.name}
+      </p>
     </article>
   );
 }

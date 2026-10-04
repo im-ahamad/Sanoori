@@ -29,12 +29,16 @@ function NavLink({
   /** Marks the catalogue as the site's primary destination. */
   emphasize?: boolean;
 }) {
+  const isHome = href === "/";
+  const Component = isHome ? "a" : Link;
+  const linkProps = isHome ? { href } : { href, prefetch: false };
+
   return (
-    <Link
-      href={href}
+    <Component
+      {...linkProps}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative inline-flex items-center whitespace-nowrap rounded-sm px-0.5 py-1 text-[9px] font-medium leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[10px] sm:px-2 sm:text-[12px] lg:px-2.5 lg:py-1.5 lg:text-[13px]",
+        "group relative inline-flex items-center whitespace-nowrap rounded-sm px-0.5 py-1 text-[10px] font-medium leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[11px] sm:px-2 sm:text-[13px] lg:px-2.5 lg:py-1.5 lg:text-[14px]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground"
@@ -52,7 +56,7 @@ function NavLink({
             : "scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100"
         )}
       />
-    </Link>
+    </Component>
   );
 }
 
@@ -75,7 +79,7 @@ function HeaderLanguageToggle() {
             onClick={() => setLanguage(lang)}
             aria-pressed={active}
             className={cn(
-              "whitespace-nowrap rounded-full px-1 py-0.5 text-[9px] font-semibold leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[10px] sm:px-2 sm:text-[11px]",
+              "whitespace-nowrap rounded-full px-1 py-0.5 text-[10px] font-semibold leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[11px] sm:px-2 sm:text-[12px]",
               active
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
@@ -122,8 +126,8 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full border-b border-border/60 transition-[box-shadow,background-color,border-color,backdrop-filter] duration-300",
         scrolled
-          ? "bg-background/95 shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-background/90"
-          : "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90"
+          ? "bg-[#E8E2D8] shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-[#E8E2D8] dark:bg-[oklch(0.19_0.02_250)] dark:shadow-[0_6px_24px_-12px_rgba(0,0,0,0.4)]"
+          : "bg-[#E8E2D8] backdrop-blur supports-[backdrop-filter]:bg-[#E8E2D8] dark:bg-[oklch(0.21_0.02_250)]"
       )}
     >
       {/* Gold brand accent strip */}
@@ -131,18 +135,18 @@ export function Header() {
 
       {/* ONE horizontal row — logo · nav · theme · language */}
       <Container className="px-2! min-[400px]:px-3! sm:px-6! lg:px-8!">
-        <div className="flex h-9 min-[400px]:h-10 sm:h-11 lg:h-12 items-center justify-between gap-1.5 min-[400px]:gap-3 sm:gap-4">
+        <div className="flex h-11 min-[400px]:h-12 sm:h-13 lg:h-15 items-center justify-between gap-1.5 min-[400px]:gap-3 sm:gap-4">
           {/* Logo */}
-          <Link
+          <a
             href="/"
             aria-label={t.header.ariaLabel.home}
             className="flex shrink-0 items-center"
           >
             <Brand
-              size="sm"
-              className="h-4 min-[400px]:h-5 sm:h-6 lg:h-7 dark:brightness-0 dark:invert"
+              size="md"
+              className="h-6 min-[400px]:h-7 sm:h-8 lg:h-9 dark:brightness-0 dark:invert"
             />
-          </Link>
+          </a>
 
           {/* Navigation — centred in the free space, all links directly visible */}
           <nav
@@ -162,7 +166,7 @@ export function Header() {
 
           <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
             {/* Theme toggle — compact */}
-            <ThemeToggle className="size-7 min-[400px]:size-8" />
+            <ThemeToggle className="size-8 min-[400px]:size-9" />
             {/* Language toggle — compact pill */}
             <HeaderLanguageToggle />
           </div>

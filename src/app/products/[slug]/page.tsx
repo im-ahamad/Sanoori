@@ -122,7 +122,9 @@ export default async function ProductDetailPage({
           { label: products.breadcrumb, href: "/products" },
           { label: product.name, href: detailUrl },
         ]}
+        backgroundImage="/images/about-hero.png"
         objectFit="object-contain sm:object-cover"
+        backdropOverlay="bg-gradient-to-b from-navy-dark/48 via-navy-dark/40 to-navy-dark/33"
       />
 
       <Container>
@@ -131,14 +133,14 @@ export default async function ProductDetailPage({
                 TOP PRODUCT AREA — 2-column: Image (left) | Info (right)
                 Single unified bordered container
            ============================================================ */}
-          <div className="flex flex-col lg:flex-row rounded-2xl border border-border overflow-hidden bg-white">
+          <div className="flex flex-col lg:flex-row rounded-2xl border border-border overflow-hidden bg-card">
             {/* Product Image — LEFT */}
             <div className="flex-1 min-w-0 lg:rounded-l-2xl">
               <ProductGallery images={galleryImages} productName={product.name} hideThumbnails />
             </div>
 
             {/* Right-side — Information SECTION */}
-            <div className="flex-1 min-w-0 bg-gradient-to-b from-rose-50 to-white p-5 lg:p-6 space-y-4 overflow-hidden h-[560px] lg:h-[580px] flex flex-col">
+            <div className="flex-1 min-w-0 bg-gradient-to-b from-rose-50 to-white dark:from-muted dark:to-card p-5 lg:p-6 space-y-4 overflow-hidden h-[560px] lg:h-[580px] flex flex-col">
               {/* Category badges */}
               <div className="flex flex-wrap items-center gap-2.5">
                 <AvailabilityBadge availability={product.availability} />
@@ -213,7 +215,7 @@ export default async function ProductDetailPage({
                 <h2 className="font-heading text-lg font-bold tracking-tight text-foreground">
                   {pd.moreAboutTitle}
                 </h2>
-                <p className="text-sm text-rose-700 font-medium">
+                <p className="text-sm text-rose-700 dark:text-rose-300 font-medium">
                   {pd.moreAboutDescription}
                 </p>
               </div>
@@ -226,7 +228,7 @@ export default async function ProductDetailPage({
                     <h3 className="font-heading text-lg font-bold text-foreground flex-shrink-0">
                       Description
                     </h3>
-                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                    <div className="product-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
                       {product.description}
                     </div>
                   </div>
@@ -236,10 +238,10 @@ export default async function ProductDetailPage({
                 {product.features.length > 0 && (
                   <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
                     <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground flex-shrink-0">
-                      <BadgeCheck className="size-4 text-rose-600" aria-hidden="true" />
+                      <BadgeCheck className="size-4 text-rose-600 dark:text-rose-400" aria-hidden="true" />
                       {pd.keyFeaturesTitle}
                     </h3>
-                    <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                    <div className="product-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
                       {product.features.map((feature, index) => (index > 0 ? "\n" : "") + feature).join("")}
                     </div>
                   </div>
@@ -248,10 +250,10 @@ export default async function ProductDetailPage({
                 {/* Specifications */}
                 <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
                   <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground flex-shrink-0">
-                    <Ruler className="size-4 text-rose-600" aria-hidden="true" />
+                    <Ruler className="size-4 text-rose-600 dark:text-rose-400" aria-hidden="true" />
                     {pd.specificationsTitle}
                   </h3>
-                  <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                  <div className="product-scroll flex-1 min-h-0 overflow-y-auto overflow-x-auto whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
                     {product.specifications.length > 0 ? (
                       product.specifications.map((spec, index) => (index > 0 ? "\n" : "") + spec).join("")
                     ) : (

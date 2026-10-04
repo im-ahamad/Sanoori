@@ -107,10 +107,10 @@ const BTN =
   "group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold tracking-[0.01em] transition-all duration-300 ease-out active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto";
 
 const BTN_CALL =
-  "bg-gold text-navy-dark shadow-[0_14px_28px_-18px_rgba(198,158,74,0.95)] hover:-translate-y-0.5 hover:bg-gold-light hover:shadow-[0_18px_32px_-18px_rgba(198,158,74,0.9)] focus-visible:ring-gold/70 focus-visible:ring-offset-navy-dark";
+  "bg-gold text-navy-dark shadow-[0_14px_28px_-18px_rgba(198,158,74,0.95)] hover:-translate-y-0.5 hover:scale-[1.03] hover:bg-gold hover:shadow-[0_25px_50px_-20px_rgba(198,158,74,1.0)] hover:ring-4 hover:ring-gold/50 focus-visible:ring-gold/70 focus-visible:ring-offset-navy-dark transition-all duration-300 ease-out";
 
 const BTN_WHATSAPP =
-  "bg-[#25D366] text-white shadow-[0_14px_28px_-18px_rgba(37,211,102,0.95)] hover:-translate-y-0.5 hover:bg-[#1EBE5B] hover:shadow-[0_18px_32px_-18px_rgba(37,211,102,0.9)] focus-visible:ring-[#25D366] focus-visible:ring-offset-navy-dark";
+  "bg-[#25D366] text-white shadow-[0_14px_28px_-18px_rgba(37,211,102,0.95)] hover:-translate-y-0.5 hover:scale-[1.03] hover:bg-[#1EBE5B] hover:shadow-[0_25px_50px_-20px_rgba(37,211,102,1.0)] hover:ring-4 hover:ring-[#25D366]/50 focus-visible:ring-[#25D366] focus-visible:ring-offset-navy-dark transition-all duration-300 ease-out";
 
 const BTN_MAP =
   "border border-gold/45 bg-gold/10 text-gold-text hover:-translate-y-0.5 hover:border-gold/75 hover:bg-gold/20 focus-visible:ring-gold/50 focus-visible:ring-offset-card";
@@ -226,12 +226,14 @@ export function ContactPageContent({
         // local /public src (400), and its disk cache already tracks the file —
         // purge .next/**/cache/images to pick up a replaced file.
         backgroundImage="/images/contact-hero.png"
-        backdropOverlay=""
+        backdropOverlay="bg-gradient-to-b from-navy-dark/30 via-navy-dark/25 to-navy-dark/21"
         objectFit="object-cover"
         objectPosition="object-center"
         noZoom
         textColor="white"
-        exactCenter
+        placement="top-left"
+        topPadding="pt-[100px]"
+        leftPadding="pl-[160px]"
         className="lg:aspect-[3/1] lg:box-content lg:min-h-fit"
       />
 
@@ -242,7 +244,7 @@ export function ContactPageContent({
       <section className="relative" aria-labelledby="contact-info-heading">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[#FAF8F3] dark:bg-[oklch(0.152_0.022_250)]"
+          className="pointer-events-none absolute inset-0 bg-[#FAF8F3] dark:bg-muted/50"
         />
         <div
           aria-hidden="true"
@@ -416,10 +418,10 @@ function PrimaryChannelPanel({
     <article
       className={cn(
         "group relative h-full overflow-hidden rounded-2xl",
-        "border border-navy/40 bg-navy-dark text-white",
-        "shadow-[0_1px_2px_rgba(4,12,28,0.20),0_24px_50px_-34px_rgba(4,12,28,0.85)]",
+        "border border-navy/15 bg-navy/60 text-white",
+        "shadow-[0_1px_2px_rgba(4,12,28,0.1),0_24px_50px_-34px_rgba(4,12,28,0.5)]",
         "transition-all duration-300 ease-out",
-        "hover:-translate-y-0.5 hover:border-gold/35 hover:shadow-[0_1px_2px_rgba(4,12,28,0.20),0_30px_56px_-34px_rgba(4,12,28,0.9)]"
+        "hover:-translate-y-0.5 hover:border-gold/25 hover:shadow-[0_1px_2px_rgba(4,12,28,0.1),0_30px_60px_-34px_rgba(4,12,28,0.7)]"
       )}
     >
       <div
@@ -811,7 +813,7 @@ function WhatsAppBand({
 }) {
   return (
     <section
-      className="relative overflow-hidden rounded-3xl border border-navy/50 bg-navy-dark text-white shadow-[0_2px_4px_rgba(4,12,28,0.25),0_36px_70px_-46px_rgba(4,12,28,0.9)]"
+      className="relative overflow-hidden rounded-3xl border border-navy/20 bg-navy/60 text-white shadow-[0_2px_4px_rgba(4,12,28,0.15),0_36px_70px_-46px_rgba(4,12,28,0.6)]"
       aria-labelledby="contact-whatsapp-heading"
     >
       <div

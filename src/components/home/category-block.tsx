@@ -16,9 +16,9 @@ interface CategoryBlockProps {
 }
 
 const CATEGORY_BACKGROUNDS: Record<string, string> = {
-  "sanitary-ware": "bg-[oklch(0.985_0.008_15)] dark:bg-[oklch(0.18_0.015_15)]",
-  tiles: "bg-[oklch(0.99_0.003_85)] dark:bg-[oklch(0.17_0.008_85)]",
-  "building-materials": "bg-[oklch(0.98_0.005_60)] dark:bg-[oklch(0.175_0.01_60)]",
+  "sanitary-ware": "bg-[oklch(0.985_0.008_15)] dark:bg-accent",
+  tiles: "bg-[oklch(0.99_0.003_85)] dark:bg-accent",
+  "building-materials": "bg-[oklch(0.98_0.005_60)] dark:bg-accent",
 };
 
 async function getLang(): Promise<"en" | "bn"> {

@@ -46,13 +46,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <HeadScripts />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col relative">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
         >
           {t.layout.skipToMainContent}
         </a>
+        
         <Providers initialLanguage={lang}>
           <SiteChrome footer={<Footer />} settings={businessSettings}>{children}</SiteChrome>
         </Providers>

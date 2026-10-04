@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 const initialState: ProductActionState = undefined;
 
@@ -81,6 +82,8 @@ function StringArrayEditor({
   onChange,
   errors,
 }: StringArrayEditorProps) {
+  const t = useAdminTranslations();
+
   return (
     <div>
       <div className="flex items-center justify-between gap-2">
@@ -92,14 +95,14 @@ function StringArrayEditor({
           onClick={() => onChange([...rows, ""])}
         >
           <Plus className="size-3" aria-hidden="true" />
-          Add
+          {t.common.addItem}
         </Button>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
 
       {rows.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          No {label.toLowerCase()} yet. Add one to get started.
+          {t.common.noItemsYet.replace("{label}", label.toLowerCase())}
         </p>
       ) : (
         <ul className="mt-3 space-y-2">
@@ -156,6 +159,7 @@ export function ProductForm({
   categories,
   initial,
 }: ProductFormProps) {
+  const t = useAdminTranslations();
   const [state, formAction, pending] = useActionState(action, initialState);
 
   const [name, setName] = useState(initial?.name ?? "");
@@ -246,22 +250,21 @@ export function ProductForm({
               id="section-basic"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Basic information
+              {t.common.basicInformation}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              The product name and slug are used across the catalogue and in
-              product URLs.
+              {t.common.basicInformationDesc}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t.common.name}</Label>
             <Input
               id="name"
               name="name"
               value={name}
               onChange={(event) => onNameChange(event.target.value)}
-              placeholder="e.g. Wall-Mount Commode"
+              placeholder={t.common.namePlaceholder}
               maxLength={200}
               disabled={pending}
               aria-invalid={Boolean(stateErrors?.name)}
@@ -271,7 +274,7 @@ export function ProductForm({
 
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
+              <Label htmlFor="slug">{t.common.slug}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   id="slug"
@@ -281,7 +284,7 @@ export function ProductForm({
                     setSlug(event.target.value);
                     setSlugAuto(false);
                   }}
-                  placeholder="e.g. wall-mount-commode"
+                  placeholder={t.common.slugPlaceholder}
                   maxLength={200}
                   disabled={pending}
                   className="font-mono text-sm"
@@ -294,36 +297,33 @@ export function ProductForm({
                   size="sm"
                   disabled={pending}
                   onClick={regenerateSlug}
-                  title="Regenerate the slug from the product name"
+                  title={t.common.regenerate}
                 >
                   <RefreshCw className="size-3.5" aria-hidden="true" />
-                  <span className="hidden sm:inline">Regenerate</span>
+                  <span className="hidden sm:inline">{t.common.regenerate}</span>
                 </Button>
               </div>
               <p id="slug-hint" className="text-xs text-muted-foreground">
-                URL slug. Lowercase letters, numbers, and dashes only.{" "}
-                {slugAuto
-                  ? "Auto-generated from the name until you edit it."
-                  : ""}
+                {t.common.slugHint}
               </p>
               <FieldError errors={stateErrors?.slug} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="product-code">Product code</Label>
+              <Label htmlFor="product-code">{t.common.productCode}</Label>
               <Input
                 id="product-code"
                 name="productCode"
                 value={productCode}
                 onChange={(event) => setProductCode(event.target.value)}
-                placeholder="Optional, e.g. SW-100"
+                placeholder={t.common.productCodePlaceholder}
                 maxLength={100}
                 disabled={pending}
                 className="font-mono text-sm"
                 aria-invalid={Boolean(stateErrors?.productCode)}
               />
               <p className="text-xs text-muted-foreground">
-                Your internal reference, if you use one. Does not affect URLs.
+                {t.common.productCodeHint}
               </p>
               <FieldError errors={stateErrors?.productCode} />
             </div>
@@ -337,16 +337,16 @@ export function ProductForm({
               id="section-listing"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Category & availability
+              {t.common.categoryAvailability}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Where the product sits in the catalogue and how it can be ordered.
+              {t.common.categoryAvailabilityDesc}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t.common.category}</Label>
               <Select
                 name="categoryId"
                 value={categoryId}
@@ -357,7 +357,7 @@ export function ProductForm({
                   className="w-full"
                   disabled={pending}
                 >
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t.common.selectCategory} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
@@ -371,7 +371,7 @@ export function ProductForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subcategory">Subcategory</Label>
+              <Label htmlFor="subcategory">{t.common.subcategory}</Label>
               {subcategoryOptions.length > 0 ? (
                 <Select
                   name="subcategoryId"
@@ -383,10 +383,10 @@ export function ProductForm({
                     className="w-full"
                     disabled={pending}
                   >
-                    <SelectValue placeholder="None" />
+                    <SelectValue placeholder={t.common.none} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={null}>None</SelectItem>
+                    <SelectItem value={null}>{t.common.none}</SelectItem>
                     {subcategoryOptions.map((subcategory) => (
                       <SelectItem
                         key={subcategory.id}
@@ -405,14 +405,14 @@ export function ProductForm({
                   disabled={pending}
                   placeholder={
                     categoryId
-                      ? "No subcategories for this category"
-                      : "Select a category first"
+                      ? t.common.noSubcategories
+                      : t.common.selectCategoryFirst
                   }
                   className="text-muted-foreground"
                 />
               )}
               <p className="text-xs text-muted-foreground">
-                Only subcategories of the selected category are available.
+                {t.common.subcategoryHint}
               </p>
               <FieldError errors={stateErrors?.subcategoryId} />
             </div>
@@ -420,7 +420,7 @@ export function ProductForm({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="availability">Availability</Label>
+              <Label htmlFor="availability">{t.common.availability}</Label>
               <Select
                 value={availability}
                 onValueChange={(value) =>
@@ -437,7 +437,7 @@ export function ProductForm({
                 <SelectContent>
                   {availabilityValues.map((value) => (
                     <SelectItem key={value} value={value}>
-                      {availabilityLabels[value]}
+                      {t.common[value as keyof typeof t.common] ?? availabilityLabels[value]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -450,10 +450,10 @@ export function ProductForm({
             <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Featured product
+                  {t.common.featuredProduct}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Highlight this product on the public catalogue.
+                  {t.common.featuredProductDesc}
                 </p>
                 <FieldError errors={stateErrors?.featured} />
               </div>
@@ -467,10 +467,10 @@ export function ProductForm({
             <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Product active
+                  {t.common.productActive}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Inactive products are hidden from the public catalogue.
+                  {t.common.productActiveDesc}
                 </p>
                 <FieldError errors={stateErrors?.isActive} />
               </div>
@@ -484,10 +484,10 @@ export function ProductForm({
             <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Show on Home
+                  {t.common.showOnHome}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Include this product in the Home page showcase.
+                  {t.common.showOnHomeDesc}
                 </p>
                 <FieldError errors={stateErrors?.showOnHome} />
               </div>
@@ -501,10 +501,10 @@ export function ProductForm({
             <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  Show on Products
+                  {t.common.showOnProducts}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Include this product in the main Products listing.
+                  {t.common.showOnProductsDesc}
                 </p>
                 <FieldError errors={stateErrors?.showOnProducts} />
               </div>
@@ -524,21 +524,21 @@ export function ProductForm({
               id="section-description"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Description
+              {t.common.description}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Full product details. Plain text is fine — rich formatting comes later.
+              {t.common.descriptionHint}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t.common.description}</Label>
             <Textarea
               id="description"
               name="description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Full product details. Plain text is fine — rich formatting comes later."
+              placeholder={t.common.descriptionPlaceholder}
               rows={8}
               maxLength={20_000}
               disabled={pending}
@@ -555,22 +555,22 @@ export function ProductForm({
               id="section-physical"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Physical attributes
+              {t.common.physicalAttributes}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Optional structured attributes used for filtering and display.
+              {t.common.physicalAttributesDesc}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="material">Material</Label>
+              <Label htmlFor="material">{t.common.material}</Label>
               <Input
                 id="material"
                 name="material"
                 value={material}
                 onChange={(event) => setMaterial(event.target.value)}
-                placeholder="e.g. Porcelain"
+                placeholder={t.common.materialPlaceholder}
                 maxLength={200}
                 disabled={pending}
                 aria-invalid={Boolean(stateErrors?.material)}
@@ -579,13 +579,13 @@ export function ProductForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="size">Size</Label>
+              <Label htmlFor="size">{t.common.size}</Label>
               <Input
                 id="size"
                 name="size"
                 value={size}
                 onChange={(event) => setSize(event.target.value)}
-                placeholder="e.g. 600×600 mm"
+                placeholder={t.common.sizePlaceholder}
                 maxLength={200}
                 disabled={pending}
                 aria-invalid={Boolean(stateErrors?.size)}
@@ -594,13 +594,13 @@ export function ProductForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="color-finish">Color / Finish</Label>
+              <Label htmlFor="color-finish">{t.common.colorFinish}</Label>
               <Input
                 id="color-finish"
                 name="colorFinish"
                 value={colorFinish}
                 onChange={(event) => setColorFinish(event.target.value)}
-                placeholder="e.g. White Gloss"
+                placeholder={t.common.colorFinishPlaceholder}
                 maxLength={200}
                 disabled={pending}
                 aria-invalid={Boolean(stateErrors?.colorFinish)}
@@ -609,13 +609,13 @@ export function ProductForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="made-in">Made in</Label>
+              <Label htmlFor="made-in">{t.common.madeIn}</Label>
               <Input
                 id="made-in"
                 name="madeIn"
                 value={madeIn}
                 onChange={(event) => setMadeIn(event.target.value)}
-                placeholder="e.g. Bangladesh"
+                placeholder={t.common.madeInPlaceholder}
                 maxLength={200}
                 disabled={pending}
                 aria-invalid={Boolean(stateErrors?.madeIn)}
@@ -632,22 +632,22 @@ export function ProductForm({
               id="section-structured"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Features & Specifications
+              {t.common.featuresSpecifications}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Structured data shown readably across the catalogue.
+              {t.common.featuresSpecificationsDesc}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="features">Features</Label>
+            <Label htmlFor="features">{t.common.features}</Label>
             <Textarea
               id="features"
               value={featuresText}
               onChange={(event) =>
                 setFeatures(event.target.value.split("\n"))
               }
-              placeholder={"One feature per line, e.g.\nWater-resistant glaze\nEasy-clean surface"}
+              placeholder={t.common.featuresPlaceholder}
               rows={5}
               disabled={pending}
               aria-invalid={Boolean(stateErrors?.features)}
@@ -655,15 +655,15 @@ export function ProductForm({
             <div className="flex items-center justify-between gap-2">
               <FieldError errors={stateErrors?.features} />
               <p className="ml-auto text-right text-xs text-muted-foreground">
-                One per line
+                {t.common.featuresHint}
               </p>
             </div>
           </div>
 
           <StringArrayEditor
-            label="Specifications"
-            hint="One specification per box, e.g. Material: Ceramic"
-            placeholder="e.g. Material: Ceramic"
+            label={t.common.specifications}
+            hint={t.common.specificationsHint}
+            placeholder={t.common.specificationsPlaceholder}
             rows={specifications}
             onChange={setSpecifications}
             errors={stateErrors?.specifications}
@@ -677,11 +677,10 @@ export function ProductForm({
               id="section-images"
               className="font-heading text-base font-bold tracking-tight text-foreground"
             >
-              Images
+              {t.common.imagesSection}
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Product photos. The first image is the primary image shown across
-              the catalogue.
+              {t.common.imagesSectionDesc}
             </p>
           </div>
 
@@ -697,7 +696,7 @@ export function ProductForm({
                 <Package className="size-4 text-muted-foreground" aria-hidden="true" />
               </div>
               <div className="text-sm text-muted-foreground">
-                Save the product first — you can add images on the next screen.
+                {t.common.saveFirst}
               </div>
             </div>
           )}
@@ -732,21 +731,23 @@ export function ProductForm({
             disabled={pending}
             render={<Link href="/admin/products" />}
           >
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button type="submit" size="lg" disabled={pending}>
             {pending ? (
               <>
                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                {mode === "create" ? "Creating product…" : "Saving changes…"}
+                {mode === "create" ? t.common.creatingProduct : t.common.savingChanges}
               </>
             ) : mode === "create" ? (
               <>
-                Create product
+                {t.common.createProduct}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </>
             ) : (
-              "Save changes"
+              <>
+                {t.common.saveChanges}
+              </>
             )}
           </Button>
         </div>

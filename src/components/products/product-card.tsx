@@ -35,7 +35,7 @@ export function ProductCard({ product, hideAvailabilityBadge = false, variant = 
       className={`
         group flex h-full flex-col overflow-hidden transition-[transform,box-shadow,border-color] duration-300
         ${isShowcase
-          ? "rounded-xl bg-white/80 dark:bg-[oklch(0.18_0.015_15)] shadow-sm hover:-translate-y-1 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] hover:border-gold/30"
+          ? "rounded-xl bg-card shadow-sm hover:-translate-y-1 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] hover:border-gold/30"
           : isGrid
           ? "border-b border-r border-border bg-card"
           : "rounded-lg border border-border bg-card shadow-sm hover:-translate-y-0.5 hover:border-gold-dark/40 hover:shadow-lg"

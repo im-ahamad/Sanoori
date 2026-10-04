@@ -30,9 +30,11 @@ export default async function ContactPage() {
   ]);
 
   return (
-    <ContactPageContent
-      businessSettings={businessSettings}
-      categories={categories.map(({ slug, name }) => ({ slug, name }))}
-    />
+    <div className="relative">
+      <ContactPageContent
+        businessSettings={businessSettings}
+        categories={categories.map(({ slug, name }) => ({ slug, name }))}
+      />
+    </div>
   );
 }

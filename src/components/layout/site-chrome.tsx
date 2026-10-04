@@ -28,7 +28,7 @@ export function SiteChrome({ children, footer, settings }: SiteChromeProps) {
   return (
     <>
       {isAdmin ? null : <Header />}
-      <div id="main-content" className="flex flex-1 flex-col">
+      <div id="main-content" className="flex flex-1 flex-col relative z-10">
         {children}
       </div>
       {isAdmin ? null : (

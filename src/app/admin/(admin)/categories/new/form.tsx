@@ -14,8 +14,10 @@ import {
 } from "@/lib/actions/categories";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
 export function AdminCategoryNewForm() {
+  const t = useAdminTranslations();
   const [state, formAction] = useActionState<
     CreateCategoryActionResult | undefined,
     FormData
@@ -31,15 +33,15 @@ export function AdminCategoryNewForm() {
         )}
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to categories
+        {t.common.backToCategories}
       </Link>
 
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          New Category
+          {t.common.newCategory}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Create a new category to organize your products.
+          {t.common.newCategoryDesc}
         </p>
       </div>
 
@@ -54,59 +56,59 @@ export function AdminCategoryNewForm() {
         )}
 
         <div className="space-y-1.5">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">{t.common.categoryName}</Label>
           <Input
             id="name"
             name="name"
             required
             maxLength={100}
-            placeholder="e.g., Sanitary Ware"
+            placeholder={t.common.categoryNamePlaceholder}
             autoComplete="off"
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="slug">Slug</Label>
+          <Label htmlFor="slug">{t.common.categorySlug}</Label>
           <Input
             id="slug"
             name="slug"
             required
             maxLength={100}
-            placeholder="e.g., sanitary-ware"
+            placeholder={t.common.categorySlugPlaceholder}
             autoComplete="off"
           />
           <p className="text-xs text-muted-foreground">
-            Lowercase letters, numbers, and hyphens only. Used in URLs.
+            {t.common.categorySlugHint}
           </p>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">{t.common.categoryDescription}</Label>
           <Textarea
             id="description"
             name="description"
             maxLength={500}
             rows={3}
-            placeholder="Optional description for this category"
+            placeholder={t.common.categoryDescriptionPlaceholder}
           />
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="image">Image URL</Label>
+          <Label htmlFor="image">{t.common.categoryImageLabel}</Label>
           <Input
             id="image"
             name="image"
             maxLength={500}
-            placeholder="https://example.com/image.jpg"
+            placeholder={t.common.categoryImagePlaceholder}
             autoComplete="off"
           />
           <p className="text-xs text-muted-foreground">
-            Optional image for category display.
+            {t.common.categoryImageHint}
           </p>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="displayOrder">Display Order</Label>
+          <Label htmlFor="displayOrder">{t.common.categoryDisplayOrderLabel}</Label>
           <Input
             id="displayOrder"
             name="displayOrder"
@@ -116,19 +118,19 @@ export function AdminCategoryNewForm() {
             autoComplete="off"
           />
           <p className="text-xs text-muted-foreground">
-            Lower numbers appear first.
+            {t.common.categoryDisplayOrderHint}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Switch id="isActive" name="isActive" checked={true} />
           <Label htmlFor="isActive" className="mb-0">
-            Active
+            {t.common.categoryActive}
           </Label>
         </div>
 
         <Button type="submit" disabled={state && !state.ok}>
-          {state && !state.ok ? "Creating…" : "Create Category"}
+          {state && !state.ok ? t.common.savingCategory : t.common.createCategory}
         </Button>
       </form>
     </div>

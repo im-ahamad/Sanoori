@@ -462,5 +462,128 @@ export const adminEn = {
     permissionAdminUsersWrite: "Create/edit admin users",
     permissionAdminUsersDelete: "Delete admin users",
     permissionAdminUsersManageRoles: "Manage admin roles",
+
+    // New Product page
+    backToProducts: "Back to products",
+    newProduct: "New product",
+    newProductDesc: "Add a new product to your catalogue. Everything can be edited later.",
+    couldNotLoadCategoriesDesc: "We could not load your categories. Please try again in a moment.",
+    noCategoriesYetDesc: "You need at least one category before you can add products. Category management arrives in a later step.",
+
+    // Product Form - Basic Information
+    basicInformationDesc: "The product name and slug are used across the catalogue and in product URLs.",
+    namePlaceholder: "e.g. Wall-Mount Commode",
+    slugPlaceholder: "e.g. wall-mount-commode",
+    productCodePlaceholder: "Optional, e.g. SW-100",
+
+    // Product Form - Category & Availability
+    categoryAvailabilityDesc: "Where the product sits in the catalogue and how it can be ordered.",
+    selectCategory: "Select a category",
+    noSubcategories: "No subcategories for this category",
+    selectCategoryFirst: "Select a category first",
+    subcategoryHint: "Only subcategories of the selected category are available.",
+    featuredProductDesc: "Highlight this product on the public catalogue.",
+    productActiveDesc: "Inactive products are hidden from the public catalogue.",
+    showOnHome: "Show on Home",
+    showOnHomeDesc: "Include this product in the Home page showcase.",
+    showOnProducts: "Show on Products",
+    showOnProductsDesc: "Include this product in the main Products listing.",
+
+    // Product Form - Description
+    descriptionPlaceholder: "Full product details. Plain text is fine — rich formatting comes later.",
+
+    // Product Form - Physical Attributes
+    physicalAttributes: "Physical attributes",
+    physicalAttributesDesc: "Optional structured attributes used for filtering and display.",
+    material: "Material",
+    materialPlaceholder: "e.g. Porcelain",
+    size: "Size",
+    sizePlaceholder: "e.g. 600×600 mm",
+    colorFinish: "Color / Finish",
+    colorFinishPlaceholder: "e.g. White Gloss",
+    madeIn: "Made in",
+    madeInPlaceholder: "e.g. Bangladesh",
+
+    // Product Form - Features & Specifications
+    featuresSpecifications: "Features & Specifications",
+    featuresSpecificationsDesc: "Structured data shown readably across the catalogue.",
+    featuresPlaceholder: "One feature per line, e.g.\nWater-resistant glaze\nEasy-clean surface",
+    specificationsPlaceholder: "e.g. Material: Ceramic",
+    noItemsYet: "No {label} yet. Add one to get started.",
+    addItem: "Add",
+
+    // Product Form - Images
+    imagesSectionDesc: "Product photos. The first image is the primary image shown across the catalogue.",
+    addProductImages: "Add product images",
+    dropImagesHint: "Drop images here or click to browse. JPG, PNG or WebP, max {size} MB each, up to {max} images.",
+    primaryLabel: "Primary",
+    imageLimitReached: "Image limit reached",
+
+    // Category forms
+    backToCategories: "Back to categories",
+    newCategory: "New Category",
+    newCategoryDesc: "Create a new category to organize your products.",
+    editCategoryTitle: "Edit Category",
+    editCategoryDesc: "Update the category details below.",
+    categoryNamePlaceholder: "e.g., Sanitary Ware",
+    categorySlugPlaceholder: "e.g., sanitary-ware",
+    categorySlugHint: "Lowercase letters, numbers, and hyphens only. Used in URLs.",
+    categoryDescriptionPlaceholder: "Optional description for this category",
+    categoryImageLabel: "Image URL",
+    categoryImagePlaceholder: "https://example.com/image.jpg",
+    categoryImageHint: "Optional image for category display.",
+    categoryDisplayOrderLabel: "Display Order",
+    categoryDisplayOrderHint: "Lower numbers appear first.",
+    categoryActiveHint: "Inactive categories are hidden from the public catalogue.",
+    createCategory: "Create Category",
+    savingCategory: "Creating…",
+
+    // Subcategory forms
+    backToSubcategories: "Back to subcategories",
+    newSubcategory: "New Subcategory",
+    newSubcategoryDesc: "Create a new subcategory to organize products within a category.",
+    editSubcategoryTitle: "Edit Subcategory",
+    editSubcategoryDesc: "Update the subcategory details below.",
+    selectCategoryPlaceholder: "Select a category",
+    noCategoriesAvailable: "No active categories available",
+    createSubcategory: "Create Subcategory",
+    savingSubcategory: "Creating…",
+
+    // Admin Users new/edit
+    backToAdminUsers: "Back to admin users",
+    newAdminTitle: "New admin",
+    newAdminDesc: "Add a new administrator to the admin panel. They will receive the ADMIN role automatically.",
+    editAdminTitle: "Edit admin",
+    editAdminDesc: "Update the administrator account details. Password cannot be changed from here.",
+    adminNamePlaceholder: "e.g. John Doe",
+    adminEmailPlaceholder: "admin@example.com",
+    adminStatusHint: "Inactive admins cannot sign in to the admin panel.",
+
+    // Product Edit page
+    editProductTitle: "Edit product",
+    editProductDesc: "Update the details of \"{name}\". Changes appear on the public catalogue in a later step.",
+    productUpdatedFlash: "Product updated successfully.",
+
+    // Order Detail page
+    backToOrders: "Back to orders",
+    orderDetailsTitle: "Order details",
+    customerNameLabel: "Name",
+    customerSectionTitle: "Customer",
+    productSectionTitle: "Product",
+    contactSectionTitle: "Contact",
+    updateStatusTitle: "Update status",
+    emailNotProvided: "Not provided",
+
+    // Inquiry Status
+    updateStatusButton: "Update status",
+    updatingStatus: "Updating…",
+
+    // Inquiry Contact Actions
+    callButton: "Call",
+    emailButton: "Email",
+    whatsappButton: "WhatsApp",
+
+    // Placeholder page
+    comingSoonTitle: "Coming in a later step",
   },
 } as const;

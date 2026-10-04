@@ -21,9 +21,29 @@ export interface SendEmailOptions {
   replyTo?: string;
 }
 
+/**
+ * Development-only mock email sender for testing without real API keys.
+ * Logs the email to console and returns success.
+ */
+async function sendMockEmail(
+  options: SendEmailOptions
+): Promise<{ success: boolean; error?: string; id?: string }> {
+  console.log("📧 [MOCK EMAIL] Would send:", {
+    to: options.to,
+    subject: options.subject,
+    text: options.text?.slice(0, 200),
+  });
+  return { success: true, id: "mock-" + Date.now() };
+}
+
 export async function sendEmail(
   options: SendEmailOptions
 ): Promise<{ success: boolean; error?: string; id?: string }> {
+  // In development without a real API key, use mock sender
+  if (process.env.NODE_ENV === "development" && !process.env.RESEND_API_KEY?.startsWith("re_")) {
+    return sendMockEmail(options);
+  }
+
   try {
     const resend = getResendClient();
 

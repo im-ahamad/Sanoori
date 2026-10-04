@@ -45,7 +45,7 @@ export default async function Home() {
   const organizationSchema = JSON.stringify(generateOrganizationSchema());
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 relative">
       <Hero />
       <CategoryGrid />
       <ProductShowcase />

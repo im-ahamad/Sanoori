@@ -140,7 +140,7 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Right-side — Information SECTION */}
-            <div className="flex-1 min-w-0 bg-gradient-to-b from-rose-50 to-white dark:from-muted dark:to-card p-5 lg:p-6 space-y-4 overflow-hidden h-[560px] lg:h-[580px] flex flex-col">
+            <div className="flex-1 min-w-0 bg-gradient-to-b from-rose-50 to-white dark:from-muted dark:to-card p-5 lg:p-6 space-y-4 h-auto lg:overflow-hidden lg:h-[580px] flex flex-col">
               {/* Category badges */}
               <div className="flex flex-wrap items-center gap-2.5">
                 <AvailabilityBadge availability={product.availability} />
@@ -221,14 +221,14 @@ export default async function ProductDetailPage({
               </div>
 
               {/* Description, Key Features, Specifications — unified flow */}
-              <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
+              <div className="flex flex-col gap-4 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
                 {/* Description */}
                 {product.description && (
-                  <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
+                  <div className="flex flex-col space-y-2 pt-1 lg:flex-1 lg:min-h-0">
                     <h3 className="font-heading text-lg font-bold text-foreground flex-shrink-0">
                       Description
                     </h3>
-                    <div className="product-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                    <div className="product-scroll whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overflow-x-hidden">
                       {product.description}
                     </div>
                   </div>
@@ -236,24 +236,24 @@ export default async function ProductDetailPage({
 
                 {/* Key Features */}
                 {product.features.length > 0 && (
-                  <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
+                  <div className="flex flex-col space-y-2 pt-1 lg:flex-1 lg:min-h-0">
                     <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground flex-shrink-0">
                       <BadgeCheck className="size-4 text-rose-600 dark:text-rose-400" aria-hidden="true" />
                       {pd.keyFeaturesTitle}
                     </h3>
-                    <div className="product-scroll flex-1 min-h-0 overflow-y-auto overflow-x-hidden whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                    <div className="product-scroll whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overflow-x-hidden">
                       {product.features.map((feature, index) => (index > 0 ? "\n" : "") + feature).join("")}
                     </div>
                   </div>
                 )}
 
                 {/* Specifications */}
-                <div className="flex-1 min-h-0 flex flex-col space-y-2 pt-1">
+                <div className="flex flex-col space-y-2 pt-1 lg:flex-1 lg:min-h-0">
                   <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground flex-shrink-0">
                     <Ruler className="size-4 text-rose-600 dark:text-rose-400" aria-hidden="true" />
                     {pd.specificationsTitle}
                   </h3>
-                  <div className="product-scroll flex-1 min-h-0 overflow-y-auto overflow-x-auto whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
+                  <div className="product-scroll whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overflow-x-auto">
                     {product.specifications.length > 0 ? (
                       product.specifications.map((spec, index) => (index > 0 ? "\n" : "") + spec).join("")
                     ) : (

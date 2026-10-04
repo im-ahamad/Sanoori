@@ -132,15 +132,16 @@ export default async function ProductsPage({
           priority
         />
 
-        {/* Hero text block - centered in left 35% of hero */}
+        {/* Hero text block - left 35% of hero from lg up, full width below lg */}
         <div
-          className="absolute inset-0 flex items-center"
-          style={{ width: "35%" }}
+          className="absolute inset-0 flex items-center lg:w-[35%]"
           aria-hidden="true"
         >
           <div
-            className="w-full flex flex-col items-center justify-center h-full px-6 text-center"
-            style={categorySlug ? { marginTop: '-100px' } : { marginTop: '-230px' }}
+            className={cn(
+              "w-full flex flex-col items-center justify-center h-full px-6 text-center",
+              categorySlug ? "-mt-[100px]" : "lg:-mt-[230px]"
+            )}
           >
             <nav aria-label="Breadcrumb" className="mb-2">
               <ol className="flex items-center gap-1.5 text-xs sm:text-sm text-white/70 hover:text-white transition-colors">

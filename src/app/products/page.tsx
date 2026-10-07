@@ -27,6 +27,18 @@ import { Availability } from "@/generated/prisma";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 
+const STYLES: Record<Availability, { variant: "default" | "secondary" | "outline"; className?: string }> = {
+  IN_STOCK: { variant: "default" },
+  ON_REQUEST: { variant: "secondary" },
+  OUT_OF_STOCK: { variant: "outline", className: "bg-border" },
+};
+
+const AVAILABILITY_KEYS: Record<Availability, string> = {
+  IN_STOCK: "inStock",
+  ON_REQUEST: "onRequest",
+  OUT_OF_STOCK: "outOfStock",
+};
+
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
   const lang = cookieStore.get("sanoori-lang")?.value;
@@ -346,9 +358,21 @@ async function CatalogueView({
             className="[&>h2]:text-xl sm:[&>h2]:text-2xl"
           />
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {featuredProducts.map((product) => {
+              const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
+              const availabilityKey = AVAILABILITY_KEYS[product.availability];
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
+                  askForPriceLabel={t.products.askForPrice}
+                  viewDetailsLabel={t.products.viewDetails}
+                  availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
+                  availabilityVariant={availabilityStyle.variant}
+                />
+              );
+            })}
           </div>
         </section>
       )}
@@ -358,24 +382,42 @@ async function CatalogueView({
           <>
             {!hasActiveFilters ? (
               <div className="sanoori-products-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-                {allProducts.map((product) => (
+                {allProducts.map((product) => {
+                const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
+                const availabilityKey = AVAILABILITY_KEYS[product.availability];
+                return (
                   <ProductCard
                     key={product.id}
                     product={product}
                     hideAvailabilityBadge
+                    categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
+                    askForPriceLabel={t.products.askForPrice}
+                    viewDetailsLabel={t.products.viewDetails}
+                    availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
+                    availabilityVariant={availabilityStyle.variant}
                   />
-                ))}
+                );
+              })}
               </div>
             ) : (
               <>
                 <div className={`sanoori-products-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8 ${filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials" ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
-                  {catalogue.items.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      hideAvailabilityBadge
-                    />
-                  ))}
+                  {catalogue.items.map((product) => {
+                    const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
+                    const availabilityKey = AVAILABILITY_KEYS[product.availability];
+                    return (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        hideAvailabilityBadge
+                        categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
+                        askForPriceLabel={t.products.askForPrice}
+                        viewDetailsLabel={t.products.viewDetails}
+                        availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
+                        availabilityVariant={availabilityStyle.variant}
+                      />
+                    );
+                  })}
                 </div>
                 <div className="mt-10">
                   <Pagination

@@ -1,12 +1,9 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { PublicProductSummary } from "@/lib/public/catalogue";
 import { AvailabilityBadge } from "@/components/products/availability-badge";
 import { getCategoryIconElement } from "@/lib/category-icons";
-import { useTranslations } from "@/lib/i18n";
 
 type ProductCardVariant = "default" | "grid" | "showcase";
 
@@ -14,6 +11,11 @@ interface ProductCardProps {
   product: PublicProductSummary;
   hideAvailabilityBadge?: boolean;
   variant?: ProductCardVariant;
+  categoryLabel: string;
+  askForPriceLabel: string;
+  viewDetailsLabel: string;
+  availabilityLabel?: string;
+  availabilityVariant?: "default" | "secondary" | "outline";
 }
 
 /**
@@ -22,8 +24,16 @@ interface ProductCardProps {
  * prefer the real product photo and fall back to a branded navy/gold tile so a
  * missing image never renders broken.
  */
-export function ProductCard({ product, hideAvailabilityBadge = false, variant = "default" }: ProductCardProps) {
-  const t = useTranslations();
+export function ProductCard({
+  product,
+  hideAvailabilityBadge = false,
+  variant = "default",
+  categoryLabel,
+  askForPriceLabel,
+  viewDetailsLabel,
+  availabilityLabel,
+  availabilityVariant,
+}: ProductCardProps) {
   const detailsHref = `/products/${product.slug}`;
   const cardImage = product.image;
 
@@ -53,7 +63,7 @@ export function ProductCard({ product, hideAvailabilityBadge = false, variant = 
             src={cardImage.url}
             alt={cardImage.alt ?? product.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1500px) 33vw, 500px"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
@@ -82,9 +92,14 @@ export function ProductCard({ product, hideAvailabilityBadge = false, variant = 
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
+            {categoryLabel}
           </p>
-          {!hideAvailabilityBadge && <AvailabilityBadge availability={product.availability} />}
+          {!hideAvailabilityBadge && availabilityLabel && (
+            <AvailabilityBadge
+              label={availabilityLabel}
+              variant={availabilityVariant ?? "outline"}
+            />
+          )}
         </div>
 
         <h3 className="mt-2 font-heading text-base font-semibold text-foreground sm:text-lg">
@@ -112,14 +127,14 @@ export function ProductCard({ product, hideAvailabilityBadge = false, variant = 
             aria-label={`Ask for the price of ${product.name}`}
             className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-0 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            {t.products.askForPrice}
+            {askForPriceLabel}
           </Link>
           <Link
             href={detailsHref}
             aria-label={`View details for ${product.name}`}
             className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-0 text-center text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            {t.products.viewDetails}
+            {viewDetailsLabel}
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>

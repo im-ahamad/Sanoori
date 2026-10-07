@@ -121,8 +121,8 @@ function AboutHeroBackdrop({
               fill
               sizes="100vw"
               quality={60}
-              preload={index === 0}
-              loading={index === 0 ? undefined : "eager"}
+              priority={index === 0}
+              loading={index === 0 ? undefined : "lazy"}
               className={cn(
                 "object-contain lg:object-cover",
                 HERO_OBJECT_POSITION,

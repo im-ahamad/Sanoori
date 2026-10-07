@@ -26,6 +26,19 @@ import { getPublicProductBySlug, getRelatedProducts } from "@/lib/public/catalog
 import { getPublicBusinessSettings } from "@/lib/public/settings";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
+import type { Availability } from "@/generated/prisma";
+
+const STYLES: Record<Availability, { variant: "default" | "secondary" | "outline"; className?: string }> = {
+  IN_STOCK: { variant: "default" },
+  ON_REQUEST: { variant: "secondary" },
+  OUT_OF_STOCK: { variant: "outline", className: "bg-border" },
+};
+
+const AVAILABILITY_KEYS: Record<Availability, string> = {
+  IN_STOCK: "inStock",
+  ON_REQUEST: "onRequest",
+  OUT_OF_STOCK: "outOfStock",
+};
 
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
@@ -143,7 +156,10 @@ export default async function ProductDetailPage({
             <div className="flex-1 min-w-0 bg-gradient-to-b from-rose-50 to-white dark:from-muted dark:to-card p-5 lg:p-6 space-y-4 h-auto lg:overflow-hidden lg:h-[580px] flex flex-col">
               {/* Category badges */}
               <div className="flex flex-wrap items-center gap-2.5">
-                <AvailabilityBadge availability={product.availability} />
+                <AvailabilityBadge
+                  label={t.common[AVAILABILITY_KEYS[product.availability] as keyof typeof t.common] ?? product.availability}
+                  variant={STYLES[product.availability]?.variant ?? "outline"}
+                />
                 <Link
                   href={`/products?category=${product.categorySlug}`}
                   className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
@@ -289,14 +305,23 @@ export default async function ProductDetailPage({
                 description={pd.relatedProductsDescription}
               />
               <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-                {relatedProducts.map((relatedProduct) => (
-                  <ProductCard
-                    key={relatedProduct.id}
-                    product={relatedProduct}
-                    variant="grid"
-                    hideAvailabilityBadge
-                  />
-                ))}
+                {relatedProducts.map((relatedProduct) => {
+                    const availabilityStyle = STYLES[relatedProduct.availability] ?? { variant: "outline" as const };
+                    const availabilityKey = AVAILABILITY_KEYS[relatedProduct.availability];
+                    return (
+                      <ProductCard
+                        key={relatedProduct.id}
+                        product={relatedProduct}
+                        variant="grid"
+                        hideAvailabilityBadge
+                        categoryLabel={t.categories[relatedProduct.categorySlug as keyof typeof t.categories] ?? relatedProduct.categoryName}
+                        askForPriceLabel={t.products.askForPrice}
+                        viewDetailsLabel={t.products.viewDetails}
+                        availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? relatedProduct.availability}
+                        availabilityVariant={availabilityStyle.variant}
+                      />
+                    );
+                  })}
               </div>
             </section>
           )}

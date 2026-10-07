@@ -6,6 +6,20 @@ import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { ProductCard as SharedProductCard } from "@/components/products/product-card";
+import type { Availability } from "@/generated/prisma";
+
+const STYLES: Record<Availability, { variant: "default" | "secondary" | "outline"; className?: string }> = {
+  IN_STOCK: { variant: "default" },
+  ON_REQUEST: { variant: "secondary" },
+  OUT_OF_STOCK: { variant: "outline", className: "bg-border" },
+};
+
+const AVAILABILITY_KEYS: Record<Availability, string> = {
+  IN_STOCK: "inStock",
+  ON_REQUEST: "onRequest",
+  OUT_OF_STOCK: "outOfStock",
+};
 
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
@@ -77,11 +91,22 @@ export async function ProductShowcase() {
 
               {/* 4×3 Product Grid - cards wrap tightly around images */}
               <div className="grid gap-4 lg:gap-5 grid-cols-2 sm:grid-cols-4 items-start">
-                {group.products.slice(0, 12).map((product, productIndex) => (
-                  <Reveal key={product.id} delay={productIndex * 0.02}>
-                    <ProductCard product={product} />
-                  </Reveal>
-                ))}
+                {group.products.slice(0, 12).map((product, productIndex) => {
+                  const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
+                  const availabilityKey = AVAILABILITY_KEYS[product.availability];
+                  return (
+                    <Reveal key={product.id} delay={productIndex * 0.02}>
+                      <SharedProductCard
+                        product={product}
+                        categoryLabel={categoryLabels[product.categorySlug as keyof typeof categoryLabels] ?? product.categoryName}
+                        askForPriceLabel={t.products.askForPrice}
+                        viewDetailsLabel={t.products.viewDetails}
+                        availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
+                        availabilityVariant={availabilityStyle.variant}
+                      />
+                    </Reveal>
+                  );
+                })}
               </div>
             </Reveal>
           ))}
@@ -117,11 +142,22 @@ export async function ProductShowcase() {
                 </div>
                 <div className="products grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 items-start">
                   {/* Identical slice + order as the desktop grid → same product set */}
-                  {group.products.slice(0, 12).map((product, productIndex) => (
-                    <Reveal key={product.id} delay={productIndex * 0.03}>
-                      <ProductCard product={product} />
-                    </Reveal>
-                  ))}
+                  {group.products.slice(0, 12).map((product, productIndex) => {
+                    const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
+                    const availabilityKey = AVAILABILITY_KEYS[product.availability];
+                    return (
+                      <Reveal key={product.id} delay={productIndex * 0.03}>
+                        <SharedProductCard
+                          product={product}
+                          categoryLabel={categoryLabels[product.categorySlug as keyof typeof categoryLabels] ?? product.categoryName}
+                          askForPriceLabel={t.products.askForPrice}
+                          viewDetailsLabel={t.products.viewDetails}
+                          availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
+                          availabilityVariant={availabilityStyle.variant}
+                        />
+                      </Reveal>
+                    );
+                  })}
                 </div>
               </Reveal>
             );

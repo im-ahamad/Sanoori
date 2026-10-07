@@ -301,7 +301,9 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
   }, []);
 
   // Warm up the highest-resolution source so the first hover is instant.
+  // Only preload on devices where zoom is actually usable (desktop with fine pointer).
   useEffect(() => {
+    if (!canUseZoom) return;
     hiResRef.current = null;
     if (!zoomImageUrl) return;
     const loader = new window.Image();
@@ -315,7 +317,7 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
     return () => {
       loader.onload = null;
     };
-  }, [zoomImageUrl, scheduleUpdate]);
+  }, [zoomImageUrl, canUseZoom, scheduleUpdate]);
 
   // Keep the magnifier exact while the page scrolls or the viewport changes.
   useEffect(() => {

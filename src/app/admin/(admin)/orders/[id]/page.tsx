@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import {
   ArrowUpRight,
   CalendarClock,
@@ -21,18 +22,6 @@ import { FlashBanner } from "@/components/admin/flash-banner";
 import { SectionError } from "@/components/admin/section-error";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-export const metadata = {
-  title: "Order",
-};
-
-function buildWhatsAppMessage(
-  customerName: string,
-  productName: string | null
-): string {
-  const productPart = productName ? ` for ${productName}` : "";
-  return `Hello ${customerName}, this is Sanoori Trading regarding your inquiry${productPart}. Could we discuss your requirements?`;
-}
 
 export default async function AdminOrderDetailPage(
   props: PageProps<"/admin/orders/[id]">
@@ -69,6 +58,11 @@ export default async function AdminOrderDetailPage(
 
   const inquiry = detailResult.data;
   const product = inquiry.product;
+
+  // Construct product URL for WhatsApp message
+  const host = (await headers()).get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") ? "http" : "https";
+  const productUrl = product?.slug ? `${protocol}://${host}/products/${product.slug}` : undefined;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6 lg:p-8">
@@ -312,10 +306,12 @@ export default async function AdminOrderDetailPage(
               <InquiryContactActions
                 phone={inquiry.phone}
                 email={inquiry.email}
-                whatsappMessage={buildWhatsAppMessage(
-                  inquiry.customerName,
-                  product?.name ?? null
-                )}
+                productSlug={product?.slug ?? null}
+                productCode={product?.productCode ?? null}
+                productId={product?.id ?? null}
+                productName={product?.name ?? null}
+                quantity={inquiry.quantity ?? null}
+                productUrl={productUrl}
               />
             </div>
           </section>

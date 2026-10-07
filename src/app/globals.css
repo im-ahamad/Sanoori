@@ -328,13 +328,40 @@
     animation: hero-arrow-sheen 7s ease-in-out infinite;
   }
 
+  /* Loading pulse animation — subtle, premium gold dots */
+  @keyframes loading-pulse {
+    0%, 80%, 100% {
+      transform: scale(0.8);
+      opacity: 0.4;
+    }
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  .loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    animation: loading-pulse 1.4s ease-in-out infinite;
+    opacity: 0.4;
+    box-shadow: 0 0 8px var(--gold)/30;
+  }
+
+  .loading-dot:nth-child(1) { animation-delay: 0ms; }
+  .loading-dot:nth-child(2) { animation-delay: 150ms; }
+  .loading-dot:nth-child(3) { animation-delay: 300ms; }
+
   @media (prefers-reduced-motion: reduce) {
     .backdrop-zoom,
     .hero-intro,
     .reveal,
     .fx-float,
     .fx-glow-pulse,
-    .fx-particle-float {
+    .fx-particle-float,
+    .loading-dot {
       animation: none;
     }
 
@@ -404,5 +431,1508 @@
 
   .section-spacing-sm {
     @apply py-10 sm:py-12 lg:py-16;
+  }
+}
+
+/*
+ * Home catalogue — category sections, MOBILE ONLY (≤768px).
+ *
+ * Scope: the mobile catalogue blocks rendered by ProductShowcase
+ * (`home-catalogue` wrapper → `.catalogue-section` → `.section-title` → `.products`).
+ *
+ * Rules:
+ * - Compact, consistent spacing between heading / grid / sections.
+ * - Natural content-driven height only: no fixed height, no min-height,
+ *   no max-height, no overflow clipping, so every product stays visible.
+ * - Nothing above 768px is touched: tablet and desktop keep their
+ *   existing Tailwind utilities unchanged.
+ */
+@media (max-width: 768px) {
+  /* Category section container: natural height + compact inner padding */
+  .home-catalogue .catalogue-section {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 12px 16px 14px;
+    /* Small, consistent separation before the next category section */
+    margin-bottom: 12px;
+  }
+
+  /* Section heading → first product row: 8px */
+  .home-catalogue .section-title {
+    margin-bottom: 8px;
+  }
+
+  /* Product grid: compact vertical rhythm, columns unchanged */
+  .home-catalogue .products {
+    row-gap: 12px;
+  }
+
+  /* ============================================================
+     PRODUCT CARD ACTIONS — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* Stack buttons vertically on mobile, reverse order: View on top, Ask for Price on bottom */
+  .sanoori-product-actions {
+    flex-direction: column !important;
+  }
+  .sanoori-product-actions > a:first-child {
+    order: 2 !important;
+  }
+  .sanoori-product-actions > a:last-child {
+    order: 1 !important;
+  }
+
+  /* ============================================================
+     HOME HERO — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* Hero section: ZERO top padding so image starts immediately after header.
+     Keep section aspect-ratio unset so content can flow naturally. */
+  .sanoori-hero {
+    padding-top: 0 !important;
+    padding-bottom: 32px !important;
+    min-height: auto !important;
+    height: auto !important;
+    aspect-ratio: unset !important;
+  }
+
+  /* Hero backdrop image container: KEEP aspect ratio.
+     The images inside use `fill` (absolute) and need the container to have defined dimensions. */
+  /* NO RULE HERE — do not unset aspect-ratio on the image container */
+
+  /* Content wrapper: no top padding, natural height */
+  .sanoori-hero > div.relative.h-full.w-full {
+    padding-top: 0 !important;
+    height: auto !important;
+  }
+
+  /* Inner flex container: ~32px top padding, compact gaps */
+  .sanoori-hero > div.relative.h-full.w-full > div.flex.h-full.items-start {
+    padding-top: 32px !important;
+    gap: 10px !important;
+    height: auto !important;
+    align-items: flex-start !important;
+  }
+
+  /* Hero heading: ~27px with line-height 1.2 */
+  .sanoori-hero h1.clamp-text-4xl-6xl {
+    font-size: 27px !important;
+    line-height: 1.2 !important;
+    margin-top: 8px !important;
+  }
+
+  /* Hero paragraph: hide on mobile */
+  .sanoori-hero p.hero-intro-d2 {
+    display: none !important;
+  }
+
+  /* Hero button (Browse Products): center horizontally */
+  .sanoori-hero div.hero-intro-d3 {
+    justify-content: center !important;
+    padding-right: 0 !important;
+    margin-top: 10px !important;
+  }
+
+  /* Hero overlay: much lighter (~20-25% at top) so image is clearly visible */
+  .sanoori-hero-overlay {
+    background: linear-gradient(180deg,
+      color-mix(in oklab, var(--navy-dark) 22%, transparent) 0%,
+      color-mix(in oklab, var(--navy-dark) 10%, transparent) 35%,
+      color-mix(in oklab, var(--navy-dark) 4%, transparent) 65%,
+      transparent 85%
+    ) !important;
+  }
+
+  /* ============================================================
+     PRODUCTS PAGE HERO — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* Hide hero description on mobile */
+  .sanoori-products-hero p[class*="mt-4"][class*="max-w-2xl"][class*="leading-relaxed"] {
+    display: none !important;
+  }
+
+  /* Breadcrumb: smaller on mobile */
+  .sanoori-products-hero nav[aria-label="Breadcrumb"] ol {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Heading: smaller on mobile, keep typography style */
+  .sanoori-products-hero h1#products-hero-heading {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Hero content block: position at top-left on mobile */
+  .sanoori-products-hero-content {
+    align-items: flex-start !important;
+  }
+  .sanoori-products-hero-content > div {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding-top: 24px !important;
+    padding-left: 16px !important;
+  }
+
+  /* ============================================================
+     CATEGORY HERO — MOBILE ONLY (strictly below 768px)
+     /products?category=sanitary-ware | tiles | building-materials
+     ============================================================ */
+  /* Scoped to `.sanoori-products-hero--category` (set only for those three
+     URLs) so the main /products hero, tablet and desktop keep their exact
+     current presentation. The inner 767.98px query means "below 768px":
+     iPad-portrait (768px) and everything wider stay untouched. */
+  @media (max-width: 767.98px) {
+    /* Natural source ratio (1942×809): the full hero image stays visible —
+       no crop, no stretch, and no blank strip above or below. `content-box`
+       keeps the 1px section divider outside the ratio box, so the image box
+       itself still matches the source ratio exactly. */
+    .sanoori-products-hero.sanoori-products-hero--category {
+      box-sizing: content-box;
+      aspect-ratio: 1942 / 809;
+      min-height: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    /* Freeze the ambient backdrop zoom so the image is never scaled in. */
+    .sanoori-products-hero.sanoori-products-hero--category img.backdrop-zoom {
+      animation: none !important;
+      transform: none !important;
+    }
+
+    /* Move the whole copy block (breadcrumb + heading + description) as one
+       piece to the top-left: cancel the desktop pull-up margin so only the
+       24px / 16px safety gap above keeps the text off the hero edges. */
+    .sanoori-products-hero.sanoori-products-hero--category
+      .sanoori-products-hero-content
+      > div {
+      margin-top: 0 !important;
+    }
+
+    /* Sanitary Ware: trim the heading two steps from the original (~17%)
+       — still large, clear and prominent. Same font, weight, colour,
+       position and spacing; only the mobile size changes (beats
+       `.sanoori-products-hero h1#…` on specificity). */
+    .sanoori-products-hero.sanoori-products-hero--sanitary-ware
+      h1#products-hero-heading {
+      font-size: clamp(1.25rem, 5vw, 1.75rem) !important;
+    }
+
+    /* Building Materials: hide only the trailing word of the heading
+       ("Materials" / "ম্যাটেরিয়ালস"), so the mobile heading reads exactly
+       "Building" / "বিল্ডিং". The span is inline above 768px, so laptop and
+       desktop keep the full heading. Breadcrumb, hero copy and every other
+       hero element keep rendering exactly as before. */
+    .sanoori-products-hero.sanoori-products-hero--building-materials
+      .sanoori-products-hero-heading-tail {
+      display: none !important;
+    }
+  }
+
+  /* ============================================================
+     PRODUCTS PAGE GRID — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* 2-column grid on mobile (≤768px), matching Home catalogue behavior */
+  .sanoori-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    row-gap: 12px !important;
+  }
+
+  /* ============================================================
+     FOOTER — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* Tighten contact grid row gap on mobile */
+  footer .col-span-2.border-t.border-stone-300\/60.pt-6 ul.grid.grid-cols-2 {
+    gap-y: 4px !important;
+    row-gap: 4px !important;
+    margin-top: 10px !important;
+  }
+
+  /* BIT credit item in contact grid: ~10px gap below Email on mobile */
+  .sanoori-footer-dev-credit-item {
+    margin-top: 10px !important;
+  }
+
+  /* ============================================================
+     FOOTER — MOBILE ONLY (below 768px): 3 hidden items
+     ============================================================
+     Visibility only: the location line and the TikTok / YouTube links
+     disappear on phones. The compact vertical rhythm that used to sit
+     here now lives in the top-level `max-width: 1023.98px` block
+     further down, so tablets get it too. Everything else — colours,
+     type, icons, borders, alignment, link destinations — is untouched. */
+  @media (max-width: 767.98px) {
+    .sanoori-footer-city,
+    .sanoori-footer-social--tiktok,
+    .sanoori-footer-social--youtube {
+      display: none !important;
+    }
+  }
+
+  /* ============================================================
+     FOOTER — ALL SCREENS: Reduce "Developed by BIT™" gap to ~8-12px
+     ============================================================ */
+  /* Target the paragraph directly — applies to mobile, tablet, desktop */
+  .sanoori-footer-dev-credit {
+    margin-top: 6px !important;
+  }
+
+  /* ============================================================
+     ABOUT HERO — MOBILE ONLY (≤768px)
+     ============================================================ */
+  @media (max-width: 767.98px) {
+    /* Hero section: MUST match backdrop's aspect-ratio (1942/809) exactly on mobile
+       so no navy/white gaps appear above/below the image.
+       The backdrop is the only in-flow child and has aspect-[1942/809];
+       forcing the same ratio on the section ensures perfect fit. */
+    .sanoori-about-hero {
+      aspect-ratio: 1942/809 !important;
+      height: auto !important;
+      min-height: auto !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    /* Hero backdrop: KEEP aspect-ratio (1942/809) so `fill` images have a container.
+       This matches Home hero behavior — see HOME HERO comment above. */
+    .sanoori-about-hero > div[style*="isolate"] {
+      /* aspect-ratio: 1942/809 from JSX — DO NOT UNSET */
+      /* Remove height/min-height overrides that cause collapse on mobile */
+    }
+
+    /* Mobile: force images to cover the backdrop completely (no letterboxing gaps).
+       The backdrop has fixed aspect-ratio 1942/809 but source images vary;
+       object-contain creates gaps. object-cover fills the container fully. */
+    .sanoori-about-hero > div[style*="isolate"] > img {
+      object-fit: cover !important;
+    }
+
+    /* Ensure section background doesn't show gaps if image ratio slightly differs */
+    /* REMOVED: transparent background was letting white body background show through.
+       Keep navy bg-navy-dark from Tailwind class so any gap shows navy, not white.
+       The backdrop's aspect-ratio should fill the section completely. */
+    /* .sanoori-about-hero {
+      background-color: transparent !important;
+    } */
+
+    /* Hide description paragraph on mobile */
+    .sanoori-about-hero p[class*="mt-4"][class*="max-w-2xl"][class*="leading-relaxed"] {
+      display: none !important;
+    }
+
+    /* Hide slider arrows on mobile */
+    .sanoori-about-hero > div.pointer-events-none.absolute.inset-x-0.top-0.flex {
+      display: none !important;
+    }
+
+    /* Content wrapper: position at top-left with comfortable inset */
+    .sanoori-about-hero > div.pointer-events-none.absolute.top-0.left-0.z-10 > div.pointer-events-auto {
+      padding-left: 16px !important;
+      padding-top: 16px !important;
+      padding-bottom: 0 !important;
+      padding-right: 16px !important;
+    }
+
+    /* Breadcrumb: 12px, white */
+    .sanoori-about-hero nav[aria-label="Breadcrumb"] ol {
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+    }
+
+    /* Heading: 22px, white, not oversized */
+    .sanoori-about-hero h1.font-heading {
+      font-size: 22px !important;
+      line-height: 1.2 !important;
+      margin-top: 4px !important;
+    }
+  }
+
+  /* ============================================================
+     ABOUT PAGE — WHAT WE SUPPLY CARDS — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* Make the three category cards more compact on mobile */
+  .sanoori-about-supply-cards {
+    gap: 8px !important;
+  }
+  .sanoori-about-supply-cards > li > a {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+  .sanoori-about-supply-cards .flex.size-11 {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .sanoori-about-supply-cards .flex.size-11 > * {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .sanoori-about-supply-cards h3 {
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+  }
+  .sanoori-about-supply-cards p {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ============================================================
+     HOME CTA BAND — MOBILE ONLY (≤768px)
+     ============================================================ */
+  /* Hide the entire "Ready to get started?" CTA section on mobile */
+  .sanoori-cta-band {
+    display: none !important;
+  }
+
+  /* ============================================================
+     PRODUCT VIEW PAGE — MOBILE ONLY (≤768px)
+     ============================================================ */
+
+  /* ----- Product Gallery: fix image sizing & remove gaps ----- */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] {
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: unset !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] > div[class*="relative"][class*="h-full"] {
+    height: auto !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] > div[class*="relative"][class*="h-full"] > img {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+  }
+
+  /* ----- Page Header (hero background): natural height, no gaps ----- */
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type {
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: unset !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type > div[class*="pointer-events-none"][class*="absolute"] {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type > div[class*="pointer-events-none"][class*="absolute"] > div[class*="relative"][class*="h-full"] {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type > div[class*="pointer-events-none"][class*="absolute"] > div[class*="relative"][class*="h-full"] > img {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type > div[class*="relative"][class*="w-full"] > div[class*="relative"][class*="w-full"] {
+    padding-top: 24px !important;
+    padding-bottom: 16px !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type > div[class*="relative"][class*="w-full"] > div[class*="relative"][class*="w-full"] > div[class*="relative"] {
+    padding-top: 0 !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type nav[aria-label="Breadcrumb"] ol {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type h1.font-heading {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  /* ----- Hero copy block: top-left of the image (below 768px only) -----
+     The breadcrumb + heading move as one unit to the top-left corner with the
+     site's standard 24px / 16px safety gap (the same gap the mobile heroes on
+     /products use; the 16px left gutter already comes from `.container-sanoori`).
+     Only the split of the block's existing vertical padding changes — top
+     48px → 24px, bottom 48px → 72px — so the block height, the hero height and
+     the image band are all bit-for-bit unchanged. */
+  @media (max-width: 767.98px) {
+    main.sanoori-product-view
+      > section:first-of-type
+      > .container-sanoori
+      > div {
+      padding-top: 24px !important;
+      padding-bottom: 72px !important;
+    }
+  }
+
+  /* ----- Product Info (right column): compact text, top-left alignment ----- */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] {
+    row-gap: 8px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-wrap"] {
+    gap: 4px !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-wrap"] > span[class*="rounded-full"]:first-child,
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-wrap"] > a[class*="rounded-full"] {
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="space-y-2"] {
+    row-gap: 4px !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="space-y-2"] > p[class*="text-sm"] {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="space-y-1"] > h2.font-heading {
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="space-y-1"] > p[class*="text-sm"][class*="text-rose"] {
+    font-size: 12px !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-col"][class*="gap-4"] > div[class*="flex"][class*="flex-col"] > h3.font-heading {
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+  }
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-col"][class*="gap-4"] > div[class*="flex"][class*="flex-col"] > div.product-scroll {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* ----- BuyPanel (Get a Price section): rearrange buttons ----- */
+  /* Remove gap below product card: target the mt-10 wrapper */
+  .sanoori-product-view .section-spacing > div[class*="mt-10"] {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Button container: grid layout for precise 2+1 arrangement */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap,
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 8px !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+  }
+
+  /* Row 1: Ask for Price (col 1) + WhatsApp (col 2) - EQUAL compact width */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="request-quote"],
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="whatsapp"],
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap > a[href*="request-quote"],
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap > a[href*="whatsapp"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 12px !important;
+    padding: 0 8px !important;
+    grid-column: auto !important;
+    grid-row: 1 !important;
+    justify-self: stretch !important;
+  }
+
+  /* Row 2: Call Us centered below, spanning both columns, auto width */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href^="tel:"],
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap > a[href^="tel:"] {
+    width: auto !important;
+    min-width: 140px !important;
+    max-width: 50% !important;
+    font-size: 12px !important;
+    padding: 0 16px !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: center !important;
+  }
+
+  /* Quantity input: slightly smaller */
+  .sanoori-product-view .section-spacing > div.mt-10 > div.space-y-4.rounded-lg > div > div.flex.items-center.justify-center.gap-2 > input#buy-quantity {
+    font-size: 13px !important;
+    height: 40px !important;
+    width: 60px !important;
+  }
+  .sanoori-product-view .section-spacing > div.mt-10 > div.space-y-4.rounded-lg > div > div.flex.items-center.justify-center.gap-2 > button.inline-flex.size-10 {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* ============================================================
+     "YOU MAY ALSO LIKE" — 2 COLUMNS ON MOBILE
+     ============================================================ */
+  /* Related products grid: 2 columns on mobile */
+  .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] > div[class*="grid"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    row-gap: 12px !important;
+  }
+
+  /* Product card buttons: compact for 2-column layout */
+  .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] div.sanoori-product-actions {
+    gap: 4px !important;
+  }
+  .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] div.sanoori-product-actions > a {
+    font-size: 11px !important;
+    padding: 0 6px !important;
+    height: 36px !important;
+    min-width: 0 !important;
+  }
+
+  /* ============================================================
+     HIDE FLOATING/STATIC 3-BUTTON BAR ON MOBILE
+     ============================================================ */
+  /* The sticky bar in BuyPanel (md:hidden) — hide on mobile */
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40.border-t.border-border.bg-background\/95 {
+    display: none !important;
+  }
+
+  /* ============================================================
+     PRODUCT HERO IMAGE: SHORTER VERTICAL HEIGHT, NO GAP, CROPPED
+     ============================================================ */
+  /* Right column: remove fixed height that forces gap below image */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  /* Product card (flex container): no extra space below image */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"][class*="rounded-2xl"] {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Image column: natural height, no extra space */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Product Gallery grid: REMOVE gap that creates dark space below image */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] {
+    gap: 0 !important;
+  }
+
+  /* Image wrapper: shorter fixed aspect-ratio (4:3), object-cover to crop vertically,
+     remove background color that creates dark gap, full width */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] {
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    aspect-ratio: 4 / 3 !important;
+  }
+
+  /* Image itself: object-cover to crop vertically within shorter area, centered */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] > div > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  /* Zoom control panel: natural positioning */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="absolute"][class*="z-40"] {
+    max-width: none !important;
+    right: auto !important;
+    left: auto !important;
+    top: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* ============================================================
+     GET A PRICE: ASK FOR PRICE + WHATSAPP (TOP ROW), CALL US (BOTTOM ROW)
+     ============================================================ */
+  /* Button container: grid layout for 2+1 arrangement */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap,
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 8px !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+  }
+
+  /* Row 1: Ask for Price (col 1) + Price on WhatsApp (col 2) — EXACTLY EQUAL SIZE */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="request-quote"],
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="whatsapp"],
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap > a[href*="request-quote"],
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap > a[href*="whatsapp"] {
+    height: 44px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 0 12px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    grid-column: auto !important;
+    grid-row: 1 !important;
+    justify-self: stretch !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Row 2: Call Us centered below, spanning both columns */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href^="tel:"],
+  .sanoori-product-view .fixed.inset-x-0.bottom-0.z-40 > div.flex.justify-center.gap-2.flex-wrap > a[href^="tel:"] {
+    height: 44px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 0 16px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: center !important;
+    border-radius: 8px !important;
+    width: auto !important;
+    min-width: 140px !important;
+    max-width: 50% !important;
+  }
+
+  /* ============================================================
+     OVERALL PROPORTIONAL MOBILE SIZING
+     ============================================================ */
+  /* Section spacing: tighter */
+  .sanoori-product-view .section-spacing {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* Page header: reduce top/bottom */
+  .sanoori-product-view > section[class*="overflow-hidden"][class*="bg-navy-dark"]:first-of-type {
+    padding-top: 0 !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* Product info cards: reduce spacing */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-col"][class*="gap-4"] > div[class*="flex"][class*="flex-col"] {
+    gap: 6px !important;
+  }
+
+  /* Description/Features/Specs headings */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-col"][class*="gap-4"] > div[class*="flex"][class*="flex-col"] > h3.font-heading {
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Description/Features/Specs content */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] > div[class*="flex"][class*="flex-col"][class*="gap-4"] > div[class*="flex"][class*="flex-col"] > div.product-scroll {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    padding-right: 4px !important;
+  }
+
+  /* BuyPanel: reduce padding */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card {
+    padding: 12px !important;
+  }
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div:first-child {
+    margin-bottom: 8px !important;
+  }
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div > p.text-sm {
+    font-size: 11px !important;
+  }
+
+  /* You May Also Like: tighter */
+  .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] {
+    margin-top: 24px !important;
+  }
+  .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] > div[class*="grid"] {
+    gap: 8px !important;
+    row-gap: 8px !important;
+  }
+
+  /* ============================================================
+     ISSUE 1: PRODUCT DETAIL HERO — REMOVE DARK GAP BELOW IMAGE
+     ============================================================ */
+  /* PageHeader section: on mobile, let image determine height, remove bg-navy-dark gap */
+  main.sanoori-product-view > section:first-of-type {
+    background-color: transparent !important;
+    min-height: 0 !important;
+  }
+  /* VisualBackdrop image wrapper: on mobile, use object-cover with fixed shorter aspect-ratio to crop empty space */
+  main.sanoori-product-view > section:first-of-type .pointer-events-none.absolute.inset-0 > div.relative.w-full.h-full {
+    aspect-ratio: 16 / 9 !important;
+  }
+  main.sanoori-product-view > section:first-of-type .pointer-events-none.absolute.inset-0 > div.relative.w-full.h-full > img {
+    object-fit: cover !important;
+    object-position: center !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+  /* Remove the header overlay on mobile to avoid dark overlay extending beyond image */
+  main.sanoori-product-view > section:first-of-type .pointer-events-none.absolute.inset-0.bg-gradient-to-b {
+    display: none !important;
+  }
+
+  /* ============================================================
+     ISSUE 2: ASK FOR PRICE + PRICE ON WHATSAPP — EXACTLY EQUAL SIZE
+     ROW 1: "Ask for Price" | "Price on WhatsApp" — side by side, equal
+     ROW 2: "Call Us" — centered underneath
+     ============================================================ */
+  /* Button container: 2 equal columns (minmax(0,1fr) so neither column can
+     be pushed wider by its label) plus a full-width second row for Call Us. */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: auto auto !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    justify-items: stretch !important;
+  }
+  /* Row 1 — Ask for Price + Price on WhatsApp: ONE shared rule so both are
+     identical in width, height, padding, font-size and border-radius.
+     The WhatsApp link points at wa.me, so it is matched by [href*="wa.me"]
+     (the older [href*="whatsapp"] selector never matched it, which left the
+     WhatsApp button at its fixed 180px width and crushed Ask for Price). */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="request-quote"],
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="wa.me"],
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href*="whatsapp"] {
+    grid-row: 1 !important;
+    grid-column: auto !important;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 48px !important;
+    margin-top: 0 !important;
+    padding: 0 4px !important;
+    font-size: clamp(10px, 3.125vw, 15px) !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    text-align: center !important;
+  }
+  /* Row 2 — Call Us: centered underneath both buttons */
+  .sanoori-product-view .space-y-4.rounded-lg.border-border.bg-card > div.mt-4.flex.justify-center.gap-2.flex-wrap > a[href^="tel:"] {
+    grid-row: 2 !important;
+    grid-column: 1 / -1 !important;
+    justify-self: center !important;
+    width: auto !important;
+    min-width: 140px !important;
+    max-width: 100% !important;
+    height: 48px !important;
+    margin-top: 0 !important;
+    padding: 0 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+}
+
+/* ============================================================
+   FOOTER + HEADER — STRICTLY BELOW 1024px (mobile + tablet)
+   ============================================================
+   Two spacing-only adjustments that stop at the `lg:` breakpoint, so
+   the desktop/laptop layout at 1024px and up is byte-for-byte what it
+   was before:
+
+   1. FOOTER — tighter vertical rhythm, so the footer is noticeably
+      shorter from top to bottom (paddings, row gaps, heading→list
+      margins, link-to-link gaps, lower-bar padding/stacking gap).
+   2. HEADER — a little more column gap between the four main nav
+      items (Home / About / Products / Contact).
+
+   Only spacing values change. Colours, backgrounds, typography sizes
+   and weights, icons, borders, dividers, alignment, link destinations,
+   logo, header height, nav colours/active state, language + theme
+   controls, the CTA and the mobile menu are all untouched, and no
+   content is added, removed or re-flowed. */
+@media (max-width: 1023.98px) {
+  /* ---------- 1. FOOTER: remove the empty vertical space ---------- */
+
+  /* Upper level: top/bottom padding 32px (mobile) / 48px (tablet) -> 16,
+     row gap 28px / 40px -> 14 */
+  footer > .container-sanoori > .grid {
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    row-gap: 14px !important;
+  }
+
+  /* Brand blurb: 16 -> 10 below the logo */
+  footer > .container-sanoori > .grid > div:first-child > p {
+    margin-top: 10px !important;
+  }
+
+  /* Column heading -> its list: 16 -> 10 */
+  footer > .container-sanoori > .grid ul.mt-4 {
+    margin-top: 10px !important;
+  }
+
+  /* Gold rule under each column heading sits 10px below the label
+     (`pb-2.5`) — 8px keeps it clearly separated but out of the way. */
+  footer > .container-sanoori > .grid h3 {
+    padding-bottom: 8px !important;
+  }
+
+  /* Individual footer links inside a column: 10 -> 6 */
+  footer ul[class*="space-y-2.5"] > li + li {
+    margin-top: 6px !important;
+  }
+
+  /* Contact column items: stacked from 640px up (`sm:space-y-3`) —
+     12 -> 8. Scoped to `min-width: 640px` because below that the same
+     <ul> is a 2-column grid whose rows are spaced by `row-gap` instead,
+     where a margin would only add height. */
+  @media (min-width: 640px) {
+    footer ul[class*="space-y-3"] > li + li {
+      margin-top: 8px !important;
+    }
+  }
+
+  /* Lower bar (copyright · privacy · social row): 20 -> 10 top/bottom
+     padding and 12 -> 8 for its stacked rows. Only `row-gap` is set, so
+     the tablet `sm:gap-6` horizontal spacing between the two groups is
+     preserved exactly. */
+  footer > div:last-child .container-sanoori > div {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    row-gap: 8px !important;
+  }
+
+  /* Contact column divider padding only exists below the `sm:`
+     breakpoint — Tailwind switches it to 0 at 640px — so keep that
+     switch intact and just tighten the value where it is used. */
+  @media (max-width: 639.98px) {
+    footer > .container-sanoori > .grid > div[class*="pt-6"] {
+      padding-top: 14px !important;
+    }
+  }
+
+  /* ---------- 2. HEADER: breathing room between nav items ---------- */
+
+  /* gap-1 (4px) below 1024px -> 12px, i.e. 24px of clear space between
+     adjacent link boxes at tablet (matches the desktop rhythm of
+     10px + 8px + 10px) and 16px at phone widths. Column gap only: the
+     nav stays a single non-wrapping row and header height is unchanged. */
+  nav[aria-label="Main navigation"] {
+    column-gap: 12px !important;
+  }
+
+  /* Phone widths only — STRICTLY BELOW 768px: one step more room again
+     (12px -> 16px) so Home / About / Products / Contact are not cramped
+     on small screens. Same `column-gap` property, so it only widens the
+     space between the link boxes: no font size, colour, active state,
+     logo, header height, language/theme control, CTA or nav behaviour
+     changes, and the row still never wraps or overflows. iPad-portrait
+     (768px) and up keep the 12px rule above / the original Tailwind
+     utilities untouched. */
+  @media (max-width: 767.98px) {
+    nav[aria-label="Main navigation"] {
+      column-gap: 16px !important;
+    }
+  }
+}
+
+/* ============================================================
+   FOOTER — STRICTLY BELOW 768px: MUCH SHORTER, SAME DESIGN
+   ============================================================
+   Spacing only. Colours, background, typography, font family, icons,
+   borders, radius, layout, alignment, link appearance, social icons,
+   the "Developed by BIT" credit and the copyright row are all left
+   exactly as they are — only the vertical gaps between items and
+   groups shrink, so the footer becomes naturally much shorter on
+   phones without anything being clipped or made unreadable:
+
+   - link lists (Quick Links / Products): 10px -> 4px between links
+   - column heading -> its list:           10px ->  6px
+   - brand blurb under the logo:           10px ->  6px
+   - upper-level row gaps:                 14px ->  6px
+   - upper-level top/bottom padding:       16px -> 10px
+   - contact divider top padding:          14px ->  8px (phones only)
+   - contact list heading / item spacing:  10/12 ->  6px
+   - "Developed by BIT" margin:            10px ->  4px
+   - lower bar padding / stacked row gap:  10/8  ->  6/4
+
+   Nothing at 768px or wider is touched: the tablet/desktop rhythm
+   from the block above keeps applying there unchanged. */
+@media (max-width: 767.98px) {
+  /* Upper level: top/bottom padding 16 -> 10, row gap 14 -> 6 */
+  footer > .container-sanoori > .grid {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    row-gap: 6px !important;
+  }
+
+  /* Brand blurb: 10 -> 6 below the logo */
+  footer > .container-sanoori > .grid > div:first-child > p {
+    margin-top: 6px !important;
+  }
+
+  /* Column heading -> its list: 10 -> 6. Same selector shape as the
+     rule in the block above, so this one wins on source order. */
+  footer > .container-sanoori > .grid ul.mt-4 {
+    margin-top: 6px !important;
+  }
+
+  /* Link lists (Quick Links / Products): 10 -> 4 between links.
+     `space-y-2.5` sets BOTH a top and a bottom margin on each <li> and
+     sibling margins collapse, so the earlier `li + li` 6px override
+     still resolved to a 10px gap. Zero the utility margins first, then
+     place the 4px explicitly — items stay close but readable. */
+  footer ul[class*="space-y-2.5"] > li {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  footer ul[class*="space-y-2.5"] > li + li {
+    margin-top: 4px !important;
+  }
+
+  /* "Developed by BIT" credit inside the contact grid: 10 -> 4 */
+  .sanoori-footer-dev-credit-item {
+    margin-top: 4px !important;
+  }
+
+  /* Contact list heading -> list: 10 -> 6. Same selector as the ≤768px
+     contact-grid rule further up the file, so source order wins here —
+     and only below 768px, where that rule is in play. */
+  footer .col-span-2.border-t.border-stone-300\/60.pt-6 ul.grid.grid-cols-2 {
+    margin-top: 6px !important;
+  }
+
+  /* Contact list is a grid below `sm:` (rows spaced by row-gap) and
+     stacked from 640px up, where `sm:space-y-3` still put 12px between
+     items. Same zero-then-place pattern as the link lists: 12 -> 6. */
+  @media (min-width: 640px) {
+    footer ul[class*="space-y-3"] > li {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    footer ul[class*="space-y-3"] > li + li {
+      margin-top: 6px !important;
+    }
+  }
+
+  /* Contact column divider top padding — only exists below `sm:`
+     (Tailwind switches it to 0 at 640px), so keep that switch intact. */
+  @media (max-width: 639.98px) {
+    footer > .container-sanoori > .grid > div[class*="pt-6"] {
+      padding-top: 8px !important;
+    }
+  }
+
+  /* Lower bar (copyright · privacy · city · social): 10 -> 6 top/bottom
+     padding and 8 -> 4 between its stacked rows. */
+  footer > div:last-child .container-sanoori > div {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    row-gap: 4px !important;
+  }
+}
+
+/* ============================================================
+   CONTACT PAGE — MOBILE ONLY (strictly below 768px)
+   /contact
+
+   Scope hooks added in src/app/contact/contact-content.tsx:
+     .sanoori-contact-hero — the PageHeader hero <section>
+     .sanoori-contact-page — the <main> wrapping everything below the hero
+
+   Rules:
+   - Hero photo keeps its exact source ratio (1944x809), so the complete
+     image stays visible: no crop, no zoom, no letterbox strip — and the
+     existing copy block moves into its top-left corner with a small
+     safety gap.
+   - The hero standfirst is hidden below 768px; breadcrumb, heading, the
+     image and the rest of the hero stay exactly as they are.
+   - Compact sizing for everything below the hero: heading/body/label
+     sizes, button text and padding, card padding and section gaps.
+   Nothing at 768px or wider is touched: tablet and desktop keep their
+   existing Tailwind utilities unchanged.
+   ============================================================ */
+@media (max-width: 767.98px) {
+  /* ---------------- HERO ---------------- */
+
+  /* The hero box becomes the photo box. `content-box` keeps the 1px
+     divider outside the ratio box, so the backdrop (`absolute inset-0`)
+     measures exactly 1944x809 and `object-cover` renders the whole
+     photo with nothing cropped or zoomed. */
+  .sanoori-contact-hero {
+    box-sizing: content-box;
+    aspect-ratio: 1944 / 809;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* The copy wrapper is in normal flow on desktop; here it becomes a
+     full-bleed overlay so the ratio box (and not the text) drives the
+     hero height. */
+  .sanoori-contact-hero > div.relative:not(.absolute) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Top-left anchor: cancel the desktop `pl-[160px]` inset and keep only
+     a small comfortable safety gap to the top/left edges. */
+  .sanoori-contact-hero > div.relative:not(.absolute) > div {
+    padding-left: 16px !important;
+  }
+  .sanoori-contact-hero > div.relative:not(.absolute) > div > div {
+    padding-top: 10px !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* Copy stays the same content and colour, just sized so the whole
+     block comfortably fits inside the uncropped photo. */
+  .sanoori-contact-hero nav[aria-label="Breadcrumb"] {
+    margin-bottom: 3px;
+  }
+  .sanoori-contact-hero nav[aria-label="Breadcrumb"] ol {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  .sanoori-contact-hero h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    line-height: 1.15 !important;
+  }
+  /* The standfirst is the only hero copy that earns nothing on a
+     phone-sized photo, so it is dropped below 768px. Breadcrumb, `Contact`
+     heading, hero image, image fitting/crop, hero height, text position,
+     remaining typography and the arrows/slider are left untouched — the
+     hero box is ratio-driven, so its height does not depend on the copy
+     block either. At 768px and wider nothing here applies. */
+  .sanoori-contact-hero h1 + p {
+    display: none;
+  }
+
+  /* ---------------- SECTIONS BELOW THE HERO ---------------- */
+
+  /* Editorial band rhythm: 64px (py-16) of empty space above/below the
+     "Contact Information" header is desktop-scale on a phone. */
+  .sanoori-contact-page .section-spacing {
+    padding-top: 24px;
+    padding-bottom: 28px;
+  }
+
+  /* Header row: tighter gap between the title column and the standfirst. */
+  .sanoori-contact-page .section-spacing > .reveal > .grid {
+    gap: 14px;
+  }
+
+  /* "Contact Information" is 24px below 640px but jumps to 36px once
+     `sm:text-4xl` takes over in the 640–767px band — one phone-sized
+     21–23px step for the whole range instead. */
+  .sanoori-contact-page h2#contact-info-heading {
+    margin-top: 10px;
+    font-size: clamp(1.3125rem, 4.6vw, 1.4375rem);
+    line-height: 1.16;
+  }
+
+  /* Standfirst keeps its readable 14px body — only the rule above it
+     gives back some of its desktop breathing room. */
+  .sanoori-contact-page .section-spacing > .reveal > .grid > div + div > p {
+    padding-top: 12px;
+  }
+
+  /* Channel cards sit closer to the header than the desktop 40/56px. */
+  .sanoori-contact-page .section-spacing > .grid {
+    margin-top: 18px;
+    gap: 12px;
+  }
+
+  /* Primary (navy) channel card: tighter shell, headline and action stack. */
+  .sanoori-contact-page article > div:last-child {
+    padding: 18px;
+  }
+  .sanoori-contact-page article > div:last-child > p {
+    margin-top: 16px;
+    font-size: clamp(1.3rem, 5vw, 1.5rem);
+    line-height: 1.2;
+  }
+  .sanoori-contact-page article > div:last-child > .mt-auto {
+    gap: 10px;
+    padding-top: 18px;
+  }
+
+  /* Secondary channel rows: 20px -> 14/16px of padding, tighter value. */
+  .sanoori-contact-page .section-spacing > .grid ul > li > * {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .sanoori-contact-page .section-spacing > .grid ul .min-w-0 > span + span {
+    margin-top: 3px;
+    font-size: 14.5px;
+    line-height: 1.35;
+  }
+
+  /* Location + categories stack: tighter gap and less tail space. */
+  .sanoori-contact-page .container-sanoori > .grid {
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+
+  /* Shared card heading (location + categories): 18/20px -> 17px. */
+  .sanoori-contact-page section[aria-labelledby="contact-location-heading"] h3,
+  .sanoori-contact-page section[aria-labelledby="contact-categories-heading"] h3 {
+    font-size: 17px;
+  }
+
+  /* Location card: tighter head / map / address rows. */
+  .sanoori-contact-page
+    section[aria-labelledby="contact-location-heading"]
+    > div:first-child {
+    gap: 12px;
+    padding: 16px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-location-heading"]
+    > div:nth-child(2) {
+    min-height: 180px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-location-heading"]
+    > div:last-child {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-location-heading"]
+    > div:last-child
+    p {
+    gap: 10px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-location-heading"]
+    > div:last-child
+    p
+    > span:first-child {
+    height: 24px;
+    margin-top: 6px;
+  }
+
+  /* Categories card: tighter shell, list rows and button block. */
+  .sanoori-contact-page section[aria-labelledby="contact-categories-heading"] {
+    padding: 18px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-categories-heading"]
+    header
+    h3 {
+    margin-top: 12px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-categories-heading"]
+    > ul {
+    margin-top: 14px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-categories-heading"]
+    > ul
+    > li
+    > a {
+    gap: 12px;
+    padding: 12px 0;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-categories-heading"]
+    > ul
+    span.font-heading {
+    font-size: 14.5px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-categories-heading"]
+    > div:last-child {
+    margin-top: 14px;
+  }
+
+  /* WhatsApp CTA band: tighter shell before the footer. */
+  .sanoori-contact-page
+    .container-sanoori
+    > div:not(.grid):not(.section-spacing) {
+    padding-top: 16px;
+    padding-bottom: 40px;
+  }
+  .sanoori-contact-page
+    section[aria-labelledby="contact-whatsapp-heading"]
+    > div:last-child {
+    gap: 20px;
+    padding: 20px;
+  }
+  .sanoori-contact-page h2#contact-whatsapp-heading {
+    margin-top: 10px;
+    font-size: clamp(1.3125rem, 4.6vw, 1.4375rem);
+    line-height: 1.16;
+  }
+  .sanoori-contact-page #contact-whatsapp-heading + p {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  .sanoori-contact-page #contact-whatsapp-heading ~ p:last-child {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+}
+
+/* ============================================================
+   REQUEST QUOTE PAGE — MOBILE ONLY (strictly below 768px)
+   /request-quote?product=...&quantity=...
+
+   Scope hooks added in src/app/request-quote/page.tsx:
+     .sanoori-quote-hero    — the PageHeader hero <section>
+     .sanoori-quote-helpful — the "Helpful to include" heading, its list
+                              and the "What happens next" card (dropped
+                              as one unit on phones)
+
+   Rules:
+   - The hero photo keeps its exact source ratio (2172x724 = 3/1) so the
+     whole image is shown: no crop, no fill-zoom, no letterbox strip —
+     and the copy block is moved into its top-left corner with a small
+     safety gap (the container's own 16/24px gutter on the left, 10px on
+     top).
+   - The hero standfirst is dropped below 768px, leaving only
+     `Home / Get a Price` and the `Get a Price` heading.
+   - The complete "Helpful to include" block (heading, list and the
+     "What happens next" card) is hidden as one unit; the WhatsApp CTA
+     above it and the form beside it stay.
+   - The WhatsApp CTA keeps its text, icon, colour and link; only its
+     padding/gap tighten (`max-md:p-4 max-md:gap-3` in page.tsx) so the
+     title stays on one line at 320px.
+   Nothing at 768px or wider is touched: tablet and desktop keep their
+   existing Tailwind utilities unchanged.
+   ============================================================ */
+@media (max-width: 767.98px) {
+  /* ---------------- HERO ---------------- */
+
+  /* The hero box becomes the photo box. `content-box` keeps the 1px
+     divider outside the ratio box, so the backdrop (`absolute inset-0`)
+     measures exactly 3/1 and `object-cover` renders the whole photo
+     with nothing cropped. */
+  .sanoori-quote-hero {
+    box-sizing: content-box;
+    aspect-ratio: 3 / 1;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* The copy wrapper is in normal flow on tablet/desktop; here it
+     becomes a full-bleed overlay so the ratio box (and not the text)
+     drives the hero height. Its own `px-4`/`sm:px-6` gutter is the left
+     safety gap. */
+  .sanoori-quote-hero > div.relative.container-sanoori {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Top-left anchor: cancel the desktop `py-12 sm:py-16 lg:py-20` inset
+     so the block hugs the top edge instead of sitting centred. */
+  .sanoori-quote-hero > div.relative.container-sanoori > div {
+    padding-top: 10px !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* The standfirst is the only hero copy that earns nothing over a
+     phone-sized photo, so it is dropped below 768px. Breadcrumb,
+     `Get a Price` heading, the hero image and its fitting stay as they
+     are. At 768px and wider nothing here applies. */
+  .sanoori-quote-hero h1 + p {
+    display: none;
+  }
+
+  /* The shared ambient backdrop zoom would scale the photo past its
+     natural box (and therefore crop it) — off on phones only. */
+  .sanoori-quote-hero img.backdrop-zoom {
+    animation: none;
+    transform: none;
+  }
+
+  /* ---------------- "HELPFUL TO INCLUDE" ---------------- */
+
+  /* Heading, list and "What happens next" card disappear as one unit;
+     their `mt-*` margins go with them, so the WhatsApp CTA above stays
+     flush with the form below it. */
+  .sanoori-quote-helpful {
+    display: none;
+  }
+}
+
+/* ============================================================
+   HERO LAYOUT FIXES — SURFACE PRO / LAPTOP RANGE ONLY (~960–1023px)
+   Target: ~960px wide viewports (Surface Pro 10 / laptop at typical scaling)
+   Scope: /about, /products, /contact, /products?category=*
+   DOES NOT APPLY to normal desktop monitors (1024px+)
+   ============================================================ */
+@media (min-width: 960px) and (max-width: 1023px) {
+  /* ---- ABOUT HERO (/about) ---- */
+  /* Fix: Remove dark empty space above/below hero image by matching
+     the backdrop container aspect-ratio to the lg (3/1) design intent.
+     The native 1942/809 ratio with object-contain creates letterboxing
+     for 3:1 slides. Override to 3/1 so object-contain fills the container
+     without dark bands, while keeping slider/crossfade intact. */
+  .sanoori-about-hero > div[style*="isolate"] {
+    aspect-ratio: 3 / 1 !important;
+  }
+
+  /* Hide ONLY the hero description */
+  .sanoori-about-hero p[class*="mt-4"][class*="max-w-2xl"][class*="leading-relaxed"] {
+    display: none !important;
+  }
+
+  /* Position remaining content (breadcrumb + title) at top-left with ~40px inset.
+     The original content wrapper uses pl-[110px] pt-[30px] at lg.
+     Override to ~40px from top and left edges. */
+  .sanoori-about-hero > div.pointer-events-none.absolute.top-0.left-0.z-10 > div.pointer-events-auto {
+    padding-left: 40px !important;
+    padding-top: 40px !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Make hero text significantly smaller for this viewport.
+     Target the h1 and breadcrumb in the About hero content. */
+  .sanoori-about-hero h1 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem) !important;
+    line-height: 1.15 !important;
+  }
+  .sanoori-about-hero nav[aria-label="Breadcrumb"] ol {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ---- PRODUCTS HERO (/products) ---- */
+  /* Hide ONLY the hero description */
+  .sanoori-products-hero:not(.sanoori-products-hero--category)
+    .sanoori-products-hero-content p[class*="mt-4"][class*="max-w-2xl"][class*="leading-relaxed"] {
+    display: none !important;
+  }
+
+  /* Position content at top-left (override centered lg layout).
+     The inner content div already has px-6 (24px). Add the delta to reach ~40px. */
+  .sanoori-products-hero:not(.sanoori-products-hero--category)
+    .sanoori-products-hero-content {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+  .sanoori-products-hero:not(.sanoori-products-hero--category)
+    .sanoori-products-hero-content > div {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    margin-top: 0 !important;
+    padding-top: 40px !important;
+    padding-left: 40px !important; /* 40px total (replaces px-6 + delta) */
+  }
+
+  /* Make hero text significantly smaller for this viewport. */
+  .sanoori-products-hero:not(.sanoori-products-hero--category) h1#products-hero-heading {
+    font-size: clamp(1.5rem, 4vw, 2.25rem) !important;
+    line-height: 1.15 !important;
+  }
+  .sanoori-products-hero:not(.sanoori-products-hero--category) nav[aria-label="Breadcrumb"] ol {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ---- CATEGORY PRODUCTS HERO (/products?category=*) ---- */
+  /* Hide ONLY the hero description */
+  .sanoori-products-hero--category
+    .sanoori-products-hero-content p[class*="mt-4"][class*="max-w-2xl"][class*="leading-relaxed"] {
+    display: none !important;
+  }
+
+  /* Position content at top-left (override -mt-[100px] pull-up).
+     Same inner structure as main products page. */
+  .sanoori-products-hero--category
+    .sanoori-products-hero-content {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+  .sanoori-products-hero--category
+    .sanoori-products-hero-content > div {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    margin-top: 0 !important;
+    padding-top: 40px !important;
+    padding-left: 40px !important;
+  }
+
+  /* Make hero text significantly smaller for this viewport. */
+  .sanoori-products-hero--category h1#products-hero-heading {
+    font-size: clamp(1.5rem, 4vw, 2.25rem) !important;
+    line-height: 1.15 !important;
+  }
+  .sanoori-products-hero--category nav[aria-label="Breadcrumb"] ol {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ---- CONTACT HERO (/contact) ---- */
+  /* Fix: Prevent image cropping by matching section aspect-ratio to the
+     Contact hero image's natural ratio (1944/809). The lg:aspect-[3/1]
+     only applies at 1024px+, so at 960-1023px the section has no ratio
+     and object-cover crops. This matches the mobile (≤768px) approach. */
+  .sanoori-contact-hero {
+    box-sizing: content-box;
+    aspect-ratio: 1944 / 809 !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* The copy wrapper is in normal flow on desktop; here it becomes a
+     full-bleed overlay so the ratio box (and not the text) drives the
+     hero height. Matches mobile behavior. */
+  .sanoori-contact-hero > div.relative:not(.absolute) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Hide ONLY the hero description (standfirst).
+     Uses the existing .sanoori-contact-hero scope class on the PageHeader section. */
+  .sanoori-contact-hero h1 + p {
+    display: none !important;
+  }
+
+  /* Position content at top-left with ~40px inset.
+     Target the content wrapper structure inside PageHeader with placement="top-left".
+     The section has class .sanoori-contact-hero.
+     Inside: div.relative.w-full > div (with left padding) > div (with top padding). */
+  .sanoori-contact-hero > div.relative.w-full > div {
+    padding-left: 40px !important;
+  }
+  .sanoori-contact-hero > div.relative.w-full > div > div {
+    padding-top: 40px !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Make hero text significantly smaller for this viewport. */
+  .sanoori-contact-hero h1 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem) !important;
+    line-height: 1.15 !important;
+  }
+  .sanoori-contact-hero nav[aria-label="Breadcrumb"] ol {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
   }
 }

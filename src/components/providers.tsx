@@ -12,11 +12,13 @@ export function Providers({
   initialLanguage: "en" | "bn";
 }) {
   return (
-    <ThemeProvider>
-      <LanguageProvider initialLanguage={initialLanguage}>
-        <LanguageRefreshHandler />
-        {children}
-      </LanguageProvider>
-    </ThemeProvider>
+    <div className="flex-1 flex-col">
+      <ThemeProvider>
+        <LanguageProvider initialLanguage={initialLanguage}>
+          <LanguageRefreshHandler />
+          {children}
+        </LanguageProvider>
+      </ThemeProvider>
+    </div>
   );
 }

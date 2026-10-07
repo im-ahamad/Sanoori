@@ -12,14 +12,6 @@ import { InquiryContactActions } from "@/components/admin/inquiry-contact-action
 import { DeleteOrderDialog } from "@/components/admin/delete-order-dialog";
 import { useAdminTranslations } from "@/lib/i18n/use-admin-translations";
 
-function buildWhatsAppMessage(
-  customerName: string,
-  productName: string | null
-): string {
-  const productPart = productName ? ` for ${productName}` : "";
-  return `Hello ${customerName}, this is Sanoori Trading regarding your inquiry${productPart}. Could we discuss your requirements?`;
-}
-
 interface PaginationProps {
   data: OrderList;
   query: string;
@@ -181,10 +173,12 @@ export function OrderTable({ data, query }: OrderTableProps) {
                         <InquiryContactActions
                           phone={order.phone}
                           email={order.email}
-                          whatsappMessage={buildWhatsAppMessage(
-                            order.customerName,
-                            order.productName
-                          )}
+                          productSlug={order.productSlug}
+                          productCode={order.productCode}
+                          productId={order.id}
+                          productName={order.productName}
+                          quantity={order.quantity}
+                          productUrl={order.productSlug ? `/products/${order.productSlug}` : undefined}
                           compact
                         />
                         <Link
@@ -249,10 +243,12 @@ export function OrderTable({ data, query }: OrderTableProps) {
                   <InquiryContactActions
                     phone={order.phone}
                     email={order.email}
-                    whatsappMessage={buildWhatsAppMessage(
-                      order.customerName,
-                      order.productName
-                    )}
+                    productSlug={order.productSlug}
+                    productCode={order.productCode}
+                    productId={order.id}
+                    productName={order.productName}
+                    quantity={order.quantity}
+                    productUrl={order.productSlug ? `/products/${order.productSlug}` : undefined}
                     compact
                   />
                   <Button

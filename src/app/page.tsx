@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Hero } from "@/components/home/hero";
 import { CategoryGrid } from "@/components/home/category-grid";
 import { ProductShowcase } from "@/components/home/product-showcase";
-import { CustomerJourney } from "@/components/home/customer-journey";
 import { CtaBand } from "@/components/home/cta-band";
 import { generateOrganizationSchema } from "@/lib/seo";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
@@ -49,7 +48,6 @@ export default async function Home() {
       <Hero />
       <CategoryGrid />
       <ProductShowcase />
-      <CustomerJourney />
       <CtaBand />
       <script
         type="application/ld+json"

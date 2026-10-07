@@ -7,6 +7,7 @@ import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import { HeadScripts } from "@/components/scripts/head-scripts";
 import { getPublicBusinessSettings } from "@/lib/public/settings";
+import { LoadingGate } from "./loading";
 import "./globals.css";
 
 const inter = Inter({
@@ -54,9 +55,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           {t.layout.skipToMainContent}
         </a>
         
-        <Providers initialLanguage={lang}>
-          <SiteChrome footer={<Footer />} settings={businessSettings}>{children}</SiteChrome>
-        </Providers>
+        <div className="flex-1 flex-col">
+          <Providers initialLanguage={lang}>
+            <SiteChrome footer={<Footer />} settings={businessSettings}>{children}</SiteChrome>
+          </Providers>
+        </div>
+
+        {/* Keeps the existing loading interface visible for a minimum duration. */}
+        <LoadingGate />
       </body>
     </html>
   );

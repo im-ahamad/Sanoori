@@ -80,6 +80,7 @@ export async function CustomerJourney() {
       <Container>
         <Reveal>
           <SectionHeader
+            align="center"
             eyebrow={t.customerJourney.eyebrow}
             title={t.customerJourney.title}
             description={t.customerJourney.description}
@@ -105,16 +106,21 @@ export async function CustomerJourney() {
               return (
                 <li
                   key={step.title}
-                  className="relative flex gap-4 sm:gap-5 lg:flex-col lg:items-center lg:gap-0 lg:text-center"
+                  className={
+                    "group relative flex gap-4 sm:gap-5 lg:flex-col lg:items-center lg:gap-0 lg:text-center " +
+                    "transition-[transform,box-shadow] duration-300 ease-out " +
+                    "[@media(min-width:769px)]:hover:[transform:translateY(-4px)] " +
+                    "[@media(min-width:769px)]:hover:shadow-[0_14px_32px_-14px_rgb(0_0_0_/_0.30)]"
+                  }
                 >
 {/* Numbered node */}
-                    <span className="relative z-10 flex size-10 sm:size-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-background font-heading text-sm sm:text-base font-bold text-gold-text shadow-sm">
+                    <span className="relative z-10 flex size-10 sm:size-12 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-background font-heading text-sm sm:text-base font-bold text-gold-text shadow-sm transition-colors duration-300 [@media(min-width:769px)]:group-hover:border-gold/60">
                      {String(index + 1).padStart(2, "0")}
                    </span>
 
                    <div className="lg:mt-6">
                      <h3 className="flex items-center gap-2 font-heading text-base sm:text-lg font-semibold text-foreground lg:justify-center">
-                       <Icon className="size-4 sm:size-5 shrink-0 text-gold-dark" aria-hidden="true" />
+                       <Icon className="size-4 sm:size-5 shrink-0 text-gold-dark transition-transform duration-300 [@media(min-width:769px)]:group-hover:scale-105" aria-hidden="true" />
                        {step.title}
                      </h3>
                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">

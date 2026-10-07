@@ -43,6 +43,8 @@ interface ProductRequestFormProps {
   businessSettings: PublicBusinessSettings;
   /** When provided (modal), the success panel shows a "Done" button. */
   onDone?: () => void;
+  /** WhatsApp deep link — rendered as a compact button beside "Ask for Price" below 1024px. */
+  whatsappHref?: string | null;
   /** Initial language for server-side rendering to avoid hydration mismatch. */
   initialLang?: SupportedLanguage;
   /** Initial quantity value from URL query parameter. */
@@ -68,6 +70,7 @@ export function ProductRequestForm({
   product,
   businessSettings,
   onDone,
+  whatsappHref,
   initialLang,
   initialQuantity,
 }: ProductRequestFormProps) {
@@ -305,7 +308,7 @@ export function ProductRequestForm({
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             {rq.productSummary.requestingPriceFor}
           </p>
-          <h3 className="mt-0.5 truncate font-heading text-base font-semibold text-foreground">
+          <h3 className="mt-0.5 break-words font-heading text-base font-semibold text-foreground sm:truncate">
             {product.name}
           </h3>
           {product.model ? (
@@ -435,24 +438,42 @@ export function ProductRequestForm({
 
       <input type="hidden" name="productSlug" value={product.slug} />
       <div>
-        <Button
-          type="submit"
-          disabled={pending}
-          className="h-12 w-full px-7 text-base"
-          aria-disabled={pending || undefined}
-        >
-          {pending ? (
-            <>
-              <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-              {rq.form.submittingButton}
-            </>
-          ) : (
-            <>
-              {rq.form.submitButton}
-              <Send className="size-5" aria-hidden="true" />
-            </>
+        <div className="flex items-center gap-2">
+          <Button
+            type="submit"
+            disabled={pending}
+            className="h-12 w-full px-7 text-base max-lg:flex-1 max-lg:px-2"
+            aria-disabled={pending || undefined}
+          >
+            {pending ? (
+              <>
+                <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+                {rq.form.submittingButton}
+              </>
+            ) : (
+              <>
+                {rq.form.submitButton}
+                <Send className="size-5" aria-hidden="true" />
+              </>
+            )}
+          </Button>
+          {whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-[#25D366] px-2 text-sm font-semibold text-white transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 max-[340px]:px-1 max-[340px]:text-xs sm:px-4 lg:hidden"
+            >
+              <MessageCircle
+                className="size-4 shrink-0 max-[340px]:size-3.5"
+                aria-hidden="true"
+              />
+              <span className="min-w-0 break-words text-center leading-tight">
+                {rq.whatsappCTA.button}
+              </span>
+            </a>
           )}
-        </Button>
+        </div>
         <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">
           {rq.form.noObligation}
         </p>

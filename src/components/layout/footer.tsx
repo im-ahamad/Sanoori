@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Globe, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { businessConfig } from "@/config/site";
 import { isConfigPlaceholder } from "@/lib/config";
 import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
@@ -186,6 +186,29 @@ export async function Footer() {
                   </a>
                 </li>
               )}
+              {/* Developer credit — placed in same column as Email on mobile (grid column 1) */}
+              <li className="sanoori-footer-dev-credit-item">
+                <p className="group flex items-start gap-2.5 text-xs italic tracking-[0.03em] text-stone-500 transition-colors duration-300 hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100">
+                  <Globe
+                    aria-hidden="true"
+                    className="mt-0.5 size-3.5 shrink-0 text-gold/90 transition-[color,transform] duration-300 group-hover:-translate-y-px group-hover:text-gold-dark dark:group-hover:text-gold"
+                  />
+                  <span className="min-w-0">
+                    Developed by{" "}
+                    <a
+                      href="https://basirait.com/en"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-sm text-gold-text transition-colors duration-300 hover:text-gold-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 dark:hover:text-gold-light"
+                    >
+                      BIT
+                      <sup className="relative -top-[6px] ml-0.5 align-baseline text-[0.6em] font-medium leading-none tracking-[0.05em]">
+                        TM
+                      </sup>
+                    </a>
+                  </span>
+                </p>
+              </li>
               {showAddress && (
                 <li className="flex items-start gap-2.5 text-sm text-stone-600 dark:text-stone-400">
                   <MapPin className={iconClass} aria-hidden="true" />
@@ -219,14 +242,17 @@ export async function Footer() {
             </div>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 sm:justify-end">
               {showCity && (
-                <span className="text-xs text-stone-500 dark:text-stone-400">
+                <span className="sanoori-footer-city text-xs text-stone-500 dark:text-stone-400">
                   {t.footer.cityCountry.replace("{city}", businessConfig.city || "").replace("{country}", businessConfig.country || "")}
                 </span>
               )}
               <ul className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
                 {socialLinks.map((social) =>
                   !isConfigPlaceholder(social.href) ? (
-                    <li key={social.key}>
+                    <li
+                      key={social.key}
+                      className={`sanoori-footer-social--${social.key}`}
+                    >
                       <a
                         href={social.href || ""}
                         target="_blank"

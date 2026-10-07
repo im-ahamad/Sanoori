@@ -114,7 +114,7 @@ export default async function ProductDetailPage({
   );
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 sanoori-product-view">
       <PageHeader
         title={product.name}
         description={undefined}
@@ -133,7 +133,7 @@ export default async function ProductDetailPage({
                 TOP PRODUCT AREA — 2-column: Image (left) | Info (right)
                 Single unified bordered container
            ============================================================ */}
-          <div className="flex flex-col lg:flex-row rounded-2xl border border-border overflow-hidden bg-card">
+          <div className="flex flex-col lg:flex-row rounded-2xl overflow-hidden bg-card">
             {/* Product Image — LEFT */}
             <div className="flex-1 min-w-0 lg:rounded-l-2xl">
               <ProductGallery images={galleryImages} productName={product.name} hideThumbnails />

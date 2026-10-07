@@ -100,15 +100,44 @@ export default async function ProductsPage({
   // Categories are needed for the filter bar before the (~streamed) results.
   const categories = await getPublicCategories();
 
+  const heroHeading =
+    categorySlug === "sanitary-ware"
+      ? t.categories["sanitary-ware"]
+      : categorySlug === "tiles"
+      ? t.categories.tiles
+      : categorySlug === "building-materials"
+      ? t.categories["building-materials"]
+      : t.products.heroTitle;
+
+  // Mobile-only heading trim for Building Materials: the trailing word
+  // ("Materials" / "ম্যাটেরিয়ালস") is wrapped so CSS can hide it below 768px,
+  // leaving exactly "Building" / "বিল্ডিং". Above 768px the span renders
+  // inline, so the heading text is byte-for-byte unchanged.
+  const heroHeadingTail =
+    categorySlug === "building-materials"
+      ? heroHeading.lastIndexOf(" ")
+      : -1;
+
   return (
     <main className="flex-1 relative">
       {/* Hero with text centered in left 35% of image */}
       <section
         className={cn(
-          "relative overflow-hidden border-b border-white/10 bg-navy-dark text-white",
+          "relative overflow-hidden border-b border-white/10 bg-navy-dark text-white sanoori-products-hero",
+          // Scope hooks for the mobile-only category hero treatment (full
+          // natural-ratio image + top-left copy in globals.css); the slug
+          // variant lets individual categories tweak their heading.
+          categorySlug && categorySlug in CATEGORY_HERO_IMAGES
+            ? `sanoori-products-hero--category sanoori-products-hero--${categorySlug}`
+            : null,
           categorySlug
-            ? "min-h-[20rem] lg:min-h-[28rem] pb-24 lg:pb-28"
-            : "min-h-[calc(100vw/3)] pb-[4px]"
+            ? "min-h-[20rem] lg:min-h-[28rem]"
+            // Floor the hero so it can never be shorter than the 137px text block
+            // (content 137 + 1px border + 2px slack). Below 420px `100vw/3` would
+            // otherwise be < 138px and clip the breadcrumb into the header and cut
+            // the description. At >=420px (and therefore all desktop widths) the
+            // `max()` resolves to `calc(100vw/3)`, so nothing else changes.
+            : "min-h-[max(calc(100vw/3),140px)] pb-[4px]"
         )}
         aria-labelledby="products-hero-heading"
       >
@@ -134,13 +163,28 @@ export default async function ProductsPage({
 
         {/* Hero text block - left 35% of hero from lg up, full width below lg */}
         <div
-          className="absolute inset-0 flex items-center lg:w-[35%]"
+          className="absolute inset-0 flex items-start lg:items-center lg:w-[35%] sanoori-products-hero-content"
           aria-hidden="true"
         >
           <div
             className={cn(
-              "w-full flex flex-col items-center justify-center h-full px-6 text-center",
-              categorySlug ? "-mt-[100px]" : "lg:-mt-[230px]"
+              // Desktop/laptop (lg+): restore the approved centered copy block
+              // (axis + vertical centering + centred text). Without it the
+              // fixed pull-up below pushes the whole block above the hero edge
+              // and the breadcrumb/heading are clipped out of view. Below lg
+              // the mobile/tablet top-left presentation is left untouched.
+              "w-full flex flex-col items-start justify-start lg:items-center lg:justify-center lg:text-center h-full px-6 text-left",
+              // The hero is aspect-ratio driven (`100vw/3`), so the block is
+              // pulled up by a fixed 230px to sit in the top-left. On narrower
+              // / short lg viewports that fixed pull-up outruns the shorter
+              // hero and shoves the breadcrumb above the hero edge (hidden
+              // behind the header). Cap the pull-up against the real hero
+              // height so the block always keeps ~24px below the top edge;
+              // at >=1440px (and every larger desktop) the cap resolves back
+              // to exactly -230px, so the approved desktop is untouched.
+              categorySlug
+                ? "-mt-[100px]"
+                : "lg:mt-[max(-230px,248px_-_100vw_/_3)]"
             )}
           >
             <nav aria-label="Breadcrumb" className="mb-2">
@@ -171,13 +215,16 @@ export default async function ProductsPage({
               id="products-hero-heading"
               className="font-heading font-bold tracking-tight text-white text-[clamp(1.875rem,5vw,3rem)] sm:text-[clamp(2.25rem,5vw,3.5rem)] lg:text-[clamp(3rem,5vw,4rem)]"
             >
-              {categorySlug === "sanitary-ware"
-                ? t.categories["sanitary-ware"]
-                : categorySlug === "tiles"
-                ? t.categories.tiles
-                : categorySlug === "building-materials"
-                ? t.categories["building-materials"]
-                : t.products.heroTitle}
+              {heroHeadingTail > 0 ? (
+                <>
+                  {heroHeading.slice(0, heroHeadingTail)}
+                  <span className="sanoori-products-hero-heading-tail">
+                    {heroHeading.slice(heroHeadingTail)}
+                  </span>
+                </>
+              ) : (
+                heroHeading
+              )}
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed sm:text-lg text-white/80 whitespace-pre-wrap">
               {t.products.heroDescription}
@@ -310,7 +357,7 @@ async function CatalogueView({
         {(!hasActiveFilters ? allProducts : catalogue.items).length > 0 ? (
           <>
             {!hasActiveFilters ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+              <div className="sanoori-products-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
                 {allProducts.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -321,7 +368,7 @@ async function CatalogueView({
               </div>
             ) : (
               <>
-                <div className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8 ${filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials" ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+                <div className={`sanoori-products-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8 ${filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials" ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
                   {catalogue.items.map((product) => (
                     <ProductCard
                       key={product.id}

@@ -103,8 +103,16 @@ const MAP_BLUEPRINT: CSSProperties = {
  * Button system — one shape, restrained states
  * ------------------------------------------------------------------ */
 
+/* Mobile (<768px) buttons: `max-md:` overrides the base size at every width
+   below 768px — and no `sm:`/`lg:` size follows it — so this is the one
+   place the button shrinks: 14px side / 8px block padding, 12px label and a
+   6px icon gap → ~33px tall (vs 40px / 13px / 16px before). Smaller, but
+   still comfortably tappable — and full width below 640px, so the hit
+   area stays wide — plus the extra room keeps the long Bangla labels
+   on a single line at 320px. 768px and above keep `px-5 py-3 text-sm`
+   exactly as before. */
 const BTN =
-  "group/btn inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold tracking-[0.01em] transition-all duration-300 ease-out active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto";
+  "group/btn inline-flex w-full items-center justify-center gap-2 max-md:gap-1.5 rounded-xl px-5 max-md:px-3.5 py-3 max-md:py-2 text-sm max-md:text-[12px] font-semibold tracking-[0.01em] transition-all duration-300 ease-out active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto";
 
 const BTN_CALL =
   "bg-gold text-navy-dark shadow-[0_14px_28px_-18px_rgba(198,158,74,0.95)] hover:-translate-y-0.5 hover:scale-[1.03] hover:bg-gold hover:shadow-[0_25px_50px_-20px_rgba(198,158,74,1.0)] hover:ring-4 hover:ring-gold/50 focus-visible:ring-gold/70 focus-visible:ring-offset-navy-dark transition-all duration-300 ease-out";
@@ -122,7 +130,7 @@ const CARD_SHELL =
   "rounded-2xl border border-border/70 bg-card shadow-[0_1px_2px_rgba(16,24,40,0.04),0_18px_40px_-30px_rgba(16,24,40,0.30)] transition-all duration-300 ease-out";
 
 const ICON_SHELL =
-  "flex size-11 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 ease-out";
+  "flex size-11 max-md:size-10 shrink-0 items-center justify-center rounded-xl border transition-all duration-300 ease-out";
 
 const ICON_GOLD = "border-gold/25 bg-gold/10 text-gold-text";
 const ICON_GREEN =
@@ -216,7 +224,7 @@ export function ContactPageContent({
   const hasCategories = featuredCategories.length > 0;
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 sanoori-contact-page">
       <PageHeader
         title={contact.pageTitle}
         description={contact.pageDescription}
@@ -234,7 +242,11 @@ export function ContactPageContent({
         placement="top-left"
         topPadding="pt-[100px]"
         leftPadding="pl-[160px]"
-        className="lg:aspect-[3/1] lg:box-content lg:min-h-fit"
+        // `sanoori-contact-hero` is the mobile-only scope hook (globals.css):
+        // below 768px it gives the hero the source image ratio (full, uncropped
+        // photo) and parks the copy block in its top-left corner. Laptop and
+        // desktop keep the `lg:` sizing below untouched.
+        className="lg:aspect-[3/1] sanoori-contact-hero"
       />
 
       {/* ================================================================
@@ -255,7 +267,7 @@ export function ContactPageContent({
         <Container className="relative">
           <div className="section-spacing">
             <Reveal>
-              <div className="grid gap-7 lg:grid-cols-12 lg:items-end lg:gap-14">
+              <div className="grid gap-7 max-md:gap-4 lg:grid-cols-12 lg:items-end lg:gap-14">
                 <div className="lg:col-span-7">
                   <p className="flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-gold-text">
                     <span className="h-px w-10 bg-gold/70" aria-hidden="true" />
@@ -263,13 +275,13 @@ export function ContactPageContent({
                   </p>
                   <h2
                     id="contact-info-heading"
-                    className="mt-5 font-heading text-3xl font-bold leading-[1.12] tracking-[-0.02em] text-foreground sm:text-4xl lg:text-[2.85rem]"
+                    className="mt-5 max-md:mt-3 font-heading text-3xl max-md:text-2xl font-bold leading-[1.12] tracking-[-0.02em] text-foreground sm:text-4xl lg:text-[2.85rem]"
                   >
                     {cp.contactInfo.title}
                   </h2>
                 </div>
                 <div className="lg:col-span-5">
-                  <p className="max-w-xl border-t border-border/70 pt-5 text-[0.95rem] leading-relaxed text-muted-foreground lg:ml-auto lg:max-w-sm">
+                  <p className="max-w-xl border-t border-border/70 pt-5 max-md:pt-4 text-[0.95rem] max-md:text-sm leading-relaxed text-muted-foreground lg:ml-auto lg:max-w-sm">
                     {cp.contactInfo.description}
                   </p>
                 </div>
@@ -277,7 +289,7 @@ export function ContactPageContent({
             </Reveal>
 
             {primaryDetail && (
-              <div className="mt-10 grid gap-5 sm:mt-14 lg:grid-cols-12 lg:gap-6">
+              <div className="mt-10 max-md:mt-6 grid gap-5 max-md:gap-3 sm:mt-14 lg:grid-cols-12 lg:gap-6">
                 <Reveal
                   className={cn(
                     "h-full",
@@ -344,7 +356,7 @@ export function ContactPageContent({
                   mapsEmbed={mapsEmbed}
                   title={cp.location.title}
                   description={cp.location.description}
-                  viewMapLabel="View on Map"
+                  viewMapLabel={cp.location.viewMapLabel}
                 />
               </Reveal>
             )}

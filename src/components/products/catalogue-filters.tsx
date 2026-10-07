@@ -49,16 +49,18 @@ export function CatalogueFilters({
   );
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 sm:p-5">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px] lg:items-start">
+    <div className="rounded-lg border border-border bg-card p-3 md:p-5">
+      <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-[1fr_300px] lg:items-start">
         {/* Category navigation */}
         <div>
-          <h2 className="flex items-center gap-1.5 font-heading text-sm font-semibold uppercase tracking-wider text-foreground">
+          {/* MOBILE (<768px): compact heading so the whole block eats less
+              vertical space. `md:` restores the approved tablet/desktop size. */}
+          <h2 className="flex items-center gap-1.5 font-heading text-[13px] md:text-sm font-semibold uppercase tracking-wider text-foreground">
             <SlidersHorizontal className="size-4 text-muted-foreground" aria-hidden="true" />
             {t.products.browseByCategory}
           </h2>
-          <nav aria-label="Product categories" className="mt-3">
-            <ul className="flex flex-wrap items-center justify-center gap-2">
+          <nav aria-label="Product categories" className="mt-2 md:mt-3">
+            <ul className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2">
               <li>
                 <CategoryChip
                   href={buildPath(values, {
@@ -92,9 +94,9 @@ export function CatalogueFilters({
           {activeCategory && activeCategory.subcategories.length > 0 && (
             <nav
               aria-label="Product types"
-              className="mt-3 border-t border-border pt-3"
+              className="mt-2 md:mt-3 border-t border-border pt-2 md:pt-3"
             >
-              <ul className="flex flex-wrap gap-2">
+              <ul className="flex flex-wrap gap-1.5 md:gap-2">
                 <li>
                   <SubcategoryChip
                     href={buildPath(values, { subcategorySlug: undefined })}
@@ -121,7 +123,7 @@ export function CatalogueFilters({
         </div>
 
         {/* Search + availability */}
-        <form action="/products" method="get" className="space-y-3">
+        <form action="/products" method="get" className="space-y-2.5 md:space-y-3">
           <input type="hidden" name="category" value={values.categorySlug ?? ""} />
           <input
             type="hidden"
@@ -130,14 +132,14 @@ export function CatalogueFilters({
           />
           <label
             htmlFor="catalogue-search"
-            className="font-heading text-sm font-semibold text-foreground"
+            className="font-heading text-[13px] md:text-sm font-semibold text-foreground"
           >
             {t.products.searchProducts}
           </label>
           <div className="flex gap-2">
             <div className="relative flex-1 min-w-0">
               <Search
-                className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+                className="pointer-events-none absolute left-3 md:left-3.5 top-1/2 size-4 md:size-5 -translate-y-1/2 text-muted-foreground"
                 aria-hidden="true"
               />
               <input
@@ -146,22 +148,22 @@ export function CatalogueFilters({
                 name="q"
                 defaultValue={values.q ?? ""}
                 placeholder={t.products.searchPlaceholder}
-                className="h-12 w-full rounded-md border border-input bg-background pl-10 pr-4 text-base shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                className="h-10 md:h-12 w-full rounded-md border border-input bg-background pl-9 md:pl-10 pr-3 md:pr-4 text-base shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               />
             </div>
             <button
               type="submit"
-              className="h-12 rounded-md bg-primary px-4 sm:px-6 text-sm sm:text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
+              className="h-10 md:h-12 rounded-md bg-primary px-3 md:px-6 text-sm md:text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
             >
               {t.products.searchButton}
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 md:gap-3 sm:grid-cols-2">
             <div>
               <label
                 htmlFor="catalogue-availability"
-                className="font-heading text-sm font-semibold text-foreground"
+                className="font-heading text-[13px] md:text-sm font-semibold text-foreground"
               >
                 {t.products.availabilityLabel}
               </label>
@@ -169,7 +171,7 @@ export function CatalogueFilters({
                 id="catalogue-availability"
                 name="availability"
                 defaultValue={values.availability ?? ""}
-                className="mt-1 h-12 w-full rounded-md border border-input bg-background px-4 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                className="mt-1 h-10 md:h-12 w-full rounded-md border border-input bg-background px-3 md:px-4 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
               >
                 <option value="">{t.products.anyAvailability}</option>
                 {AVAILABILITY_OPTIONS.slice(1).map((value) => {
@@ -187,7 +189,7 @@ export function CatalogueFilters({
               </select>
             </div>
             <div className="flex items-center">
-              <label className="flex h-12 items-center gap-2.5 text-sm font-medium text-foreground">
+              <label className="flex h-10 md:h-12 w-full items-center gap-2 md:gap-2.5 text-sm font-medium text-foreground lg:w-auto">
                 <input
                   type="checkbox"
                   name="featured"
@@ -218,8 +220,11 @@ function CategoryChip({
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
+      /* MOBILE (<768px): 40px tall + tighter padding keeps the chips compact
+         while staying a comfortable tap target. `md:` keeps the approved
+         48px desktop/tablet chip untouched. Labels are never truncated. */
       className={cn(
-        "inline-flex h-12 items-center justify-center rounded-full border px-4 font-medium transition-colors duration-200 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "inline-flex h-10 md:h-12 items-center justify-center rounded-full border px-3 md:px-4 font-medium transition-colors duration-200 text-[13px] md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         active
           ? "border-primary bg-primary text-primary-foreground hover:text-gold"
           : "border-border bg-background text-foreground hover:border-primary/40 hover:text-gold-text"
@@ -243,8 +248,10 @@ function SubcategoryChip({
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
+      /* MOBILE (<768px): tighter padding/type; height stays 36px so the
+         secondary chips remain easy to tap. `md:` restores desktop values. */
       className={cn(
-        "inline-flex h-9 items-center rounded-full border px-4 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "inline-flex h-9 items-center rounded-full border px-3 md:px-4 text-[13px] md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         active
           ? "border-gold bg-gold/15 font-medium text-navy-dark"
           : "border-border bg-background text-muted-foreground hover:border-gold/50 hover:text-foreground"

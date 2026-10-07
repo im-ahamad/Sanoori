@@ -219,7 +219,7 @@ export const en = {
     getPriceDescription: "Choose a quantity, then message us — we reply with the price.",
     quantityLabel: "Quantity",
     quantityHint: "You can change this in the WhatsApp message too.",
-    getPriceOnWhatsApp: "Get Price on WhatsApp",
+    getPriceOnWhatsApp: "Price on WhatsApp",
     askForPrice: "Ask for Price",
     whatsappOpensWithDetails: "Opens WhatsApp with this product and quantity already in your message.",
     callUs: "Call Us",
@@ -341,6 +341,7 @@ export const en = {
     whatsappCTA: {
       title: "Message us on WhatsApp",
       description: "Tell us what you need and get a reply fast.",
+      button: "Price on WhatsApp",
     },
     helpfulToInclude: {
       title: "Helpful to include",
@@ -514,6 +515,7 @@ export const en = {
     location: {
       title: "Find Us",
       description: "Visit our showroom at the address below.",
+      viewMapLabel: "View on Map",
     },
     whatsappCTA: {
       title: "Need a quick answer?",

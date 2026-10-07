@@ -107,7 +107,7 @@ function AboutHeroBackdrop({
       <div
         aria-hidden="true"
         role="presentation"
-        className="pointer-events-none relative aspect-[3/1] w-full overflow-hidden"
+        className="pointer-events-none relative aspect-[1942/809] lg:aspect-[3/1] w-full overflow-hidden"
         style={{ isolation: "isolate" }}
       >
         {ABOUT_HERO_SLIDES.map((src, index) => {
@@ -124,7 +124,7 @@ function AboutHeroBackdrop({
               preload={index === 0}
               loading={index === 0 ? undefined : "eager"}
               className={cn(
-                "object-cover",
+                "object-contain lg:object-cover",
                 HERO_OBJECT_POSITION,
                 isActive || isPrevious ? "opacity-100" : "opacity-0"
               )}
@@ -185,7 +185,7 @@ function AboutHeroNav({
     "absolute inset-y-0 -left-1/3 w-1/3 bg-linear-to-r from-transparent via-white/20 to-transparent hero-arrow-sheen";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex aspect-[3/1] items-center justify-between px-4 sm:px-6 lg:px-8">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex aspect-[1942/809] lg:aspect-[3/1] items-center justify-between px-4 sm:px-6 lg:px-8">
       <button
         type="button"
         onClick={onPrevious}
@@ -245,7 +245,7 @@ export function AboutHero({
   };
 
   return (
-    <section className="relative overflow-hidden bg-navy-dark text-white lg:grid lg:aspect-[3/1] lg:box-content lg:min-h-fit">
+    <section className="relative overflow-hidden bg-navy-dark text-white lg:grid lg:aspect-[3/1] sanoori-about-hero">
       <AboutHeroBackdrop
         active={active}
         previous={previous}
@@ -261,7 +261,7 @@ export function AboutHero({
                 <nav aria-label="Breadcrumb" className="mb-1">
                   <ol
                     className={cn(
-                      "flex items-center gap-1.5 text-xs sm:text-sm",
+                      "flex items-center gap-1.5 text-xs lg:text-sm",
                       toneClass.breadcrumb,
                       toneClass.glow
                     )}

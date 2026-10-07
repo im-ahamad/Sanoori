@@ -3,22 +3,23 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { businessConfig } from "@/config/site";
+import { isConfigPlaceholder } from "@/lib/config";
 import type { BusinessSettings as PrismaBusinessSettings } from "@/generated/prisma/client";
 
 export interface PublicBusinessSettings {
   id: string;
   name: string;
-  phone: string | null;
-  whatsapp: string | null;
-  email: string | null;
-  address: string | null;
-  city: string | null;
-  country: string | null;
-  facebook: string | null;
-  instagram: string | null;
-  tiktok: string | null;
-  youtube: string | null;
-  telegram: string | null;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  address: string;
+  city: string;
+  country: string;
+  facebook: string;
+  instagram: string;
+  tiktok: string;
+  youtube: string;
+  telegram: string;
   logo: {
     src: string;
     alt: string;
@@ -32,6 +33,13 @@ export interface PublicBusinessSettings {
   };
 }
 
+function resolveValue(stored: string | null, configured: string): string {
+  if (stored === null || isConfigPlaceholder(stored)) {
+    return configured;
+  }
+  return stored;
+}
+
 function toPublicBusinessSettings(
   settings: PrismaBusinessSettings | null
 ): PublicBusinessSettings {
@@ -41,17 +49,17 @@ function toPublicBusinessSettings(
   return {
     id: settings.id,
     name: settings.name,
-    phone: settings.phone,
-    whatsapp: settings.whatsapp,
-    email: settings.email,
-    address: settings.address,
-    city: settings.city,
-    country: settings.country,
-    facebook: settings.facebook,
-    instagram: settings.instagram,
-    tiktok: settings.tiktok,
-    youtube: settings.youtube,
-    telegram: settings.telegram,
+    phone: resolveValue(settings.phone, fallback.phone),
+    whatsapp: resolveValue(settings.whatsapp, fallback.whatsapp),
+    email: resolveValue(settings.email, fallback.email),
+    address: resolveValue(settings.address, fallback.address),
+    city: resolveValue(settings.city, fallback.city),
+    country: resolveValue(settings.country, fallback.country),
+    facebook: resolveValue(settings.facebook, fallback.facebook),
+    instagram: resolveValue(settings.instagram, fallback.instagram),
+    tiktok: resolveValue(settings.tiktok, fallback.tiktok),
+    youtube: resolveValue(settings.youtube, fallback.youtube),
+    telegram: resolveValue(settings.telegram, fallback.telegram),
     logo: fallback.logo,
     maps: fallback.maps,
     analytics: fallback.analytics,

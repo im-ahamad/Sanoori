@@ -134,7 +134,7 @@ function HeroBackdrop({
       <div
         aria-hidden="true"
         role="presentation"
-        className="pointer-events-none relative aspect-[1942/809] w-full overflow-hidden lg:aspect-[3/1] lg:col-start-1 lg:row-start-1 lg:self-center"
+        className="pointer-events-none relative aspect-[1942/809] w-full overflow-hidden lg:aspect-[3/1] lg:col-start-1 lg:row-start-1"
         style={{ isolation: "isolate" }}
       >
         {HERO_SLIDES.map((src, index) => {
@@ -168,7 +168,7 @@ function HeroBackdrop({
       <div
         aria-hidden="true"
         role="presentation"
-        className={cn("pointer-events-none absolute inset-0", HERO_OVERLAY)}
+        className={cn("pointer-events-none absolute inset-0", HERO_OVERLAY, "sanoori-hero-overlay")}
       />
     </>
   );
@@ -270,7 +270,7 @@ export function Hero() {
   const motion = reducedMotion ? "duration-0" : "duration-700";
 
   return (
-    <section className="relative overflow-hidden bg-navy-dark text-white lg:grid lg:aspect-[3/1] lg:box-content lg:min-h-fit">
+    <section className="relative overflow-hidden bg-navy-dark text-white lg:grid lg:aspect-[3/1] lg:box-content lg:min-h-fit sanoori-hero">
       {/* Full-width hero image (natural ratio, manual navigation) + navy wash */}
       <HeroBackdrop
         active={active}
@@ -289,8 +289,8 @@ export function Hero() {
                   motion,
                   "lg:gap-2 xl:gap-3",
                   active !== 0
-                    ? "text-[calc(0.7rem_-_3px)] sm:text-[calc(0.72rem_-_3px)] lg:text-[calc(0.7rem_-_3px)] xl:text-[calc(0.78rem_-_3px)]"
-                    : "text-[0.7rem] sm:text-[0.72rem] lg:text-[0.7rem] xl:text-[0.78rem]"
+                    ? "text-[12px] lg:text-[calc(0.7rem_-_3px)] xl:text-[calc(0.78rem_-_3px)]"
+                    : "text-[12px] lg:text-[0.7rem] xl:text-[0.78rem]"
                 )}
               >
                 <span className={cn("h-px w-8 bg-gold/60", "lg:w-6 xl:w-8")} aria-hidden="true" />

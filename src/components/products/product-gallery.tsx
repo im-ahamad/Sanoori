@@ -361,10 +361,26 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
   return (
     <div
       ref={rootRef}
-      className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_72px] lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start relative"
+      className={cn(
+        // The trailing column is a thumbnail rail, so it is only reserved when
+        // thumbnails are actually rendered — otherwise it is dead space beside
+        // the image (this page hides them). The `lg` (>=1024px) rail is kept
+        // unconditionally: it is part of the approved desktop layout.
+        "grid grid-cols-1 gap-3 relative lg:grid-cols-[minmax(0,1fr)_88px] lg:items-start",
+        !hideThumbnails && "md:grid-cols-[minmax(0,1fr)_72px]"
+      )}
     >
-      {/* Main image */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-white dark:bg-background">
+      {/* Main image — below `lg` the box follows the image's own aspect ratio.
+          Delivered URLs use `c_limit`, so they are never square: a fixed 1:1 box
+          letterboxed ~33% of the area for landscape/portrait shots and shrank
+          the product. In flow at its natural ratio the image fills the width with
+          no empty bands; the approved desktop (>=1024px) keeps the square box. */}
+      <div
+        className={cn(
+          "relative w-full overflow-hidden rounded-lg bg-white dark:bg-background lg:aspect-square",
+          !selected.url && "aspect-square"
+        )}
+      >
         {selected.url ? (
           <div
             ref={mainImageRef}
@@ -374,13 +390,17 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
             onMouseLeave={handleMouseLeave}
             onTouchStart={handleTouchStart}
           >
+            {/* The 1080×1080 props mirror the `c_limit` delivery box: a truthful
+                placeholder ratio until the bytes arrive, then the image's own
+                natural ratio takes over (attributes map to `aspect-ratio: auto …`). */}
             <Image
               src={displayImageUrl}
               alt={selectedAlt}
-              fill
+              width={1080}
+              height={1080}
               sizes="(max-width: 1024px) 100vw, 640px"
               unoptimized
-              className="object-contain"
+              className="block w-full h-auto object-contain lg:absolute lg:inset-0 lg:h-full lg:w-full"
               style={{ objectFit: 'contain' }}
               priority
             />

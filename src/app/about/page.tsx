@@ -9,6 +9,7 @@ import { getPublicCategories } from "@/lib/public/catalogue";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import { AboutHero } from "@/components/about/about-hero";
+import { CustomerJourney } from "@/components/home/customer-journey";
 
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
@@ -38,17 +39,21 @@ export default async function AboutPage() {
         title={t.about.heroTitle}
         description={t.about.heroDescription}
         breadcrumbs={[{ label: "about", href: "/about" }]}
-        breadcrumbLinkClassName="text-[1rem] transition-colors duration-200 hover:text-gold-light"
+        breadcrumbLinkClassName="text-[12px] lg:text-[1rem] transition-colors duration-200 hover:text-gold-light"
       />
 
       <div className="section-spacing">
         <Container>
           <Reveal>
+            {/* "Who we are" — MOBILE ONLY (strictly below 768px): a smaller
+                heading, smaller body copy and tighter spacing. The `md:`
+                values are exactly the previous utilities, so iPad-portrait
+                (768px) and everything wider render byte-for-byte as before. */}
             <div className="mx-auto max-w-3xl">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              <h2 className="font-heading text-xl font-bold tracking-tight text-foreground md:text-3xl">
                 {t.about.whoWeAre.title}
               </h2>
-              <div className="mt-4 space-y-4 text-base leading-relaxed text-muted-foreground">
+              <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground md:mt-4 md:space-y-4 md:text-base">
                 <p>
                   {t.about.whoWeAre.p1}
                 </p>
@@ -67,7 +72,7 @@ export default async function AboutPage() {
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                 {t.about.whatWeSupply.description}
               </p>
-              <ul className="mt-6 space-y-4">
+              <ul className="mt-6 space-y-4 sanoori-about-supply-cards">
                 {categories.map((category) => {
                   const translatedName = t.categories[category.slug as keyof typeof t.categories] ?? category.name;
                   return (
@@ -100,30 +105,12 @@ export default async function AboutPage() {
               </ul>
             </div>
           </Reveal>
+        </Container>
 
-          <Reveal>
-            <div className="mx-auto mt-14 max-w-3xl">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {t.about.howWeWork.title}
-              </h2>
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {t.about.howWeWork.valueProps.map((item) => (
-                  <div
-                    key={item.title}
-                    className="rounded-lg border border-border bg-card p-5 shadow-sm"
-                  >
-                    <h3 className="font-heading text-base font-semibold text-foreground">
-                      {item.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
+        {/* Moved from the Home page — replaces the old "How we work" section. */}
+        <CustomerJourney />
 
+        <Container>
           <Reveal>
             <div className="mx-auto mt-14 max-w-3xl rounded-lg border border-border bg-muted/40 p-6 text-center shadow-sm sm:p-8">
               <h2 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">

@@ -26,7 +26,7 @@ export function SiteChrome({ children, footer, settings }: SiteChromeProps) {
   const isAdmin = pathname === ADMIN_PREFIX || pathname.startsWith(`${ADMIN_PREFIX}/`);
 
   return (
-    <>
+    <div className="flex flex-col min-h-full">
       {isAdmin ? null : <Header />}
       <div id="main-content" className="flex flex-1 flex-col relative z-10">
         {children}
@@ -37,6 +37,6 @@ export function SiteChrome({ children, footer, settings }: SiteChromeProps) {
           <WhatsAppButton settings={settings} />
         </>
       )}
-    </>
+    </div>
   );
 }

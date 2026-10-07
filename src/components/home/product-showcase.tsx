@@ -1,7 +1,7 @@
 import { Container } from "@/components/layout/container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Reveal } from "@/components/shared/reveal";
-import { getHomeShowcaseProductsByCategory, getHomeCategoryBlocks } from "@/lib/public/catalogue";
+import { getHomeShowcaseProductsByCategory } from "@/lib/public/catalogue";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -23,14 +23,19 @@ async function getLang(): Promise<"en" | "bn"> {
  *    - Tiles
  *    - Building Materials
  *
- * Mobile/Tablet: cards with name below, consistent styling
+ * Mobile/Tablet: same three sections, same products, same order — rendered as a
+ * compact 2-up grid instead of the 4-up desktop grid.
+ *
+ * DATA PARITY: desktop and mobile are fed from a single fetch
+ * (`getHomeShowcaseProductsByCategory`) and map over the exact same
+ * `group.products` array, so the product set, count and order are identical at
+ * every viewport. Only the responsive grid markup differs.
  */
 export async function ProductShowcase() {
   const lang = await getLang();
-  const [categoryGroups, categoryBlocks] = await Promise.all([
-    getHomeShowcaseProductsByCategory(12), // 4 cols × 3 rows = 12 products per category
-    getHomeCategoryBlocks(5), // 5 products per shelf for mobile
-  ]);
+  // Single source of truth for BOTH desktop and mobile rendering.
+  // 4 cols × 3 rows = 12 products per category on desktop.
+  const categoryGroups = await getHomeShowcaseProductsByCategory(12);
   const t = getServerTranslations(lang);
 
   // Category order and display names from translations
@@ -45,11 +50,6 @@ export async function ProductShowcase() {
   const orderedGroups = categoryOrder
     .map((slug) => categoryGroups.find((g) => g.category.slug === slug))
     .filter((g): g is (typeof categoryGroups)[0] => g !== undefined);
-
-  // For mobile: order categoryBlocks the same way
-  const orderedBlocks = categoryOrder
-    .map((slug) => categoryBlocks.find((b) => b.category.slug === slug))
-    .filter((b): b is (typeof categoryBlocks)[0] => b !== undefined);
 
   return (
     <section className="section-spacing bg-background" aria-labelledby="product-showcase-heading">
@@ -87,10 +87,13 @@ export async function ProductShowcase() {
           ))}
         </div>
 
-        {/* MOBILE/TABLET: Cards with names below, consistent styling */}
-        <div className="lg:hidden mt-10 space-y-12">
-          {orderedBlocks.map((block, groupIndex) => {
-            const categorySlug = block.category.slug;
+        {/* MOBILE/TABLET: same products, same order as the desktop grid above —
+            only the responsive arrangement differs (compact 2-up on phones).
+            `home-catalogue` scopes the mobile-only (≤768px) spacing rules in
+            globals.css — tablet (769–1023px) keeps the utilities below. */}
+        <div className="home-catalogue lg:hidden mt-10 space-y-12">
+          {orderedGroups.map((group, groupIndex) => {
+            const categorySlug = group.category.slug;
             const CATEGORY_BACKGROUNDS: Record<string, string> = {
               "sanitary-ware": "bg-[oklch(0.985_0.008_15)] dark:bg-accent",
               tiles: "bg-[oklch(0.99_0.003_85)] dark:bg-accent",
@@ -98,18 +101,23 @@ export async function ProductShowcase() {
             };
             const backgroundClass = CATEGORY_BACKGROUNDS[categorySlug] ?? "bg-muted/30";
             const translatedCategoryName =
-              categoryLabels[categorySlug] ?? block.category.name;
+              categoryLabels[categorySlug] ?? group.category.name;
 
             return (
-              <Reveal key={block.category.id} delay={groupIndex * 0.08} className={`${backgroundClass} rounded-xl p-6`}>
-                <div className="mb-6 flex items-center gap-3">
+              <Reveal
+                key={group.category.id}
+                delay={groupIndex * 0.08}
+                className={`${backgroundClass} catalogue-section rounded-xl p-6`}
+              >
+                <div className="section-title mb-6 flex items-center gap-3">
                   <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground">
                     {translatedCategoryName}
                   </h3>
                   <span className="h-1 w-10 bg-gold/60 shrink-0" aria-hidden="true" />
                 </div>
-                <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 items-start">
-                  {block.productShelf.map((product, productIndex) => (
+                <div className="products grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 items-start">
+                  {/* Identical slice + order as the desktop grid → same product set */}
+                  {group.products.slice(0, 12).map((product, productIndex) => (
                     <Reveal key={product.id} delay={productIndex * 0.03}>
                       <ProductCard product={product} />
                     </Reveal>
@@ -166,7 +174,7 @@ function ProductCard({ product }: ProductCardProps) {
       >
         {/* Card frame - thin soft frame wrapping the image */}
         <div
-          className="relative overflow-hidden rounded-[18px] bg-[#F5F6F4] dark:bg-card p-1 transition-all duration-300 group-hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.04)] motion-reduce:transition-none motion-reduce:hover:shadow-none"
+          className="relative overflow-hidden rounded-[18px] bg-[#F5F6F4] dark:bg-card p-1 transition-all duration-300 group-hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.04)] md:group-hover:shadow-[0_18px_36px_-10px_rgba(0,0,0,0.16)] md:group-hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:shadow-none"
           aria-hidden="true"
         >
           {product.image ? (
@@ -174,7 +182,7 @@ function ProductCard({ product }: ProductCardProps) {
             <img
               src={product.image.url}
               alt={product.image.alt ?? product.name}
-              className="object-contain object-center w-full h-auto block rounded-[14px] transition-transform duration-500 group-hover:scale-[1.01]"
+              className="object-contain object-center w-full h-auto block rounded-[14px] transition-transform duration-500 group-hover:scale-[1.01] md:group-hover:scale-[1.04]"
               loading="lazy"
             />
           ) : (

@@ -2,6 +2,7 @@ import { Mail, MessageCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { buildWhatsAppChatLink } from "@/lib/contact/whatsapp";
+import { createWhatsAppProductMessage } from "@/lib/contact/whatsapp";
 
 interface InquiryContactActionsProps {
   /** Normalised customer phone number (always present on a website inquiry). */
@@ -9,9 +10,17 @@ interface InquiryContactActionsProps {
   /** Customer email when provided on the form. */
   email: string | null;
   /** Pre-filled WhatsApp message; when null the WhatsApp action is hidden. */
-  whatsappMessage: string | null;
+  whatsappMessage?: string | null;
   /** Renders compact icon-only buttons (used in list rows). */
   compact?: boolean;
+  /** Product data for product-specific WhatsApp message. */
+  productSlug?: string | null;
+  productCode?: string | null;
+  productId?: string | null;
+  productName?: string | null;
+  quantity?: number | null;
+  /** Full product URL (constructed by server component with correct host). */
+  productUrl?: string | null;
 }
 
 /**
@@ -23,12 +32,31 @@ export function InquiryContactActions({
   email,
   whatsappMessage,
   compact = false,
+  productSlug: _productSlug,
+  productCode,
+  productId,
+  productName,
+  quantity,
+  productUrl,
 }: InquiryContactActionsProps) {
   const telHref = `tel:${phone}`;
   const mailHref = email ? `mailto:${email}` : null;
-  const whatsappHref = whatsappMessage
-    ? buildWhatsAppChatLink(phone, whatsappMessage)
-    : null;
+
+  // Build WhatsApp href - use enhanced product-specific message when product data is available
+  let whatsappHref: string | null = null;
+  if (productUrl && productName) {
+    // Use the existing product message utility for consistent format
+    const message = createWhatsAppProductMessage({
+      productName,
+      productId: productId || "unknown",
+      productCode,
+      quantity: quantity ?? 1,
+      productUrl,
+    });
+    whatsappHref = buildWhatsAppChatLink(phone, message);
+  } else if (whatsappMessage) {
+    whatsappHref = buildWhatsAppChatLink(phone, whatsappMessage);
+  }
 
   if (compact) {
     return (
@@ -58,11 +86,7 @@ export function InquiryContactActions({
             variant="ghost"
             size="icon-sm"
             render={
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" />
             }
             aria-label={`WhatsApp ${phone}`}
             title={`WhatsApp ${phone}`}

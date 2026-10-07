@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, MessageCircle, Minus, Phone, Plus } from "lucide-react";
 import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
 import type { PublicBusinessSettings } from "@/lib/public/settings";
@@ -46,6 +46,39 @@ export function BuyPanel({
   const t = useTranslations();
   const pd = t.productDetails;
   const [quantity, setQuantity] = useState(QUANTITY_MIN);
+
+  /**
+   * The action bar below is `fixed`, so it needs reserved page space —
+   * otherwise the last content on the page (footer links) stays permanently
+   * trapped behind it. Mirror the bar's own height as page bottom padding
+   * while it is visible. The bar is `md:hidden`, so from 768px up it measures
+   * 0px, the padding is cleared, and the approved desktop layout is untouched.
+   */
+  const stickyBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const bar = stickyBarRef.current;
+    if (!bar) return;
+
+    const previous = document.body.style.paddingBottom;
+    const sync = () => {
+      const height = bar.offsetHeight;
+      document.body.style.paddingBottom = height > 0 ? `${height}px` : previous;
+    };
+
+    sync();
+    // Watch both the bar (label/language changes change its height) and the
+    // breakpoint-crossing window resize that shows or hides it.
+    const observer = new ResizeObserver(sync);
+    observer.observe(bar);
+    window.addEventListener("resize", sync);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", sync);
+      document.body.style.paddingBottom = previous;
+    };
+  }, []);
 
   const whatsapp = createWhatsAppProductLink(businessSettings, {
     productName,
@@ -188,7 +221,10 @@ export function BuyPanel({
       </div>
 
       {/* Mobile sticky action bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] backdrop-blur md:hidden">
+      <div
+        ref={stickyBarRef}
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 p-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] backdrop-blur md:hidden"
+      >
         <div className="flex justify-center gap-2 flex-wrap">
           {askForPriceButton("w-[150px]")}
           {whatsAppButton("w-[180px]")}

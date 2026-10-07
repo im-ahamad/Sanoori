@@ -11,11 +11,13 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 /**
- * Single-line header navigation.
+ * Header navigation.
  *
  * Every link stays directly visible at every breakpoint (no drawer, no
- * hamburger, no second row) — type scale, padding and gaps simply shrink as
- * the viewport narrows so the row always fits.
+ * hamburger, no hidden menu). Below `sm` the row wraps onto two compact
+ * lines — logo · theme · language on the first line, the nav links centred
+ * on the second — so the header always fits the viewport at a readable
+ * label size. From `sm` up it is the original single line.
  */
 function NavLink({
   href,
@@ -38,7 +40,7 @@ function NavLink({
       {...linkProps}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative inline-flex items-center whitespace-nowrap rounded-sm px-0.5 py-1 text-[10px] font-medium leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[11px] sm:px-2 sm:text-[13px] lg:px-2.5 lg:py-1.5 lg:text-[14px]",
+        "group relative inline-flex items-center whitespace-nowrap rounded-sm px-0.5 py-1 text-[12px] font-medium leading-tight transition-colors min-[400px]:px-1.5 sm:px-2 sm:text-[13px] lg:px-2.5 lg:py-1.5 lg:text-[14px]",
         active
           ? "text-foreground"
           : "text-muted-foreground hover:text-foreground"
@@ -79,7 +81,7 @@ function HeaderLanguageToggle() {
             onClick={() => setLanguage(lang)}
             aria-pressed={active}
             className={cn(
-              "whitespace-nowrap rounded-full px-1 py-0.5 text-[10px] font-semibold leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[11px] sm:px-2 sm:text-[12px]",
+              "whitespace-nowrap rounded-full px-1 py-1.5 text-[10px] font-semibold leading-tight transition-colors min-[400px]:px-1.5 min-[400px]:text-[11px] sm:px-2 sm:py-0.5 sm:text-[12px]",
               active
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
@@ -133,14 +135,15 @@ export function Header() {
       {/* Gold brand accent strip */}
       <div className="h-0.5 w-full bg-gold" aria-hidden="true" />
 
-      {/* ONE horizontal row — logo · nav · theme · language */}
+      {/* Mobile: logo · theme · language on line 1, nav on line 2.
+          sm and up: one line — logo · nav · theme · language. */}
       <Container className="px-2! min-[400px]:px-3! sm:px-6! lg:px-8!">
-        <div className="flex h-11 min-[400px]:h-12 sm:h-13 lg:h-15 items-center justify-between gap-1.5 min-[400px]:gap-3 sm:gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-1.5 gap-y-1 py-1.5 min-[400px]:gap-x-3 sm:h-13 sm:flex-nowrap sm:gap-x-4 sm:py-0 lg:h-15">
           {/* Logo */}
           <a
             href="/"
             aria-label={t.header.ariaLabel.home}
-            className="flex shrink-0 items-center"
+            className="order-1 flex shrink-0 items-center"
           >
             <Brand
               size="md"
@@ -150,7 +153,7 @@ export function Header() {
 
           {/* Navigation — centred in the free space, all links directly visible */}
           <nav
-            className="flex flex-1 items-center justify-center gap-0 min-[400px]:gap-0.5 sm:gap-1 lg:gap-2"
+            className="order-3 flex w-full items-center justify-center gap-1 sm:order-2 sm:w-auto sm:flex-1 lg:gap-2"
             aria-label="Main navigation"
           >
             {navigationConfig.main.map((item) => (
@@ -164,7 +167,7 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
+          <div className="order-2 flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 sm:order-3 sm:gap-2">
             {/* Theme toggle — compact */}
             <ThemeToggle className="size-8 min-[400px]:size-9" />
             {/* Language toggle — compact pill */}

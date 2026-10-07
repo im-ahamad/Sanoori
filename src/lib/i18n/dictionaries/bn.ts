@@ -341,6 +341,7 @@ export const bn = {
     whatsappCTA: {
       title: "ওয়াহটসঅ্যাপে মেসেজ করুন",
       description: "আপনার প্রয়োজন আমাদের জানান এবং দ্রুত উত্তর পান।",
+      button: "ওয়াহটসঅ্যাপে দাম জানুন",
     },
     helpfulToInclude: {
       title: "শামিল করলে সুবিধা হবে",
@@ -514,6 +515,7 @@ export const bn = {
     location: {
       title: "আমাদের খুঁজে বের করুন",
       description: "নিচের ঠিকানায় আমাদের শোরুমে আসুন।",
+      viewMapLabel: "মানচিত্রে দেখুন",
     },
     whatsappCTA: {
       title: "দ্রুত উত্তর লাগছে?",

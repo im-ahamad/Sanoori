@@ -96,18 +96,28 @@ export function ProductCard({ product, hideAvailabilityBadge = false, variant = 
           </Link>
         </h3>
 
-        <div className="mt-4 flex gap-2">
+        {/*
+          Actions reflow instead of overflowing. The card column width is set by
+          the grid (down to ~216px in the 4-up lg layout), so the labels may not
+          have room for one line: with `whitespace-nowrap` the "Ask for Price"
+          text was WIDER than its own button and spilled onto the card. Without
+          it the label wraps to a second line inside the fixed h-11 (44px) tap
+          target, and `text-center` keeps both the single-line and the wrapped
+          state centred. Nothing else changes — same buttons, same labels,
+          same links, same order.
+        */}
+        <div className="mt-4 flex flex-col sm:flex-row gap-2 sanoori-product-actions">
           <Link
             href={`/request-quote?product=${product.slug}`}
             aria-label={`Ask for the price of ${product.name}`}
-            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-0 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
+            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-0 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {t.products.askForPrice}
           </Link>
           <Link
             href={detailsHref}
             aria-label={`View details for ${product.name}`}
-            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-0 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 whitespace-nowrap"
+            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-0 text-center text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {t.products.viewDetails}
             <ArrowRight className="size-4" aria-hidden="true" />

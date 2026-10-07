@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/shared/page-header";
 import { ProductRequestForm } from "@/components/products/product-request-form";
-import { buildWhatsAppLink, GENERAL_ENQUIRY_MESSAGE } from "@/lib/contact/whatsapp";
+import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
 import {
   getPublicProductBySlug,
   getPublicProductOptions,
@@ -15,6 +15,7 @@ import { notFound, redirect } from "next/navigation";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import { getPublicBusinessSettings } from "@/lib/public/settings";
+import { headers } from "next/headers";
 
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
@@ -75,8 +76,6 @@ export default async function RequestQuotePage({
     getPublicBusinessSettings(),
   ]);
 
-  const whatsappHref = buildWhatsAppLink(businessSettings, GENERAL_ENQUIRY_MESSAGE);
-
   const productDetail = productOptions.some((option) => option.slug === requestedSlug)
     ? await getPublicProductBySlug(requestedSlug)
     : null;
@@ -85,9 +84,23 @@ export default async function RequestQuotePage({
     notFound();
   }
 
+  const host = (await headers()).get("host") ?? "localhost:3000";
+  const protocol = host.startsWith("localhost") ? "http" : "https";
+
+  const productUrl = `${protocol}://${host}/products/${productDetail.slug}`;
+  const whatsappProduct = createWhatsAppProductLink(businessSettings, {
+    productName: productDetail.name,
+    productId: productDetail.id,
+    productCode: productDetail.productCode,
+    quantity: initialQuantity ?? 1,
+    productUrl,
+  });
+  const whatsappHref = whatsappProduct?.url ?? null;
+
   return (
     <main className="flex-1 relative">
       <PageHeader
+        className="sanoori-quote-hero"
         title={rq.pageTitle}
         description={rq.pageDescription}
         breadcrumbs={[{ label: rq.breadcrumb, href: "/request-quote" }]}
@@ -147,7 +160,7 @@ export default async function RequestQuotePage({
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-4 rounded-lg bg-[#25D366] p-5 text-white shadow-sm transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2"
+                className="hidden items-start gap-4 rounded-lg bg-[#25D366] p-5 text-white shadow-sm transition-colors hover:bg-[#1fb958] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 max-md:gap-3 max-md:p-4 lg:flex"
               >
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white/20">
                   <MessageCircle className="size-5" aria-hidden="true" />
@@ -163,10 +176,10 @@ export default async function RequestQuotePage({
               </a>
             )}
 
-            <h2 className="mt-10 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h2 className="sanoori-quote-helpful mt-10 font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               {rq.helpfulToInclude.title}
             </h2>
-            <ul className="mt-6 space-y-6">
+            <ul className="sanoori-quote-helpful mt-6 space-y-6">
               {[
                 {
                   icon: Package,
@@ -195,7 +208,7 @@ export default async function RequestQuotePage({
               ))}
             </ul>
 
-            <div className="mt-10 rounded-lg border border-border bg-card p-6">
+            <div className="sanoori-quote-helpful mt-10 rounded-lg border border-border bg-card p-6">
               <h2 className="font-heading text-base font-semibold text-foreground">
                 {rq.whatHappensNext.title}
               </h2>
@@ -240,6 +253,7 @@ export default async function RequestQuotePage({
                       : null,
                   }}
                   businessSettings={businessSettings}
+                  whatsappHref={whatsappHref}
                   initialLang={lang}
                   initialQuantity={initialQuantity}
                 />

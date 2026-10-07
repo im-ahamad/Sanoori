@@ -21,6 +21,7 @@ export interface OrderListItem {
   email: string | null;
   productName: string | null;
   productCode: string | null;
+  productSlug: string | null;
   quantity: number | null;
   source: InquirySource;
   status: InquiryStatus;
@@ -103,7 +104,7 @@ export async function listAdminOrders(
           status: true,
           createdAt: true,
           updatedAt: true,
-          product: { select: { name: true, productCode: true } },
+          product: { select: { name: true, productCode: true, slug: true } },
         },
       }),
       db.inquiry.count({ where }),
@@ -113,6 +114,7 @@ export async function listAdminOrders(
       ...item,
       productName: item.product?.name ?? null,
       productCode: item.product?.productCode ?? null,
+      productSlug: item.product?.slug ?? null,
     }));
 
     return {

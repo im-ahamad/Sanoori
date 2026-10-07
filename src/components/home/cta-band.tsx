@@ -16,7 +16,7 @@ export async function CtaBand() {
   const t = getServerTranslations(lang);
 
   return (
-    <section className="relative overflow-hidden bg-navy-dark text-white">
+    <section className="relative overflow-hidden bg-navy-dark text-white sanoori-cta-band">
       <VisualBackdrop
         variant="hero"
         overlayClassName="bg-gradient-to-r from-navy-dark/70 via-navy/60 to-navy-dark/50"

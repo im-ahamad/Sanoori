@@ -111,7 +111,7 @@ export default async function RequestQuotePage({
 
       <Container>
         <div className="section-spacing grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12">
-          <div className="lg:col-span-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <div className="sanoori-quote-product-card lg:col-span-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <div className="flex flex-col gap-6 p-6 sm:p-8 md:flex-row md:items-center">
               {productDetail.primaryImage ? (
                 <Image
@@ -120,7 +120,7 @@ export default async function RequestQuotePage({
                   width={320}
                   height={240}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
-                  className="h-48 w-full flex-shrink-0 rounded-lg bg-muted object-cover sm:h-44 sm:w-[200px] md:h-40 md:w-72 lg:h-44 lg:w-80"
+                  className="sanoori-quote-product-image h-48 w-full flex-shrink-0 rounded-lg bg-muted object-cover sm:h-44 sm:w-[200px] md:h-40 md:w-72 lg:h-44 lg:w-80"
                 />
               ) : (
                 <span className="flex h-48 w-full flex-shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground md:h-40 md:w-72">
@@ -231,6 +231,17 @@ export default async function RequestQuotePage({
 
           <div className="lg:col-span-3">
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
+              {/* Phones only: the summary card is hidden here, so its "View product
+                  details" link is repeated at the top of the form card, immediately
+                  above the request-form introduction. Hidden from md (768px) up,
+                  where the original link inside the summary card is shown. */}
+              <Link
+                href={`/products/${productDetail.slug}`}
+                className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+              >
+                {rq.viewProductDetails}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
               <h2 className="font-heading text-xl font-bold tracking-tight text-foreground">
                 {rq.sendRequest.title}
               </h2>

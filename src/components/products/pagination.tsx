@@ -24,10 +24,20 @@ function buildHref(queryParams: Record<string, string>, page: number): string {
  * Server-rendered pagination. Always carries the active search/filter query so
  * navigating pages never loses the user's context.
  */
-export function Pagination({ state, t }: { state: PaginationState; t: ReturnType<typeof getServerTranslations> }) {
+export function Pagination({
+  state,
+  t,
+  hideSummary = false,
+}: {
+  state: PaginationState;
+  t: ReturnType<typeof getServerTranslations>;
+  /** When true, the summary line is omitted; the controls stay unchanged. */
+  hideSummary?: boolean;
+}) {
   const { page, totalPages, total, queryParams } = state;
 
   if (totalPages <= 1) {
+    if (hideSummary) return null;
     return (
       <p className="text-center text-sm text-muted-foreground">
         {t.products.showingProducts.replace("{total}", total.toString()).replace("{product|products}", total === 1 ? t.products.product : t.products.products)}
@@ -86,13 +96,15 @@ export function Pagination({ state, t }: { state: PaginationState; t: ReturnType
         </PageButton>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {t.products.pageOf
-          .replace("{page}", page.toString())
-          .replace("{totalPages}", totalPages.toString())
-          .replace("{total}", total.toString())
-          .replace("{product|products}", total === 1 ? t.products.product : t.products.products)}
-      </p>
+      {!hideSummary && (
+        <p className="text-sm text-muted-foreground">
+          {t.products.pageOf
+            .replace("{page}", page.toString())
+            .replace("{totalPages}", totalPages.toString())
+            .replace("{total}", total.toString())
+            .replace("{product|products}", total === 1 ? t.products.product : t.products.products)}
+        </p>
+      )}
     </nav>
   );
 }

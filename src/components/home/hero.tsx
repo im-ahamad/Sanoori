@@ -343,7 +343,7 @@ export function Hero() {
                 </ButtonLink>
               </div>
 
-              <div className="hidden md:block absolute bottom-0 left-0 border-t border-r border-white/10 bg-navy-dark/50 px-5 py-4 text-xs text-white/60">
+              <div className="hidden lg:block absolute bottom-0 left-0 border-t border-r border-white/10 bg-navy-dark/50 px-5 py-4 text-xs text-white/60">
                 {t.hero.footer}
               </div>
             </div>

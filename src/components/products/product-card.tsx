@@ -5,7 +5,7 @@ import type { PublicProductSummary } from "@/lib/public/catalogue";
 import { AvailabilityBadge } from "@/components/products/availability-badge";
 import { getCategoryIconElement } from "@/lib/category-icons";
 
-type ProductCardVariant = "default" | "grid" | "showcase";
+type ProductCardVariant = "default" | "grid" | "showcase" | "catalogue";
 
 interface ProductCardProps {
   product: PublicProductSummary;
@@ -39,6 +39,85 @@ export function ProductCard({
 
   const isGrid = variant === "grid";
   const isShowcase = variant === "showcase";
+  const isCatalogue = variant === "catalogue";
+
+  /*
+   * `catalogue` variant — mirrors the Home page catalogue card
+   * (`CatalogueProductCard` in components/home/product-catalogue.tsx): square
+   * 1:1 image container with a soft blue-grey background, `object-contain`
+   * fitting, 8px corners, no card border/shadow, and the product name below the
+   * image. The two /products actions (Ask for Price + View) are kept exactly as
+   * they are in the default variant so nothing about those buttons changes.
+   */
+  if (isCatalogue) {
+    return (
+      <article className="catalogue-card group">
+        <Link
+          href={detailsHref}
+          className="relative block aspect-square overflow-hidden rounded-[8px] bg-[oklch(0.97_0.015_250)] transition-all duration-300 group-hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.08)]"
+          aria-label={`View ${product.name}`}
+          tabIndex={-1}
+        >
+          {cardImage ? (
+            <Image
+              src={cardImage.url}
+              alt={cardImage.alt ?? product.name}
+              fill
+              sizes="(max-width: 767px) 33vw, 25vw"
+              className="block rounded-[8px] object-contain object-center transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center rounded-[8px] bg-[oklch(0.97_0.015_250)]">
+              <span
+                className="text-navy-light/40 text-center px-3 text-sm leading-snug"
+                aria-hidden="true"
+              >
+                {product.name}
+              </span>
+            </div>
+          )}
+
+          {/* Subtle warm overlay on hover — same treatment as the Home card */}
+          <div
+            className="absolute inset-0 rounded-[8px] bg-gradient-to-t from-gold/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            aria-hidden="true"
+          />
+        </Link>
+
+        {/* Product name — same placement and typography as the Home catalogue card */}
+        <p className="catalogue-name text-[14px] font-normal text-[#1A1A1A] dark:text-foreground/90 leading-snug max-w-full break-words">
+          <Link
+            href={detailsHref}
+            className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {product.name}
+          </Link>
+        </p>
+
+        {/*
+          Actions are intentionally identical to the default variant above (same
+          order, labels, links, classes) so /products keeps its exact buttons.
+        */}
+        <div className="mt-4 flex flex-col sm:flex-row gap-2 sanoori-product-actions">
+          <Link
+            href={`/request-quote?product=${product.slug}`}
+            aria-label={`Ask for the price of ${product.name}`}
+            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md bg-primary px-3 py-0 text-center text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {askForPriceLabel}
+          </Link>
+          <Link
+            href={detailsHref}
+            aria-label={`View details for ${product.name}`}
+            className="inline-flex h-11 flex-1 min-w-0 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 py-0 text-center text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {viewDetailsLabel}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article

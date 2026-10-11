@@ -432,6 +432,134 @@
   .section-spacing-sm {
     @apply py-10 sm:py-12 lg:py-16;
   }
+
+  /* ============================================================
+     PREMIUM PRODUCT CATALOGUE — Home page
+     ============================================================ */
+
+  /* Product grid — responsive columns per breakpoint
+     Mobile (< 768px): 3 columns × 3 rows = 9 products
+     Tablet (768px - 1023px): 4 columns × 3 rows = 12 products
+     Desktop (≥ 1024px): 4 columns × 4 rows = 16 products
+     Consistent spacing: 8px horizontal, 12px vertical at all breakpoints */
+  .catalogue-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 8px;
+    row-gap: 12px;
+    align-items: start;
+    grid-auto-rows: auto;
+  }
+
+  /* Tablet: exactly 4 columns */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .catalogue-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* Desktop: exactly 4 columns × 3 rows = 12 products */
+  @media (min-width: 1024px) {
+    .catalogue-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    /* Show exactly 12 products (4 cols × 3 rows) on desktop */
+    .catalogue-grid > :nth-child(n+13) {
+      display: none;
+    }
+  }
+
+  /* Category container — unified background, border, rounded corners
+     Background: light tint of primary navy (--navy: oklch(0.22 0.05 250)) */
+  .catalogue-category-container {
+    background: oklch(0.97 0.015 250); /* slightly lighter, softer blue-grey tint */
+    border: 1px solid oklch(0.90 0.025 250); /* slightly softer border */
+    border-radius: 16px; /* gently rounded outer corners */
+  }
+
+  /* First category container — no extra top margin */
+  .catalogue-category-container:first-child {
+    margin-top: 0;
+  }
+
+  /* Category heading inside container — already padded via px-4 py-3 */
+
+  /* Responsive product count — hide excess products at each breakpoint
+     Mobile (< 768px): show 9 (3×3), hide 10th+
+     Tablet (768px - 1023px): show 12 (4×3), hide 13th+
+     Desktop (≥ 1024px): show 16 (4×4), all visible */
+  @media (max-width: 767px) {
+    .catalogue-grid > :nth-child(n+10) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .catalogue-grid > :nth-child(n+13) {
+      display: none;
+    }
+  }
+
+  /* Product card base styles */
+  .catalogue-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Product name — fluid sizing with clamp for readability */
+  .catalogue-name {
+    font-size: clamp(0.75rem, 2.5vw, 0.875rem); /* 12px - 14px fluid */
+    line-height: 1.2;
+    margin-top: 0.0625rem; /* 1px — minimal gap, visual ~2px with line-height */
+    color: #1a1a1a;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .dark .catalogue-name {
+    color: var(--foreground);
+    opacity: 0.9;
+  }
+
+  /* Hover effect for hover-capable devices (desktop) */
+  @media (hover: hover) and (pointer: fine) {
+    /* Hide product name by default on hover-capable devices */
+    .catalogue-card .catalogue-name {
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+    }
+
+    /* Reveal product name on card hover */
+    .catalogue-card:hover .catalogue-name,
+    .catalogue-card:focus-within .catalogue-name {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Ensure card doesn't shift on hover */
+    .catalogue-card {
+      transition: box-shadow 0.3s ease;
+    }
+  }
+
+  /* Touch devices and non-hover devices: always show product names */
+  @media (hover: none) and (pointer: coarse) {
+    .catalogue-card .catalogue-name {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+  }
+
+  /* Fallback for devices that report hover but are touch-primary */
+  @media (hover: hover) and (pointer: coarse) {
+    .catalogue-card .catalogue-name {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+  }
 }
 
 /*
@@ -483,54 +611,17 @@
   }
 
   /* ============================================================
-     HOME HERO — MOBILE ONLY (≤768px)
+     HOME HERO — CONTENT BLOCK (0px–1023.98px)
+     ============================================================
+     The rules that produce the 720px appearance for the hero content
+     block live in the top-level `@media (max-width: 1023.98px)` block
+     at the end of this file. They used to sit here, nested inside this
+     `max-width: 768px` query — native CSS nesting capped the inner
+     `max-width: 1023px` at 768px, so the 768–1023px tablet range fell
+     back to the desktop/tablet Tailwind utilities and looked different
+     from 720px. Moved out unchanged: the same styling now applies for
+     the whole 0–1023.98px range, and nothing at 1024px+ is affected.
      ============================================================ */
-  /* Hero section: ZERO top padding so image starts immediately after header.
-     Keep section aspect-ratio unset so content can flow naturally. */
-  .sanoori-hero {
-    padding-top: 0 !important;
-    padding-bottom: 32px !important;
-    min-height: auto !important;
-    height: auto !important;
-    aspect-ratio: unset !important;
-  }
-
-  /* Hero backdrop image container: KEEP aspect ratio.
-     The images inside use `fill` (absolute) and need the container to have defined dimensions. */
-  /* NO RULE HERE — do not unset aspect-ratio on the image container */
-
-  /* Content wrapper: no top padding, natural height */
-  .sanoori-hero > div.relative.h-full.w-full {
-    padding-top: 0 !important;
-    height: auto !important;
-  }
-
-  /* Inner flex container: ~32px top padding, compact gaps */
-  .sanoori-hero > div.relative.h-full.w-full > div.flex.h-full.items-start {
-    padding-top: 32px !important;
-    gap: 10px !important;
-    height: auto !important;
-    align-items: flex-start !important;
-  }
-
-  /* Hero heading: ~27px with line-height 1.2 */
-  .sanoori-hero h1.clamp-text-4xl-6xl {
-    font-size: 27px !important;
-    line-height: 1.2 !important;
-    margin-top: 8px !important;
-  }
-
-  /* Hero paragraph: hide on mobile */
-  .sanoori-hero p.hero-intro-d2 {
-    display: none !important;
-  }
-
-  /* Hero button (Browse Products): center horizontally */
-  .sanoori-hero div.hero-intro-d3 {
-    justify-content: center !important;
-    padding-right: 0 !important;
-    margin-top: 10px !important;
-  }
 
   /* Hero overlay: much lighter (~20-25% at top) so image is clearly visible */
   .sanoori-hero-overlay {
@@ -628,16 +719,6 @@
       .sanoori-products-hero-heading-tail {
       display: none !important;
     }
-  }
-
-  /* ============================================================
-     PRODUCTS PAGE GRID — MOBILE ONLY (≤768px)
-     ============================================================ */
-  /* 2-column grid on mobile (≤768px), matching Home catalogue behavior */
-  .sanoori-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-    row-gap: 12px !important;
   }
 
   /* ============================================================
@@ -993,7 +1074,7 @@
   }
 
   /* ============================================================
-     PRODUCT HERO IMAGE: SHORTER VERTICAL HEIGHT, NO GAP, CROPPED
+     PRODUCT HERO IMAGE: FULL IMAGE, NO GAP, NATURAL RATIO (≤768px)
      ============================================================ */
   /* Right column: remove fixed height that forces gap below image */
   .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="bg-gradient-to-b"] {
@@ -1019,22 +1100,21 @@
     gap: 0 !important;
   }
 
-  /* Image wrapper: shorter fixed aspect-ratio (4:3), object-cover to crop vertically,
-     remove background color that creates dark gap, full width */
+  /* Image wrapper: follow the image's own aspect ratio (no fixed 4:3 box),
+     remove the background that created a dark gap, and round the corners so the
+     whole image — including its bottom — stays visible. Width capping / centring
+     across phones and tablets is handled by the `<1024px` block further down. */
   .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] {
-    max-width: none !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
     background-color: transparent !important;
-    border-radius: 0 !important;
-    aspect-ratio: 4 / 3 !important;
+    border-radius: 8px !important;
+    aspect-ratio: unset !important;
   }
 
-  /* Image itself: object-cover to crop vertically within shorter area, centered */
+  /* Image itself: contained at its natural ratio (never cropped or zoomed), centered */
   .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] > div > img {
     width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
+    height: auto !important;
+    object-fit: contain !important;
     object-position: center !important;
   }
 
@@ -1247,6 +1327,164 @@
     align-items: center !important;
     justify-content: center !important;
     gap: 6px !important;
+  }
+}
+
+/* ============================================================
+   PRODUCT DETAIL — IMAGE SIZE / CENTRING (mobile + tablet, <1024px)
+   ============================================================
+   On phones and tablets the product image box is capped at a sensible
+   maximum width and centred inside its column, so the image stays visually
+   balanced instead of stretching across the whole screen. It keeps its own
+   aspect ratio (`object-fit: contain`) and ~8px rounded corners, and the
+   product area gets a consistent, comfortable gap below the hero/banner.
+   Laptop and desktop (>=1024px) keep their existing layout untouched. */
+@media (max-width: 1023.98px) {
+  /* Comfortable, consistent gap between the hero/banner and the product image
+     area (overrides the tighter 12px value used on phones). */
+  .sanoori-product-view .section-spacing {
+    padding-top: 24px !important;
+  }
+
+  /* Cap the image box to a sensible maximum and centre it in its column, so the
+     image stays balanced instead of stretching the full width of the screen. */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] {
+    width: 100% !important;
+    max-width: 480px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Phones: shrink only the rendered main product image so it no longer
+     dominates the screen. The image box, spacing, layout and hero are untouched
+     — the image is scaled down inside its existing area, kept whole at its
+     natural ratio (`object-fit: contain`), centred, and keeps rounded corners.
+     Tablet sizing is refined in the side-by-side block further down. */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] > div[class*="relative"][class*="h-full"] > img {
+    width: 60% !important;
+    height: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    border-radius: 8px !important;
+  }
+}
+
+/* ============================================================
+   PRODUCT DETAIL — TABLET LAYOUT (768px – 1023.98px)
+   ============================================================
+   Tablets show the main product area side by side instead of stacked: a compact
+   image/gallery on the LEFT, the product information (name, details, description
+   …) on the RIGHT. The information keeps the majority of the width so it stays
+   readable, while the image stays compact, fully visible and never cropped.
+   Desktop (>=1024px) and phones (<768px) keep their existing layouts. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  /* Stacked card → horizontal row (image | information). */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"][class*="rounded-2xl"] {
+    flex-direction: row !important;
+  }
+
+  /* LEFT column: keep the image/gallery compact. */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"][class*="rounded-2xl"] > div[class*="flex-1"][class*="rounded-l"] {
+    flex: 0 0 40% !important;
+    width: 40% !important;
+    max-width: 40% !important;
+  }
+
+  /* (The information column keeps its existing `flex-1`, so it automatically
+     takes the remaining ~60% of the width once the image column is fixed.) */
+
+  /* Image inside the narrow column: compact, still un-cropped and centred. */
+  .sanoori-product-view .section-spacing > div[class*="flex-col"] > div[class*="flex-1"][class*="rounded-l"] > div[class*="grid"] > div[class*="relative"][class*="overflow-hidden"] > div[class*="relative"][class*="h-full"] > img {
+    width: 90% !important;
+  }
+}
+
+/* ============================================================
+   PRODUCTS PAGE — PRODUCT GRID (all widths)
+   ============================================================
+   Mirrors the Home page catalogue grid (`.catalogue-grid` in the utilities
+   layer): 3 columns on mobile, 4 on tablet and desktop, 8px column / 12px row
+   gaps, top-aligned rows. Unlike the Home grid this never hides overflow
+   items — /products must always show every product. */
+.sanoori-products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 8px;
+  row-gap: 12px;
+  align-items: start;
+  grid-auto-rows: auto;
+}
+
+@media (min-width: 768px) {
+  .sanoori-products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* /products category sections only: stay 3 columns across mobile AND tablet
+   (the shared grid above switches to 4 at 768px), then use 4 columns from
+   laptop/desktop (1024px) up. Scoped with the extra `.sanoori-category-grid`
+   class so the featured / filtered / skeleton grids keep their column count. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .sanoori-products-grid.sanoori-category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* /products main-category filter URLs (?category=sanitary-ware|tiles|
+   building-materials): keep the shared grid at 3 columns across mobile AND
+   tablet (it otherwise switches to 4 at 768px), so a page fits 10 full rows =
+   30 products. From laptop/desktop (1024px) up it uses 4 columns and shows the
+   full 32 fetched products = 8 full rows. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .sanoori-products-grid.sanoori-category-filtered-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Below 1024px, hide the 31st+ product so mobile/tablet always finish on a
+   complete row (3 × 10 = 30); laptop/desktop shows all 32 (4 × 8). Each of the
+   three categories has more than 32 active products, so the trailing row is
+   never left partially empty. */
+@media (max-width: 1023.98px) {
+  .sanoori-products-grid.sanoori-category-filtered-grid > :nth-child(n+31) {
+    display: none;
+  }
+}
+
+/* /products default (category-sectioned) catalogue only: each COMPLETE category
+   section — its surrounding area, its product cards, and the container behind
+   each image — is painted the requested `#FAF5F7`. Scoped via
+   `.sanoori-products-catalogue` (the grouped view), so the Home catalogue and
+   the /products category-filter views keep their existing backgrounds. The
+   section gaps are never painted, so each category's background starts and ends
+   with its own section. The `<img>` itself is never given a background, so every
+   image keeps its original colours, aspect ratio and `object-contain` behaviour;
+   only the area around it changes. */
+.sanoori-products-catalogue .catalogue-category-container,
+.sanoori-products-catalogue .catalogue-card,
+.sanoori-products-catalogue .catalogue-card > a {
+  background-color: #faf5f7;
+}
+
+/* The cards reuse the Home `.catalogue-card` / `.catalogue-name` styling, but
+   on /products the name must stay visible: it is a link, and the card also
+   carries the two action buttons below it. This cancels the Home hover-reveal
+   (which fades the name out on hover-capable devices) for these cards only. */
+.sanoori-products-grid .catalogue-card .catalogue-name {
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* /products only, mobile below 700px: hide both action buttons so each card is
+   just its own product image — kept whole via `object-fit: contain` inside the
+   card's existing ~8px rounded container — followed by the product name stacked
+   directly below it. Nothing else about the image/name/card is changed, and at
+   700px and up (or on any other page/section) nothing is touched. */
+@media (max-width: 699.98px) {
+  .sanoori-products-grid .sanoori-product-actions {
+    display: none !important;
   }
 }
 
@@ -1775,6 +2013,94 @@
   .sanoori-quote-helpful {
     display: none;
   }
+
+  /* ---------------- PRODUCT CARD ---------------- */
+
+  /* The summary card is hidden on phones: its photo and "requesting a
+     price for" block are already gone below `md`, and its "View product
+     details" link is now repeated at the top of the request-form card
+     (page.tsx), immediately above the "Send your request" heading. The
+     card — with its image, summary and link — is unchanged at 768px and
+     wider, where this block no longer applies. */
+  .sanoori-quote-product-card {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   REQUEST QUOTE — PRODUCT CARD PHOTO (PHONES + TABLETS, < 1024px)
+   Target: /request-quote?product=...&quantity=...
+   ============================================================
+   The summary-card product photo was sized as a cropped banner
+   (`h-48 w-full ... object-cover` on phones, fixed boxes at sm/md),
+   so the portrait shot was heavily cropped and, on phones, filled
+   the whole card width.
+
+   Below `lg` the photo now keeps its own aspect ratio in a compact
+   box (`width/height:auto` + max-*), stays fully visible with
+   `object-fit:contain` (no crop, zoom, stretch or overflow), and is
+   centred in the card (`align-self:center`, which centres on the
+   phone column and only vertically centres in the md row). At 1024px
+   and wider none of this applies: the Tailwind `lg:h-44 lg:w-80`
+   size and `object-cover` fitting are exactly as before.
+   ============================================================ */
+@media (max-width: 1023.98px) {
+  .sanoori-quote-product-image {
+    width: auto !important;
+    height: auto !important;
+    max-width: 180px !important;
+    max-height: 176px !important;
+    align-self: center !important;
+    object-fit: contain !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .sanoori-quote-product-image {
+    max-width: 240px !important;
+  }
+}
+
+/* ============================================================
+   REQUEST QUOTE — PRODUCT CARD PHOTO (LAPTOP / DESKTOP, >= 1024px)
+   Target: /request-quote?product=...&quantity=...
+   ============================================================
+   From `lg` up the card photo keeps its Tailwind box
+   (`lg:h-44 lg:w-80` = 320x176) but was fitted with `object-cover`,
+   which cropped the taller product shots (portrait tiles and similar).
+
+   The photo element, its box size, its position and the card layout
+   are all unchanged; only the fitting inside that box becomes
+   `contain` so the whole original photo is shown, uncropped, at its
+   own aspect ratio. Nothing below 1024px (the mobile and tablet
+   blocks above) is touched.
+   ============================================================ */
+@media (min-width: 1024px) {
+  .sanoori-quote-product-image {
+    object-fit: contain !important;
+  }
+}
+
+/* ============================================================
+   ABOUT HERO — TABLET VERTICAL GAP FIX (768–959px ONLY)
+   ============================================================
+   Cause: the first about-hero slide (`about-hero.png`) is exactly
+   3:1 (2172×724), while the other slides are ~2.4:1 (1944×809).
+   Below `lg` the backdrop keeps aspect-[1942/809] (~2.4:1) with
+   object-contain, which letterboxes the 3:1 first slide vertically —
+   navy bands above and below the main hero image. (The other slides
+   already match the box, so they have no vertical bands.)
+   Fix: match the backdrop to the 3:1 design intent in this band —
+   the same change the 960–1023px block below already makes — so
+   object-contain fills the box exactly, with NO image crop or
+   object-fit change. Slides 2–5 now letterbox horizontally in this
+   band, exactly as they already do at 960–1023px. Nothing below
+   768px (mobile block) or at 960px+ changes.
+   ============================================================ */
+@media (min-width: 768px) and (max-width: 959.98px) {
+  .sanoori-about-hero > div[style*="isolate"] {
+    aspect-ratio: 3 / 1 !important;
+  }
 }
 
 /* ============================================================
@@ -1934,5 +2260,258 @@
   .sanoori-contact-hero nav[aria-label="Breadcrumb"] ol {
     font-size: 0.75rem !important;
     line-height: 1.3 !important;
+  }
+}
+
+/* ============================================================
+   CATEGORY HERO — TABLET ADJUSTMENTS (768–969px ONLY)
+   /products?category=sanitary-ware | tiles | building-materials
+   ============================================================
+   The category hero copy block carries a fixed `-mt-[100px]` pull-up (used
+   to sit top-left on the taller laptop/desktop hero). Below 768px and at
+   960px+ existing blocks cancel it, but the 768–959px band had no override,
+   so the breadcrumb/heading were pulled above the hero's clipped top edge.
+   The second query below only restores that position in the band.
+
+   Across the whole 768–969px range, the heading is set to the same slightly
+   smaller clamp already used at 960px+ (so the longer "Building Materials"
+   fits comfortably) and the description is hidden. Only these adjustments
+   apply: breadcrumb, text, typography elsewhere, hero image/fitting, hero
+   height, slider, arrows and every other property are untouched. Nothing
+   below 768px or at 970px and above is affected. */
+@media (min-width: 768px) and (max-width: 969px) {
+  /* Heading: one step smaller so the longest heading fits comfortably. */
+  .sanoori-products-hero--category h1#products-hero-heading {
+    font-size: clamp(1.5rem, 4vw, 2.25rem) !important;
+  }
+
+  /* Hide only the description. */
+  .sanoori-products-hero--category
+    .sanoori-products-hero-content
+    p[class*="mt-4"][class*="max-w-2xl"][class*="leading-relaxed"] {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 959.98px) {
+  /* Cancel the fixed -100px pull-up so the copy sits inside the hero. */
+  .sanoori-products-hero--category
+    .sanoori-products-hero-content
+    > div {
+    margin-top: 0 !important;
+    padding-top: 24px !important;
+  }
+}
+
+/* ============================================================
+   HOME HERO — CONTENT BLOCK: 720px LOOK ACROSS 0px–1023.98px
+   ============================================================
+   The hero content block (the copy BELOW the main hero image: the
+   "Sanitary Ware, Tiles & Building Materials" heading, the description
+   and the Browse Products button) renders exactly as it does at a 720px
+   viewport for the entire 0–1023px range.
+
+   These declarations are the original 720px "mobile" rules, reused
+   verbatim. They previously lived inside a `max-width: 768px` query
+   (with a nested `max-width: 1023px`), so native CSS nesting capped them
+   at 768px and the 768–1023px tablet range silently fell back to the
+   desktop/tablet Tailwind utilities (large clamped heading, 48px top
+   padding, visible description, left-aligned button). Moving them here
+   to the top level extends the SAME styling — no competing override —
+   across the whole 0–1023.98px range, so there is no separate tablet
+   layout for this block. Nothing at 1024px and up is touched.
+   ============================================================ */
+@media (max-width: 1023.98px) {
+  /* Hero section: ZERO top padding so image starts immediately after header.
+     Keep section aspect-ratio unset so content can flow naturally. */
+  .sanoori-hero {
+    padding-top: 0 !important;
+    padding-bottom: 32px !important;
+    min-height: auto !important;
+    height: auto !important;
+    aspect-ratio: unset !important;
+  }
+
+  /* Hero backdrop image container: KEEP aspect ratio.
+     The images inside use `fill` (absolute) and need the container to
+     have defined dimensions. */
+
+  /* Content wrapper: no top padding, natural height */
+  .sanoori-hero > div.relative.h-full.w-full {
+    padding-top: 0 !important;
+    height: auto !important;
+  }
+
+  /* Inner flex container: ~32px top padding, compact gaps */
+  .sanoori-hero > div.relative.h-full.w-full > div.flex.h-full.items-start {
+    padding-top: 32px !important;
+    gap: 10px !important;
+    height: auto !important;
+    align-items: flex-start !important;
+  }
+
+  /* Hero heading: ~27px with line-height 1.2 */
+  .sanoori-hero h1.clamp-text-4xl-6xl {
+    font-size: 27px !important;
+    line-height: 1.2 !important;
+    margin-top: 8px !important;
+  }
+
+  /* Hero paragraph: hidden across 0–1023px (the only exception) */
+  .sanoori-hero p.hero-intro-d2 {
+    display: none !important;
+  }
+
+  /* Hero button (Browse Products): center horizontally across 0–1023px */
+  .sanoori-hero div.hero-intro-d3 {
+    justify-content: center !important;
+    padding-right: 0 !important;
+    margin-top: 10px !important;
+  }
+  .sanoori-hero div.hero-intro-d3 > a,
+  .sanoori-hero div.hero-intro-d3 > .button-link {
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+}
+
+/* ============================================================
+   HOME HERO — BROWSE PRODUCTS BUTTON: FULL WIDTH (700px–1023.98px)
+   ============================================================
+   From 700px through 1023px the Browse Products button stretches to the
+   full width of its content container (the block below the hero image),
+   so it reaches the right edge and grows proportionally as the viewport
+   widens. Only the button's width changes — text, font size, height,
+   colors, border radius, href and click behaviour are unchanged, and
+   nothing below 700px or at 1024px+ is touched. This is scoped to the
+   same 1023.98px endpoint used by the other "below 1024px" rules.
+   ============================================================ */
+@media (min-width: 700px) and (max-width: 1023.98px) {
+  .sanoori-hero div.hero-intro-d3 > a,
+  .sanoori-hero div.hero-intro-d3 > .button-link {
+    width: 100% !important;
+  }
+}
+
+/* ============================================================
+   HOME HERO — BROWSE PRODUCTS BUTTON: FULL WIDTH (824px–1023.98px)
+   ============================================================
+   Above ~816px the hero content column (`max-w-[48rem]` on the copy
+   block) stops growing at 768px while the viewport keeps widening, so
+   the button's flex container stays 768px wide and its right edge no
+   longer reaches the content area's right edge. Widening only the
+   button's flex container (`hero-intro-d3`) to `100vw − 48px` (the full
+   content width: viewport minus the `px-6` = 24px gutters) makes the
+   button reach the right edge again and grow with the viewport. Only the
+   button container's width changes — heading, description, spacing,
+   alignment, text, button style, and everything below 824px or at
+   1024px+ are untouched.
+   ============================================================ */
+@media (min-width: 824px) and (max-width: 1023.98px) {
+  .sanoori-hero div.hero-intro-d3 {
+    width: calc(100vw - 48px) !important;
+  }
+}
+
+/* ============================================================
+   HOME HERO — OVERLAY KEPT INSIDE THE CLEAN WALL AREA (≥1024px)
+   ============================================================
+   The hero content group (eyebrow, "Sanitary Ware, Tiles & Building
+   Materials" heading, description, Browse Products button) is kept
+   fully inside the clean wall on the LEFT of the hero image.
+
+   Wall geometry (measured from the actual slide pixels in the visible
+   middle band — the band shown by the ≥1024 object-cover 3:1 crop):
+   the strong (real) subject onset lies at ~38.5% of the width on
+   hero-2/hero-3, ~40% on hero-4, ~42% on hero-5 and ~46% on main-hero
+   (the faint edge texture before it is uniform wall grain, identical in
+   the already-approved 30–34% content band). The overlay is shared by
+   every slide, so it is sized for the narrowest wall:
+     - the copy column is capped at `calc(36vw - 88px)`, i.e. its right
+       edge sits at 36% of the viewport — a small, comfortable ~2.5vw
+       reserve before the strong subject onset on the tightest slides;
+     - the left inset is 88px (the 32px `lg:px-8` gutter + 56px, replacing
+       the `lg:ml-20` 80px), so the whole content group sits further right
+       with a comfortable gap from the image's left edge — balanced;
+     - the group also drops slightly: the wrapper's top padding moves from
+       24px (`lg:pt-6`) to 40px for a more premium, centred composition;
+     - eyebrow & heading are slightly larger: the eyebrow (Sanoori Trading)
+       is clamped to 13–15px and the heading to `clamp(1.875rem, 3.1vw,
+       3.75rem)` — both still fully in the wall;
+     - the long description is dropped below 1440px, the band where the
+       3:1 hero is too short for it above the bottom-left caption panel
+       (the moved-down layout needs a little more height); it returns at
+       1440px+ where the hero is tall enough;
+     - the button fills the whole column and therefore expands with the
+       available wall width; its right edge sits at the same safe 36vw
+       boundary as the text — always inside the wall on every slide.
+   Only copy sizing/positioning changes. The image and its crop/fit
+   (object-cover 3:1), hero height, slider, arrows, and everything below
+   1024px are untouched (the 0–1023px layout keeps its own block above).
+   ============================================================ */
+@media (min-width: 1024px) {
+  /* Content wrapper: move the group slightly DOWN — top padding from
+     `lg:pt-6` (24px) to 40px for a more balanced, premium composition. */
+  .sanoori-hero > div.relative.h-full.w-full > div.flex.h-full.items-start {
+    padding-top: 40px !important;
+  }
+
+  /* Copy group: sit further right — left inset 88px total (the 32px
+     `lg:px-8` gutter + 56px, replacing `lg:ml-20`'s 80px). */
+  .sanoori-hero > div.relative.h-full.w-full > div.flex.h-full.items-start > div {
+    margin-left: 56px !important;
+  }
+
+  /* Copy column: cap at `36vw - 88px` (the right edge therefore sits at
+     36vw — ~2.5vw short of the strong subject onset at ~38.5% on the
+     tightest slides, so the group is always inside the wall). */
+  .sanoori-hero > div.relative.h-full.w-full > div.flex.h-full.items-start > div > div {
+    max-width: calc(36vw - 88px) !important;
+  }
+
+  /* Eyebrow ("Sanoori Trading"): slightly larger — 13–15px, unifies the
+     active/inactive slide-state sizes. Still small under the heading. */
+  .sanoori-hero p.hero-intro:not(.hero-intro-d2) {
+    font-size: clamp(0.8125rem, 1vw, 0.9375rem) !important;
+  }
+
+  /* Heading: fluid and wall-proportional, slightly larger than before so
+     it reads prominent, still 3 lines max and fully inside the wall. */
+  .sanoori-hero h1.clamp-text-4xl-6xl {
+    font-size: clamp(1.875rem, 3.1vw, 3.75rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  /* Description: fluid inside the wall column (was text-lg / max-w-32rem). */
+  .sanoori-hero p.hero-intro-d2 {
+    font-size: clamp(0.875rem, 1.2vw, 1.125rem) !important;
+    line-height: 1.65 !important;
+    max-width: none !important;
+  }
+
+  /* Button: drop the slide-state `pe-[111px]/pe-[170px]` padding and let
+     the button fill the whole column (no width cap), so it expands with
+     the available wall width up to the safe 36vw right edge. */
+  .sanoori-hero div.hero-intro-d3 {
+    padding-right: 0 !important;
+  }
+  .sanoori-hero div.hero-intro-d3 > a,
+  .sanoori-hero div.hero-intro-d3 > .button-link {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+}
+
+/* At the tightest hero heights (1024–1439px) the 3:1 crop is under
+   ~480px tall; with the bottom-left caption panel AND the moved-down
+   (40px) content group there is no room for the long description above
+   the button, so the description is dropped there (the eyebrow, heading
+   and button always stay). It is shown again from 1440px where the hero
+   is tall enough. */
+@media (max-width: 1439.98px) {
+  .sanoori-hero p.hero-intro-d2 {
+    display: none !important;
   }
 }

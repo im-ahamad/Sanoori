@@ -291,8 +291,17 @@ async function CatalogueView({
       filters.featured
   );
 
+  // The three main category URLs (?category=sanitary-ware|tiles|building-materials)
+  // get the dedicated catalogue grid treatment below: 3 cols × 10 rows on
+  // mobile/tablet (30 products) and 4 cols × 8 rows on laptop/desktop
+  // (32 products). Any other filter/search keeps the shared default grid.
+  const isMainCategoryFilter =
+    filters.categorySlug === "sanitary-ware" ||
+    filters.categorySlug === "tiles" ||
+    filters.categorySlug === "building-materials";
+
   const [catalogue, featuredProducts] = await Promise.all([
-    getPublicProducts({ ...filters, page, pageSize: (filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials") ? 32 : undefined }),
+    getPublicProducts({ ...filters, page, pageSize: isMainCategoryFilter ? 32 : undefined }),
     getFeaturedProducts(4),
   ]);
 
@@ -307,44 +316,33 @@ async function CatalogueView({
     featured: filters.featured ? "true" : "",
   };
 
-  // For the default all products view (no active filters), fetch products in the specific category order:
-  // Rows 1-2: Sanitary Ware (8 products)
-  // Rows 3-4: Tiles (8 products)
-  // Rows 5-6: Building Materials (8 products)
-  // Rows 7-8: Sanitary Ware (8 products)
-  // Rows 9-10: Building Materials (8 products)
-  // Rows 11-12: Sanitary Ware (8 products)
-  // Total: 48 products in 4 columns × 12 rows
-  let allProducts: Awaited<ReturnType<typeof getPublicProductsShowcase>> = [];
+  // Default view (no active filters): group the existing products into the three
+  // main category sections, mirroring the Home page catalogue. Category-specific
+  // URLs (?category=...) keep using the flat filtered grid below.
+  // Up to 24 products per category: 3 cols × 8 rows on mobile/tablet, 4 cols × 6
+  // rows on laptop/desktop. Products flow in sequentially from the same category,
+  // so a row is never left with empty cells while more of that category exist.
+  const productsPerCategory = 24;
+  type ShowcaseProduct = Awaited<ReturnType<typeof getPublicProductsShowcase>>[number];
+  const defaultCategoryGroups: { slug: string; products: ShowcaseProduct[] }[] = [];
   if (!hasActiveFilters) {
     const [sanitaryWareProducts, tilesProducts, buildingMaterialsProducts] = await Promise.all([
-      getPublicProductsShowcase({ ...filters, categorySlug: "sanitary-ware" }, 24),
-      getPublicProductsShowcase({ ...filters, categorySlug: "tiles" }, 8),
-      getPublicProductsShowcase({ ...filters, categorySlug: "building-materials" }, 16),
+      getPublicProductsShowcase({ ...filters, categorySlug: "sanitary-ware" }, productsPerCategory),
+      getPublicProductsShowcase({ ...filters, categorySlug: "tiles" }, productsPerCategory),
+      getPublicProductsShowcase({ ...filters, categorySlug: "building-materials" }, productsPerCategory),
     ]);
 
-    // Arrange in the exact order:
-    // First 8 Sanitary Ware (rows 1-2)
-    // Next 8 Tiles (rows 3-4)
-    // Next 8 Building Materials (rows 5-6)
-    // Next 8 Sanitary Ware (rows 7-8)
-    // Next 8 Building Materials (rows 9-10)
-    // Last 8 Sanitary Ware (rows 11-12)
-    const sanitaryWareFirst8 = sanitaryWareProducts.slice(0, 8);
-    const sanitaryWareRows7_8 = sanitaryWareProducts.slice(8, 16);
-    const sanitaryWareRows11_12 = sanitaryWareProducts.slice(16, 24);
-    const buildingMaterialsRows5_6 = buildingMaterialsProducts.slice(0, 8);
-    const buildingMaterialsRows9_10 = buildingMaterialsProducts.slice(8, 16);
-    
-    allProducts = [
-      ...sanitaryWareFirst8,
-      ...tilesProducts.slice(0, 8),
-      ...buildingMaterialsRows5_6,
-      ...sanitaryWareRows7_8,
-      ...buildingMaterialsRows9_10,
-      ...sanitaryWareRows11_12,
-    ];
+    defaultCategoryGroups.push(
+      { slug: "sanitary-ware", products: sanitaryWareProducts },
+      { slug: "tiles", products: tilesProducts },
+      { slug: "building-materials", products: buildingMaterialsProducts }
+    );
   }
+
+  const defaultProductCount = defaultCategoryGroups.reduce(
+    (count, group) => count + group.products.length,
+    0
+  );
 
   return (
     <>
@@ -357,7 +355,8 @@ async function CatalogueView({
             description={t.products.featuredProductsDescription}
             className="[&>h2]:text-xl sm:[&>h2]:text-2xl"
           />
-          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          {/* Same responsive grid + card style as the Home catalogue */}
+          <div className="mt-6 sanoori-products-grid">
             {featuredProducts.map((product) => {
               const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
               const availabilityKey = AVAILABILITY_KEYS[product.availability];
@@ -365,6 +364,7 @@ async function CatalogueView({
                 <ProductCard
                   key={product.id}
                   product={product}
+                  variant="catalogue"
                   categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
                   askForPriceLabel={t.products.askForPrice}
                   viewDetailsLabel={t.products.viewDetails}
@@ -377,31 +377,58 @@ async function CatalogueView({
         </section>
       )}
 
-      <section aria-label="Catalogue results" className="mt-12">
-        {(!hasActiveFilters ? allProducts : catalogue.items).length > 0 ? (
+      <section
+        aria-label="Catalogue results"
+        className={cn("mt-12", !hasActiveFilters && "sanoori-products-catalogue")}
+      >
+        {(!hasActiveFilters ? defaultProductCount : catalogue.items.length) > 0 ? (
           <>
             {!hasActiveFilters ? (
-              <div className="sanoori-products-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-                {allProducts.map((product) => {
-                const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
-                const availabilityKey = AVAILABILITY_KEYS[product.availability];
-                return (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    hideAvailabilityBadge
-                    categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
-                    askForPriceLabel={t.products.askForPrice}
-                    viewDetailsLabel={t.products.viewDetails}
-                    availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
-                    availabilityVariant={availabilityStyle.variant}
-                  />
-                );
-              })}
+              <div className="space-y-3">
+                {defaultCategoryGroups
+                  .filter((group) => group.products.length > 0)
+                  .map((group) => (
+                    <section
+                      key={group.slug}
+                      aria-labelledby={`products-category-${group.slug}`}
+                      className="catalogue-category-container"
+                    >
+                      <h2
+                        id={`products-category-${group.slug}`}
+                        className="font-heading text-lg lg:text-xl font-semibold tracking-tight text-foreground px-4 py-3"
+                      >
+                        {t.categories[group.slug as keyof typeof t.categories] ?? group.slug}
+                      </h2>
+                      <div className="sanoori-products-grid sanoori-category-grid px-4 pb-4">
+                        {group.products.map((product) => {
+                          const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
+                          const availabilityKey = AVAILABILITY_KEYS[product.availability];
+                          return (
+                            <ProductCard
+                              key={product.id}
+                              product={product}
+                              variant="catalogue"
+                              hideAvailabilityBadge
+                              categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
+                              askForPriceLabel={t.products.askForPrice}
+                              viewDetailsLabel={t.products.viewDetails}
+                              availabilityLabel={t.common[availabilityKey as keyof typeof t.common] ?? product.availability}
+                              availabilityVariant={availabilityStyle.variant}
+                            />
+                          );
+                        })}
+                      </div>
+                    </section>
+                  ))}
               </div>
             ) : (
               <>
-                <div className={`sanoori-products-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-8 ${filters.categorySlug === "sanitary-ware" || filters.categorySlug === "tiles" || filters.categorySlug === "building-materials" ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+                <div
+                  className={cn(
+                    "sanoori-products-grid",
+                    isMainCategoryFilter && "sanoori-category-filtered-grid"
+                  )}
+                >
                   {catalogue.items.map((product) => {
                     const availabilityStyle = STYLES[product.availability] ?? { variant: "outline" as const };
                     const availabilityKey = AVAILABILITY_KEYS[product.availability];
@@ -409,6 +436,7 @@ async function CatalogueView({
                       <ProductCard
                         key={product.id}
                         product={product}
+                        variant="catalogue"
                         hideAvailabilityBadge
                         categoryLabel={t.categories[product.categorySlug as keyof typeof t.categories] ?? product.categoryName}
                         askForPriceLabel={t.products.askForPrice}
@@ -428,6 +456,7 @@ async function CatalogueView({
                       queryParams: paginationQuery,
                     }}
                     t={t}
+                    hideSummary={isMainCategoryFilter}
                   />
                 </div>
               </>
@@ -462,18 +491,14 @@ function CatalogueSkeleton({ t }: { t: ReturnType<typeof getServerTranslations> 
   return (
     <div aria-busy="true" aria-label={t.products.loadingProducts}>
       <Skeleton className="h-44 w-full rounded-lg" />
-      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+      <div className="mt-12 sanoori-products-grid">
         {Array.from({ length: 48 }).map((_, index) => (
-          <div
-            key={index}
-            className="overflow-hidden rounded-lg border border-border bg-card"
-          >
-            <Skeleton className="aspect-[4/3] w-full rounded-none" />
-            <div className="space-y-3 p-5">
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-10 w-full" />
+          <div key={index} className="catalogue-card">
+            <Skeleton className="aspect-square w-full rounded-[8px]" />
+            <Skeleton className="mt-1 h-4 w-3/4 rounded" />
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <Skeleton className="h-11 w-full rounded-md" />
+              <Skeleton className="h-11 w-full rounded-md" />
             </div>
           </div>
         ))}

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/hero";
-import { CategoryGrid } from "@/components/home/category-grid";
-import { ProductShowcase } from "@/components/home/product-showcase";
-import { CtaBand } from "@/components/home/cta-band";
+import { ProductCatalogue } from "@/components/home/product-catalogue";
 import { generateOrganizationSchema } from "@/lib/seo";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
@@ -46,9 +44,7 @@ export default async function Home() {
   return (
     <main className="flex-1 relative">
       <Hero />
-      <CategoryGrid />
-      <ProductShowcase />
-      <CtaBand />
+      <ProductCatalogue />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: organizationSchema }}

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { CategoryShowcase } from "@/components/home/category-showcase";
 import { Hero } from "@/components/home/hero";
 import { ProductCatalogue } from "@/components/home/product-catalogue";
 import { generateOrganizationSchema } from "@/lib/seo";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import { siteConfig } from "@/config/site";
+
 
 async function getLang(): Promise<"en" | "bn"> {
   const cookieStore = await cookies();
@@ -44,7 +46,9 @@ export default async function Home() {
   return (
     <main className="flex-1 relative">
       <Hero />
+      <CategoryShowcase />
       <ProductCatalogue />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: organizationSchema }}

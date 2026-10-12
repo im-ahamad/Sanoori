@@ -54,7 +54,7 @@ export function ProductCard({
       <article className="catalogue-card group">
         <Link
           href={detailsHref}
-          className="relative block aspect-square overflow-hidden rounded-[8px] bg-[oklch(0.97_0.015_250)] transition-all duration-300 group-hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.08)]"
+          className="relative block aspect-square overflow-hidden rounded-[8px] bg-[oklch(0.97_0.015_250)] transition-all duration-300 group-hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.08)] dark:bg-muted"
           aria-label={`View ${product.name}`}
           tabIndex={-1}
         >
@@ -67,9 +67,9 @@ export function ProductCard({
               className="block rounded-[8px] object-contain object-center transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center rounded-[8px] bg-[oklch(0.97_0.015_250)]">
+            <div className="absolute inset-0 flex items-center justify-center rounded-[8px] bg-[oklch(0.97_0.015_250)] dark:bg-muted">
               <span
-                className="text-navy-light/40 text-center px-3 text-sm leading-snug"
+                className="text-navy-light/40 dark:text-muted-foreground text-center px-3 text-sm leading-snug"
                 aria-hidden="true"
               >
                 {product.name}

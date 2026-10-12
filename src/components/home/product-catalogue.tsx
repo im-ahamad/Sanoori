@@ -19,7 +19,7 @@ async function getLang(): Promise<"en" | "bn"> {
  * Layout:
  * - Section header: "Explore our products" / "A selection from our catalogue"
  * - Three category sections (Sanitary Ware, Tiles, Building Materials)
- * - Each category: heading + product grid (8 products max)
+ * - Each category: heading + product grid (up to 20 products / 5 rows)
  * - Mobile: exactly 3 columns, 0px gaps
  * - Tablet: exactly 4 columns, 0px gaps
  * - Desktop: exactly 4 columns, with approved desktop spacing
@@ -32,8 +32,8 @@ export async function ProductCatalogue() {
   const lang = await getLang();
   const t = getServerTranslations(lang);
 
-  // Fetch 16 products per category (max needed for desktop: 4×4)
-  const categoryGroups = await getHomeShowcaseProductsByCategory(16);
+  // Fetch 20 products per category (max needed for desktop/tablet: 4×5)
+  const categoryGroups = await getHomeShowcaseProductsByCategory(20);
 
   // Category order and display names from translations
   const categoryOrder = ["sanitary-ware", "tiles", "building-materials"] as const;
@@ -57,17 +57,21 @@ export async function ProductCatalogue() {
             <SectionHeader
               eyebrow={t.productShowcase.eyebrow}
               title={t.productShowcase.title}
+              description={t.productShowcase.catalogueDescription}
               align="left"
             />
           </div>
         </Reveal>
 
-        {/* Three category sections with product grids */}
-        <div className="mt-8 space-y-3">
+        {/* Three category sections with product grids. The gap between the
+            three groups reuses the `gap-5` spacing (1.25rem / 20px) of the
+            "Explore categories" card grid on tablet and up; mobile keeps its
+            existing spacing. */}
+        <div className="mt-8 space-y-6 md:space-y-10">
           {orderedGroups.map((group, groupIndex) => (
             <Reveal key={group.category.id} delay={groupIndex * 0.08} className="space-y-4">
               {/* Category container — unified background, border, rounded corners */}
-              <div className="catalogue-category-container">
+              <div className="catalogue-category-container dark:border-border dark:bg-card">
                 {/* Category heading */}
                 <h2 className="font-heading text-lg lg:text-xl font-semibold tracking-tight text-foreground px-4 py-3">
                   {categoryLabels[group.category.slug] ?? group.category.name}
@@ -75,7 +79,7 @@ export async function ProductCatalogue() {
 
                 {/* Product Grid — responsive columns per breakpoint */}
                 <div className="catalogue-grid px-4 pb-4">
-                {group.products.slice(0, 16).map((product, productIndex) => (
+                {group.products.slice(0, 20).map((product, productIndex) => (
                   <Reveal key={product.id} delay={productIndex * 0.02}>
                     <CatalogueProductCard product={product} />
                   </Reveal>
@@ -114,7 +118,7 @@ function CatalogueProductCard({ product }: { product: PublicProductSummary }) {
       >
         {/* Square image container — 1:1 aspect ratio, subtle navy tint background */}
         <div
-          className="relative aspect-square overflow-hidden rounded-[8px] bg-[oklch(0.97_0.015_250)] transition-all duration-300 group-hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.08)]"
+          className="relative aspect-square overflow-hidden rounded-[8px] bg-[oklch(0.97_0.015_250)] transition-all duration-300 group-hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.08)] dark:bg-muted"
           aria-hidden="true"
         >
           {hasImage ? (
@@ -126,8 +130,8 @@ function CatalogueProductCard({ product }: { product: PublicProductSummary }) {
               loading="lazy"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-[oklch(0.97_0.015_250)] rounded-[8px]">
-              <span className="text-navy-light/40 text-center px-3 text-sm leading-snug" aria-hidden="true">
+            <div className="absolute inset-0 flex items-center justify-center bg-[oklch(0.97_0.015_250)] rounded-[8px] dark:bg-muted">
+              <span className="text-navy-light/40 dark:text-muted-foreground text-center px-3 text-sm leading-snug" aria-hidden="true">
                 {product.name}
               </span>
             </div>

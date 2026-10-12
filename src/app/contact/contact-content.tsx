@@ -240,8 +240,11 @@ export function ContactPageContent({
         noZoom
         textColor="white"
         placement="top-left"
-        topPadding="pt-[100px]"
-        leftPadding="pl-[160px]"
+        // Positioning only: at `lg` (>=1024px) the whole copy block sits in
+        // the hero's top-left corner with a small 40px gap, matching the
+        // 960–1023px band. Below 1024px the original insets are untouched.
+        topPadding="pt-[100px] lg:pt-10"
+        leftPadding="pl-[160px] lg:pl-10"
         // `sanoori-contact-hero` is the mobile-only scope hook (globals.css):
         // below 768px it gives the hero the source image ratio (full, uncropped
         // photo) and parks the copy block in its top-left corner. Laptop and
@@ -252,12 +255,16 @@ export function ContactPageContent({
       {/* ================================================================
           Contact information — warm neutral band with editorial header
           and an asymmetric primary / secondary channel composition.
+
+          The band background uses the shared website token (`bg-background`
+          → the common page colour in light mode, `--background` in dark
+          mode) instead of a page-local hardcoded tint, so it matches the
+          rest of the site.
          ================================================================ */}
-      <section className="relative" aria-labelledby="contact-info-heading">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[#FAF8F3] dark:bg-muted/50"
-        />
+      <section
+        className="relative bg-background"
+        aria-labelledby="contact-info-heading"
+      >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute right-0 top-0 h-72 w-72 sm:h-96 sm:w-96"

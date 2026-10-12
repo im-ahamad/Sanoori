@@ -26,6 +26,31 @@ const HERO_OBJECT_POSITION = "object-center";
 
 const HERO_OVERLAY = "";
 
+/**
+ * Renders the About hero description with a deliberate line break after
+ * "tiles," — i.e. "A supplier of sanitary ware, tiles," on the first line and
+ * "and building materials in Bangladesh." on the second.
+ *
+ * The break is a real <br>. It needs no media query because the description
+ * paragraph already only renders at ≥1024px (it is hidden on mobile and tablet
+ * by the existing rules), so tablet/mobile are unaffected. The wording itself
+ * is never changed: if the marker is absent (e.g. the Bengali copy) the string
+ * is returned untouched.
+ */
+function renderAboutDescription(description: string) {
+  const marker = "tiles,";
+  const index = description.indexOf(marker);
+  if (index === -1) return description;
+
+  return (
+    <>
+      {description.slice(0, index + marker.length)}{" "}
+      <br />
+      {description.slice(index + marker.length).replace(/^\s+/, "")}
+    </>
+  );
+}
+
 type SlideState = { active: number; previous: number };
 
 function useManualSlider() {
@@ -221,6 +246,7 @@ interface AboutHeroProps {
   description: string;
   breadcrumbs?: Array<{ label: string; href: string }>;
   breadcrumbLinkClassName?: string;
+  showArrows?: boolean;
 }
 
 export function AboutHero({
@@ -228,6 +254,7 @@ export function AboutHero({
   description,
   breadcrumbs,
   breadcrumbLinkClassName,
+  showArrows = true,
 }: AboutHeroProps) {
   const t = useTranslations();
   const { active, previous, reducedMotion, showPrevious, showNext } =
@@ -320,23 +347,25 @@ export function AboutHero({
               {description && (
                 <p
                   className={cn(
-                    "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg",
+                    "mt-4 max-w-2xl text-base leading-relaxed sm:text-lg md:hidden lg:block",
                     toneClass.description,
                     toneClass.glow
                   )}
                 >
-                  {description}
+                  {renderAboutDescription(description)}
                 </p>
               )}
             </div>
         </div>
       </div>
 
-      <AboutHeroNav
-        onPrevious={showPrevious}
-        onNext={showNext}
-        reducedMotion={reducedMotion}
-      />
+      {showArrows && (
+        <AboutHeroNav
+          onPrevious={showPrevious}
+          onNext={showNext}
+          reducedMotion={reducedMotion}
+        />
+      )}
     </section>
   );
 }

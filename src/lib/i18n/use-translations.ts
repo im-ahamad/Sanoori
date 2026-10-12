@@ -13,6 +13,7 @@ type Common = Widen<typeof en.common>;
 type Header = Widen<typeof en.header>;
 type Hero = Widen<typeof en.hero>;
 type CategoryGrid = Widen<typeof en.categoryGrid>;
+type CategoryShowcase = Widen<typeof en.categoryShowcase>;
 type ProductShowcase = Widen<typeof en.productShowcase>;
 type CustomerJourney = Widen<typeof en.customerJourney>;
 type CtaBand = Widen<typeof en.ctaBand>;
@@ -38,6 +39,7 @@ type Dictionary = {
   header: Header;
   hero: Hero;
   categoryGrid: CategoryGrid;
+  categoryShowcase: CategoryShowcase;
   productShowcase: ProductShowcase;
   customerJourney: CustomerJourney;
   ctaBand: CtaBand;

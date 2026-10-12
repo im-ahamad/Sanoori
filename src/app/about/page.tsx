@@ -40,6 +40,7 @@ export default async function AboutPage() {
         description={t.about.heroDescription}
         breadcrumbs={[{ label: "about", href: "/about" }]}
         breadcrumbLinkClassName="text-[12px] lg:text-[1rem] transition-colors duration-200 hover:text-gold-light"
+        showArrows={false}
       />
 
       <div className="section-spacing">

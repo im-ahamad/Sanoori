@@ -128,8 +128,8 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 w-full border-b border-border/60 transition-[box-shadow,background-color,border-color,backdrop-filter] duration-300",
         scrolled
-          ? "bg-[#E8E2D8] shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-[#E8E2D8] dark:bg-[oklch(0.19_0.02_250)] dark:shadow-[0_6px_24px_-12px_rgba(0,0,0,0.4)]"
-          : "bg-[#E8E2D8] backdrop-blur supports-[backdrop-filter]:bg-[#E8E2D8] dark:bg-[oklch(0.21_0.02_250)]"
+          ? "bg-[#DDD5C7] shadow-[0_6px_24px_-12px_rgba(0,0,0,0.3)] backdrop-blur supports-[backdrop-filter]:bg-[#DDD5C7] dark:bg-[oklch(0.19_0.02_250)] dark:shadow-[0_6px_24px_-12px_rgba(0,0,0,0.4)]"
+          : "bg-[#DDD5C7] backdrop-blur supports-[backdrop-filter]:bg-[#DDD5C7] dark:bg-[oklch(0.21_0.02_250)]"
       )}
     >
       {/* Gold brand accent strip */}

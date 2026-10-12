@@ -227,6 +227,21 @@
   }
 }
 
+/*
+ * Public site background (light theme only).
+ *
+ * The white page canvas (`body`) and the white content-section wrappers
+ * (`section.bg-background`) reuse the exact colour behind the footer's bottom
+ * line — #F1EBE1 / rgb(241 235 225) — so the pages match that footer strip.
+ * The header, the footer and every other white surface (cards, buttons,
+ * inputs, product images) keep their own backgrounds, and the dark theme is
+ * left untouched because of the `:not(.dark)` guard.
+ */
+html:not(.dark) body,
+html:not(.dark) section.bg-background {
+  background-color: #F1EBE1;
+}
+
 /* Disable all transitions during theme switch to prevent slow color animations */
 .theme-switching *,
 .theme-switching *::before,
@@ -438,9 +453,9 @@
      ============================================================ */
 
   /* Product grid — responsive columns per breakpoint
-     Mobile (< 768px): 3 columns × 3 rows = 9 products
-     Tablet (768px - 1023px): 4 columns × 3 rows = 12 products
-     Desktop (≥ 1024px): 4 columns × 4 rows = 16 products
+     Mobile (< 768px): 3 columns × 5 rows = 15 products
+     Tablet (768px - 1023px): 4 columns × 5 rows = 20 products
+     Desktop (≥ 1024px): 4 columns × 5 rows = 20 products
      Consistent spacing: 8px horizontal, 12px vertical at all breakpoints */
   .catalogue-grid {
     display: grid;
@@ -458,13 +473,13 @@
     }
   }
 
-  /* Desktop: exactly 4 columns × 3 rows = 12 products */
+  /* Desktop: exactly 4 columns × 5 rows = 20 products */
   @media (min-width: 1024px) {
     .catalogue-grid {
       grid-template-columns: repeat(4, 1fr);
     }
-    /* Show exactly 12 products (4 cols × 3 rows) on desktop */
-    .catalogue-grid > :nth-child(n+13) {
+    /* Show exactly 20 products (4 cols × 5 rows) on desktop */
+    .catalogue-grid > :nth-child(n+21) {
       display: none;
     }
   }
@@ -484,18 +499,19 @@
 
   /* Category heading inside container — already padded via px-4 py-3 */
 
-  /* Responsive product count — hide excess products at each breakpoint
-     Mobile (< 768px): show 9 (3×3), hide 10th+
-     Tablet (768px - 1023px): show 12 (4×3), hide 13th+
-     Desktop (≥ 1024px): show 16 (4×4), all visible */
+  /* Responsive product count — show 5 rows (the original 3 rows plus the 2
+     additional rows) at each breakpoint and hide the rest
+     Mobile (< 768px): show 15 (3×5), hide 16th+
+     Tablet (768px - 1023px): show 20 (4×5), hide 21st+
+     Desktop (≥ 1024px): show 20 (4×5), hide 21st+ */
   @media (max-width: 767px) {
-    .catalogue-grid > :nth-child(n+10) {
+    .catalogue-grid > :nth-child(n+16) {
       display: none;
     }
   }
 
   @media (min-width: 768px) and (max-width: 1023px) {
-    .catalogue-grid > :nth-child(n+13) {
+    .catalogue-grid > :nth-child(n+21) {
       display: none;
     }
   }
@@ -1054,8 +1070,11 @@
     row-gap: 12px !important;
   }
 
-  /* Product card buttons: compact for 2-column layout */
+  /* Product card buttons: hidden on mobile/small-tablet (≤768px) — only the
+     "You may also like" related-products cards; the buttons stay visible on
+     the catalogue, Home and any other surface that uses this card. */
   .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] div.sanoori-product-actions {
+    display: none !important;
     gap: 4px !important;
   }
   .sanoori-product-view .section-spacing > section[aria-labelledby="related-products-heading"] div.sanoori-product-actions > a {
@@ -1465,6 +1484,17 @@
 .sanoori-products-catalogue .catalogue-card,
 .sanoori-products-catalogue .catalogue-card > a {
   background-color: #faf5f7;
+}
+
+/* Dark theme: the same three grouped-catalogue surfaces above must switch off
+   the light `#FAF5F7` and use the existing card surface token instead —
+   otherwise the near-white category headings and product names (which become
+   `--foreground` in dark mode) sit on a near-white panel and disappear. Light
+   mode is untouched because this rule only applies under `.dark`. */
+.dark .sanoori-products-catalogue .catalogue-category-container,
+.dark .sanoori-products-catalogue .catalogue-card,
+.dark .sanoori-products-catalogue .catalogue-card > a {
+  background-color: var(--card);
 }
 
 /* The cards reuse the Home `.catalogue-card` / `.catalogue-name` styling, but
@@ -2264,6 +2294,46 @@
 }
 
 /* ============================================================
+   CONTACT HERO — TOP-LEFT COPY FIX (768–959px ONLY)
+   /contact
+
+   Between 768px and 959px the copy block still carried the desktop
+   `pt-[100px]` / `pl-[160px]` insets (the 960–1023px block above and
+   the 1024px+ `lg:` band already park it top-left at 40px), so in this
+   band only the breadcrumb + heading + standfirst sat far from the
+   hero's top-left corner.
+
+   The correction moves the whole block to a small 40px top/left gap,
+   matching the neighbouring bands. The block's own vertical padding is
+   redistributed (top 100→40, bottom 40→100) so the padding box — and
+   therefore the content-driven hero height here — is unchanged. The
+   inner breadcrumb/heading/description spacing, typography, colours,
+   hero image/fitting and everything below 768px or at 960px+ are
+   untouched.
+   ============================================================ */
+@media (min-width: 768px) and (max-width: 959.98px) {
+  .sanoori-contact-hero > div.relative:not(.absolute) > div {
+    padding-left: 40px !important;
+  }
+  .sanoori-contact-hero > div.relative:not(.absolute) > div > div {
+    padding-top: 40px !important;
+    padding-bottom: 100px !important;
+  }
+  /* Tablet: hide the standfirst (the 960–1023px block above already removes
+     it, so this completes the 768–1023px tablet range). Mobile (<768px) and
+     desktop (>=1024px) are untouched.
+
+     `visibility: hidden` (not `display: none`) on purpose: in this band the
+     hero has no aspect-ratio, so its height is driven by the copy block. The
+     description's box is kept so the hero height, the image crop and the
+     position of every other element stay exactly as they were — only the
+     pixels are not painted. */
+  .sanoori-contact-hero h1 + p {
+    visibility: hidden !important;
+  }
+}
+
+/* ============================================================
    CATEGORY HERO — TABLET ADJUSTMENTS (768–969px ONLY)
    /products?category=sanitary-ware | tiles | building-materials
    ============================================================
@@ -2512,6 +2582,91 @@
    is tall enough. */
 @media (max-width: 1439.98px) {
   .sanoori-hero p.hero-intro-d2 {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   PRIVACY POLICY PAGE — RESPONSIVE
+   /privacy-policy
+
+   Scope hooks added in src/app/privacy-policy/page.tsx:
+     .sanoori-privacy-hero — the PageHeader hero <section>
+     .sanoori-privacy-page — the <main> wrapping everything below the hero
+
+   Hero goal: the Privacy Policy hero image is 1944×809 (~2.4:1). The
+   section is given that exact ratio (content-box keeps the 1px divider
+   outside the box), so the image layer fills the box with the complete
+   photo — object-contain never crops it at any viewport — and the copy
+   block becomes a full-bleed overlay anchored to the hero's top-left
+   corner on every device (small, comfortable gap from the top and left
+   edges; the whole block moves together as one unit). The ambient
+   backdrop zoom would scale past the box (cropping the photo), so it is
+   off via the `noZoom` prop. At every breakpoint the image is fully
+   visible; the description is hidden on phones and tablets only.
+   ============================================================ */
+.sanoori-privacy-hero {
+  box-sizing: content-box;
+  aspect-ratio: 1944 / 809;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* The copy wrapper becomes a full-bleed overlay so the ratio box (and
+   not the text) drives the hero height. It spans the whole hero (no
+   max-width) and its own `px-4 sm:px-6 lg:px-8` gutter supplies the
+   left gap, while `padding-top` supplies the top gap. */
+.sanoori-privacy-hero > div.relative.container-sanoori {
+  position: absolute;
+  inset: 0;
+  max-width: none;
+  padding-top: 40px;
+}
+
+/* Cancel the shared `py-12 sm:py-16 lg:py-20` inset so the whole block
+   (breadcrumb + heading + description) sits flush inside those gaps. */
+.sanoori-privacy-hero > div.relative.container-sanoori > div {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* ---------- MOBILE ONLY (strictly below 768px) ---------- */
+/* Smaller top gap on phones; the description is hidden (breadcrumb and
+   the "Privacy Policy" heading stay visible). Nothing at 768px or wider
+   changes — tablet/desktop keep the standard sizing. */
+@media (max-width: 767.98px) {
+  .sanoori-privacy-hero > div.relative.container-sanoori {
+    padding-top: 20px;
+  }
+  .sanoori-privacy-hero h1 + p {
+    display: none !important;
+  }
+  .sanoori-privacy-hero nav[aria-label="Breadcrumb"] ol {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  .sanoori-privacy-hero h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Sections below the hero: slimmer outer section padding so the
+     editorial rhythm is not desktop-scale on a phone. */
+  .sanoori-privacy-page .section-spacing {
+    padding-top: 24px;
+    padding-bottom: 40px;
+  }
+}
+
+/* ---------- TABLET ONLY (768px – 1023.98px) ---------- */
+/* The description is hidden on tablets too (breadcrumb + heading stay);
+   the hero box and everything below 768px or at 1024px+ are untouched. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .sanoori-privacy-hero > div.relative.container-sanoori {
+    padding-top: 32px;
+  }
+  .sanoori-privacy-hero h1 + p {
     display: none !important;
   }
 }

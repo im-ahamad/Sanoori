@@ -253,7 +253,7 @@ function SubcategoryChip({
       className={cn(
         "inline-flex h-9 items-center rounded-full border px-3 md:px-4 text-[13px] md:text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         active
-          ? "border-gold bg-gold/15 font-medium text-navy-dark"
+          ? "border-gold bg-gold/15 font-medium text-navy-dark dark:text-foreground"
           : "border-border bg-background text-muted-foreground hover:border-gold/50 hover:text-foreground"
       )}
     >

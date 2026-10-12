@@ -59,10 +59,16 @@ export const en = {
     title: "Everything You Need, In One Place",
     description: "From sanitary ware and tiles to core building materials, our catalogue covers every surface and system. Browse by category to discover products that match your project's requirements.",
   },
+  categoryShowcase: {
+    description:
+      "From bathroom essentials to tiles and building materials, explore the right products for your home or project.",
+  },
   productShowcase: {
     eyebrow: "Explore our products",
     title: "A selection from our catalogue",
     description: "Browse a sample of what Sanoori Trading supplies — sanitary ware, tiles, and building materials you can actually order.",
+    catalogueDescription:
+      "Explore our range of sanitary ware, tiles, and building materials for your home, renovation, or construction project.",
     cta: "Browse Products",
     seeFullCatalogue: "See the full catalogue with search, filters, and every category.",
   },

@@ -42,3 +42,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local business data and maintenance artifacts
+/backups/
+/scripts/*.js
+/.com.google.Chrome.*

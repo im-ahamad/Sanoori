@@ -22,7 +22,7 @@ import {
   generateProductSchema,
   generateBreadcrumbSchema,
 } from "@/lib/seo";
-import { getPublicProductBySlug, getRelatedProducts } from "@/lib/public/catalogue";
+import { getPublicProductBySlug, getRelatedProducts, getPublicProducts } from "@/lib/public/catalogue";
 import { getPublicBusinessSettings } from "@/lib/public/settings";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
@@ -66,6 +66,17 @@ export async function generateMetadata({
       : undefined,
   });
 }
+
+export async function generateStaticParams() {
+  const products = await getPublicProducts({
+    pageSize: 1000,
+  });
+  return products.items.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
+export const revalidate = 60;
 
 export default async function ProductDetailPage({
   params,
@@ -138,6 +149,7 @@ export default async function ProductDetailPage({
         backgroundImage="/images/about-hero.png"
         objectFit="object-contain sm:object-cover"
         backdropOverlay="bg-gradient-to-b from-navy-dark/48 via-navy-dark/40 to-navy-dark/33"
+        priorityBackdrop={false}
       />
 
       <Container>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { productImageHero, productImageThumb } from "@/lib/cloudinary-url";
-import { ProductImagePlaceholder } from "@/components/products/product-image-placeholder";
+import { ProductImage } from "@/components/products/product-image";
 
 export interface GalleryImage {
   id: string;
@@ -376,54 +376,37 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
           Delivered URLs use `c_limit`, so they are never square: a fixed 1:1 box
           letterboxed ~33% of the area for landscape/portrait shots and shrank
           the product. In flow at its natural ratio the image fills the width with
-          no empty bands; the approved desktop (>=1024px) keeps the square box. */}
+          no empty bands; the approved desktop (>=1024px) keeps the square box.
+
+          `ProductImage` is a server component, so the photograph is part of the
+          initial HTML. This client wrapper adds only the interaction layer. */}
       <div
-        className={cn(
-          "relative w-full overflow-hidden rounded-lg bg-white dark:bg-background lg:aspect-square",
-          !selected.url && "aspect-square"
-        )}
+        ref={mainImageRef}
+        className="relative w-full h-full"
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
       >
-        {selected.url ? (
+        <ProductImage
+          url={selected.url}
+          alt={selectedAlt}
+          hasImage={Boolean(selected.url)}
+        />
+        {/* Lens overlay marking the exact magnified region */}
+        {zoomFrame && (
           <div
-            ref={mainImageRef}
-            className="relative w-full h-full"
-            onMouseMove={handleMouseMove}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onTouchStart={handleTouchStart}
-          >
-            {/* The 1080×1080 props mirror the `c_limit` delivery box: a truthful
-                placeholder ratio until the bytes arrive, then the image's own
-                natural ratio takes over (attributes map to `aspect-ratio: auto …`). */}
-            <Image
-              src={displayImageUrl}
-              alt={selectedAlt}
-              width={1080}
-              height={1080}
-              sizes="(max-width: 1024px) 100vw, 640px"
-              unoptimized
-              className="block w-full h-auto object-contain lg:absolute lg:inset-0 lg:h-full lg:w-full"
-              style={{ objectFit: 'contain' }}
-              priority
-            />
-            {/* Lens overlay marking the exact magnified region */}
-            {zoomFrame && (
-              <div
-                className="absolute pointer-events-none border border-primary/50 bg-primary/10 rounded-[2px]"
-                style={{
-                  left: zoomFrame.lensLeft,
-                  top: zoomFrame.lensTop,
-                  width: zoomFrame.lensWidth,
-                  height: zoomFrame.lensHeight,
-                  opacity: isZoomVisible ? 1 : 0,
-                  transition: `opacity ${ZOOM_FADE_MS}ms ease-out`,
-                }}
-                aria-hidden="true"
-              />
-            )}
-          </div>
-        ) : (
-          <ProductImagePlaceholder label="Photos coming soon" />
+            className="absolute pointer-events-none border border-primary/50 bg-primary/10 rounded-[2px]"
+            style={{
+              left: zoomFrame.lensLeft,
+              top: zoomFrame.lensTop,
+              width: zoomFrame.lensWidth,
+              height: zoomFrame.lensHeight,
+              opacity: isZoomVisible ? 1 : 0,
+              transition: `opacity ${ZOOM_FADE_MS}ms ease-out`,
+            }}
+            aria-hidden="true"
+          />
         )}
       </div>
 

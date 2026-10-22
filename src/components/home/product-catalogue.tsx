@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "@/components/layout/container";
 import { getHomeShowcaseProductsByCategory } from "@/lib/public/catalogue";
 import { getServerTranslations } from "@/lib/i18n/server-translations";
@@ -122,12 +123,17 @@ function CatalogueProductCard({ product }: { product: PublicProductSummary }) {
           aria-hidden="true"
         >
           {hasImage ? (
-            // eslint-disable-next-line @next/next/no-img-element -- native img retained for responsive object-contain in padded container; Image fill would alter layout
-            <img
+            // Same responsive image pattern as the /products catalogue card
+            // (components/products/product-card.tsx): next/image `fill` in the
+            // existing 1:1 container + sizes matching the 3-col mobile /
+            // 4-col tablet & desktop grid, so small screens download small
+            // variants. Defaults to lazy loading (tiles are below the fold).
+            <Image
               src={product.image!.url}
               alt={product.image!.alt ?? product.name}
+              fill
+              sizes="(max-width: 767px) 33vw, 25vw"
               className="object-contain object-center w-full h-full block rounded-[8px] transition-transform duration-500 group-hover:scale-[1.02]"
-              loading="lazy"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-[oklch(0.97_0.015_250)] rounded-[8px] dark:bg-muted">

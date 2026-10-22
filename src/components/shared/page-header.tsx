@@ -49,6 +49,14 @@ interface PageHeaderProps {
   /** Extra classes for the breadcrumb link/crumb text (font size, etc.).
    * Applied to the crumb text while keeping its existing color and spacing. */
   breadcrumbLinkClassName?: string;
+  /**
+   * Whether the decorative background image is preloaded/eager. Defaults to
+   * `true` (unchanged behavior), appropriate when the backdrop is the page's
+   * largest above-the-fold element. Pages that have their own real LCP image
+   * (e.g. a product photo) can set this to `false` so the preload is not
+   * spent on the decorative image.
+   */
+  priorityBackdrop?: boolean;
   className?: string;
 }
 
@@ -72,6 +80,7 @@ export function PageHeader({
   leftPadding,
   breadcrumbLinkClassName,
   textColor,
+  priorityBackdrop = true,
   className,
 }: PageHeaderProps) {
   const tone =
@@ -156,7 +165,7 @@ export function PageHeader({
         overlayClassName={backdropOverlay}
         objectFit={objectFit}
         objectPosition={objectPosition}
-        priority
+        priority={priorityBackdrop}
         unoptimized={unoptimized}
         noZoom={noZoom}
         className={backdropClassName}

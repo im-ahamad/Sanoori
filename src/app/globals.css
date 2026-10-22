@@ -2670,3 +2670,87 @@ html:not(.dark) section.bg-background {
     display: none !important;
   }
 }
+
+/* ============================================================
+   MOBILE & TABLET — IMAGE BACKGROUNDS MATCH THE SECTION BACKGROUND
+   (≤1023.98px; mobile-only rule at ≤767.98px)
+   ============================================================
+   On mobile and tablet, every tinted surface behind the category and
+   product images is painted the exact colour of the section/page it
+   sits on:
+     light — #F1EBE1, the literal painted by the unlayered
+             `html:not(.dark) body, html:not(.dark) section.bg-background`
+             rule at the top of this file. NOTE: var(--background) is NOT
+             that colour — the token is pure white oklch(1 0 0).
+     dark  — var(--background), what bg-background sections use in dark.
+   Covered (rendered) surfaces:
+     - Home "Explore our products" (ProductCatalogue): the category panels
+       (.catalogue-category-container) and the product image tiles
+       (div/a with bg-[oklch...] inside .catalogue-grid).
+     - Home "Explore categories" showcase panel (tablet only — the section
+       is display:none below 768px): section.bg-background >
+       .container-sanoori > .w-full.max-w-[1216px] > .rounded-md.
+     - /products (all widths ≤1023.98px): default grouped view (category
+       containers + card bodies + image links), the featured grid, and the
+       three main category-filtered grids — all image links live inside
+       .sanoori-products-grid and carry bg-[oklch...].
+   Desktop (≥1024px), the images themselves, borders, and every other
+   styling stay untouched. The previous version of this block targeted the
+   never-mounted HomeCategorySection markup (matched zero elements) and
+   applied var(--background) — white — instead of the section colour. */
+
+@media (max-width: 1023.98px) {
+  /* Light mode — exact section/page colour (#F1EBE1) */
+  html:not(.dark) .catalogue-category-container,
+  html:not(.dark) .catalogue-grid .catalogue-card [class*="bg-\[oklch"],
+  html:not(.dark) .sanoori-products-grid .catalogue-card [class*="bg-\[oklch"],
+  html:not(.dark) .sanoori-products-catalogue .catalogue-card,
+  html:not(.dark) section.bg-background > .container-sanoori > .w-full.max-w-\[1216px\] > .rounded-md {
+    background-color: #F1EBE1 !important;
+  }
+
+  /* Dark mode — the same surfaces follow the dark section background */
+  .dark .catalogue-category-container,
+  .dark .catalogue-grid .catalogue-card [class*="bg-\[oklch"],
+  .dark .sanoori-products-grid .catalogue-card [class*="bg-\[oklch"],
+  .dark .sanoori-products-catalogue .catalogue-card,
+  .dark section.bg-background > .container-sanoori > .w-full.max-w-\[1216px\] > .rounded-md {
+    background-color: var(--background) !important;
+  }
+}
+
+/* ============================================================
+   MOBILE ONLY (≤767.98px) — hide the names below the images (image-only cards)
+   ============================================================
+   Home "Explore our products" (ProductCatalogue): hides p.catalogue-name
+   below each homepage image tile. Scoped by .catalogue-grid, which exists
+   ONLY in the Home ProductCatalogue, so the category group headings (h2,
+   which sit above the grids) stay visible.
+
+   /products (default page only — no filters): hides the product name below
+   each image:
+   - Featured grid: cards inside the section carrying
+     aria-labelledby="featured-heading" (products/page.tsx; rendered only on
+     /products without active filters).
+   - Grouped default view: .sanoori-products-grid.sanoori-category-grid
+     (products/page.tsx grouped category sections).
+   The three main category-filtered grids
+   (.sanoori-products-grid.sanoori-category-filtered-grid —
+   ?category=sanitary-ware|tiles|building-materials) are deliberately NOT
+   targeted: those URLs keep all product names visible, as do search /
+   subcategory / availability filtered views (untouched scope).
+
+   Touch/tablet devices keep names at ≥768px; nothing above 768px and no
+   desktop styling changes. */
+@media (max-width: 767.98px) {
+  /* Home: product names below the homepage images */
+  .catalogue-grid .catalogue-name {
+    display: none !important;
+  }
+
+  /* /products (default page): product names below the images */
+  section[aria-labelledby="featured-heading"] .catalogue-name,
+  .sanoori-products-grid.sanoori-category-grid .catalogue-name {
+    display: none !important;
+  }
+}

@@ -8,7 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation";
  * How long the loading interface stays visible (ms).
  * Long enough to be clearly noticeable, short enough to stay snappy.
  */
-const MIN_VISIBLE_MS = 900;
+const MIN_VISIBLE_MS = 250;
 
 /**
  * Premium loading interface for Sanoori Trading.
@@ -82,16 +82,28 @@ export default function Loading() {
 }
 
 /**
- * Watches the query string so route changes that keep the same path
- * (search box, filters, `router.push`) also start the loading interface.
- * Suspense-wrapped so it never affects rendering of the page itself.
+ * Reports real route changes (path and/or query string) so navigations that we
+ * did not start from a link click — `router.push`, search box, filters — also
+ * start the loading interface. Suspense-wrapped because it reads
+ * `useSearchParams()`, so it never affects rendering of the page itself.
+ *
+ * The very first run (initial mount) is intentionally skipped: an effect runs on
+ * mount even with no navigation, which would otherwise re-trigger the overlay
+ * during hydration and defeat the initial-load frame dismissal.
  */
-function SearchChangeWatcher({ onChange }: { onChange: () => void }) {
+function RouteChangeWatcher({ onChange }: { onChange: (url: string) => void }) {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const search = searchParams.toString();
+  const didMountRef = useRef(false);
 
   useEffect(() => {
-    onChange();
-  }, [searchParams, onChange]);
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    onChange(pathname + (search ? `?${search}` : ""));
+  }, [pathname, search, onChange]);
 
   return null;
 }
@@ -105,7 +117,6 @@ function SearchChangeWatcher({ onChange }: { onChange: () => void }) {
  * It only controls the visual transition — no data, form or navigation is delayed.
  */
 export function LoadingGate() {
-  const pathname = usePathname();
   const [visible, setVisible] = useState(true);
   const stateRef = useRef<{ visible: boolean; timer: ReturnType<typeof setTimeout> | null }>({
     visible: true,
@@ -114,6 +125,9 @@ export function LoadingGate() {
   // Last URL we reacted to, so fragment (#section) and same-URL history entries
   // do not flash the loading interface.
   const lastUrlRef = useRef<string>("");
+  // Set once any navigation starts. The initial-load dismissal uses this so a
+  // navigation that begins before the first frame does not get cut short.
+  const navigatedRef = useRef(false);
 
   const hide = useCallback(() => {
     const state = stateRef.current;
@@ -122,30 +136,49 @@ export function LoadingGate() {
   }, []);
 
   const show = useCallback(() => {
+    navigatedRef.current = true;
     lastUrlRef.current = window.location.pathname + window.location.search;
     const state = stateRef.current;
-    if (state.visible) return;
-    state.visible = true;
-    setVisible(true);
+    if (!state.visible) {
+      state.visible = true;
+      setVisible(true);
+    }
+    // Always (re)schedule the minimum-duration timer. When a navigation starts
+    // while the initial overlay is still up, state.visible is already true, so
+    // this replaces the initial-load frame dismissal with the nav timer.
     if (state.timer) clearTimeout(state.timer);
     state.timer = setTimeout(hide, MIN_VISIBLE_MS);
   }, [hide]);
 
-  // Initial page load / refresh — visible from the first paint, then released.
+  // Initial page load / refresh — visible from the very first paint. Because the
+  // server-rendered overlay already covers a fully-painted page, release it on
+  // the first frame after hydration instead of holding it for MIN_VISIBLE_MS.
+  // Navigations (show) keep their own MIN_VISIBLE_MS timer below.
   useEffect(() => {
     const state = stateRef.current;
     state.visible = true;
     lastUrlRef.current = window.location.pathname + window.location.search;
-    state.timer = setTimeout(hide, MIN_VISIBLE_MS);
+    const frame = requestAnimationFrame(() => {
+      // If a navigation started before this frame, it owns the overlay now.
+      if (navigatedRef.current) return;
+      hide();
+    });
     return () => {
+      cancelAnimationFrame(frame);
       if (state.timer) clearTimeout(state.timer);
     };
   }, [hide]);
 
-  // Route changes we did not start from a link click (back/forward, router.push).
-  useEffect(() => {
-    show();
-  }, [pathname, show]);
+  // Route changes we did not start from a link click (back/forward, router.push,
+  // search box, filters). Compared by URL value so that merely rendering — e.g.
+  // the initial mount — never starts the loading interface.
+  const handleRouteChange = useCallback(
+    (url: string) => {
+      if (url === lastUrlRef.current) return;
+      show();
+    },
+    [show],
+  );
 
   // Internal link clicks — start showing the moment navigation begins.
   useEffect(() => {
@@ -196,7 +229,7 @@ export function LoadingGate() {
     <>
       {visible ? <LoadingScreen /> : null}
       <Suspense fallback={null}>
-        <SearchChangeWatcher onChange={show} />
+        <RouteChangeWatcher onChange={handleRouteChange} />
       </Suspense>
     </>
   );

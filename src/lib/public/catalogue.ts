@@ -250,31 +250,41 @@ export const getPublicProducts = unstable_cache(
       ? (filters.availability as Availability)
       : undefined;
 
+    const andConditions: Prisma.ProductWhereInput[] = [];
+
+    if (q) {
+      andConditions.push({
+        OR: [
+          { name: { contains: q, mode: "insensitive" as const } },
+          { slug: { contains: q, mode: "insensitive" as const } },
+          { productCode: { contains: q, mode: "insensitive" as const } },
+          { description: { contains: q, mode: "insensitive" as const } },
+          { category: { name: { contains: q, mode: "insensitive" as const } } },
+          { subcategory: { name: { contains: q, mode: "insensitive" as const } } },
+        ],
+      });
+    }
+
+    if (filters.categorySlug) {
+      andConditions.push({ category: { slug: filters.categorySlug } });
+    }
+
+    if (filters.subcategorySlug) {
+      andConditions.push({ subcategory: { slug: filters.subcategorySlug } });
+    }
+
+    if (featured !== undefined) {
+      andConditions.push({ featured });
+    }
+
+    if (availability) {
+      andConditions.push({ availability });
+    }
+
     const where: Prisma.ProductWhereInput = {
       isActive: true,
       showOnProducts: true,
-      AND: [
-        q
-          ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" as const } },
-                { slug: { contains: q, mode: "insensitive" as const } },
-                { productCode: { contains: q, mode: "insensitive" as const } },
-                { description: { contains: q, mode: "insensitive" as const } },
-                { category: { name: { contains: q, mode: "insensitive" as const } } },
-                { subcategory: { name: { contains: q, mode: "insensitive" as const } } },
-              ],
-            }
-          : {},
-        filters.categorySlug
-          ? { category: { slug: filters.categorySlug } }
-          : {},
-        filters.subcategorySlug
-          ? { subcategory: { slug: filters.subcategorySlug } }
-          : {},
-        featured !== undefined ? { featured } : {},
-        availability ? { availability } : {},
-      ],
+      AND: andConditions.length > 0 ? andConditions : undefined,
     };
 
     const [total, products] = await Promise.all([
@@ -322,31 +332,41 @@ export const getPublicProductsShowcase = unstable_cache(
       ? (filters.availability as Availability)
       : undefined;
 
+    const andConditions: Prisma.ProductWhereInput[] = [];
+
+    if (q) {
+      andConditions.push({
+        OR: [
+          { name: { contains: q, mode: "insensitive" as const } },
+          { slug: { contains: q, mode: "insensitive" as const } },
+          { productCode: { contains: q, mode: "insensitive" as const } },
+          { description: { contains: q, mode: "insensitive" as const } },
+          { category: { name: { contains: q, mode: "insensitive" as const } } },
+          { subcategory: { name: { contains: q, mode: "insensitive" as const } } },
+        ],
+      });
+    }
+
+    if (filters.categorySlug) {
+      andConditions.push({ category: { slug: filters.categorySlug } });
+    }
+
+    if (filters.subcategorySlug) {
+      andConditions.push({ subcategory: { slug: filters.subcategorySlug } });
+    }
+
+    if (featured !== undefined) {
+      andConditions.push({ featured });
+    }
+
+    if (availability) {
+      andConditions.push({ availability });
+    }
+
     const where: Prisma.ProductWhereInput = {
       isActive: true,
       showOnProducts: true,
-      AND: [
-        q
-          ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" as const } },
-                { slug: { contains: q, mode: "insensitive" as const } },
-                { productCode: { contains: q, mode: "insensitive" as const } },
-                { description: { contains: q, mode: "insensitive" as const } },
-                { category: { name: { contains: q, mode: "insensitive" as const } } },
-                { subcategory: { name: { contains: q, mode: "insensitive" as const } } },
-              ],
-            }
-          : {},
-        filters.categorySlug
-          ? { category: { slug: filters.categorySlug } }
-          : {},
-        filters.subcategorySlug
-          ? { subcategory: { slug: filters.subcategorySlug } }
-          : {},
-        featured !== undefined ? { featured } : {},
-        availability ? { availability } : {},
-      ],
+      AND: andConditions.length > 0 ? andConditions : undefined,
     };
 
     const products = await db.product.findMany({

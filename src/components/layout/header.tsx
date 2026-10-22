@@ -33,7 +33,9 @@ function NavLink({
 }) {
   const isHome = href === "/";
   const Component = isHome ? "a" : Link;
-  const linkProps = isHome ? { href } : { href, prefetch: false };
+  // App Router default (auto) prefetch: for these dynamic public routes it
+  // prefetches only the shared loading shell, removing the round trip on click.
+  const linkProps = { href };
 
   return (
     <Component

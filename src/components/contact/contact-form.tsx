@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useTranslations, getTranslations } from "@/lib/i18n/use-translations";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { submitContactFormAction } from "@/lib/actions/contact-form";
 
 export function ContactForm() {
-  const tContext = useTranslations();
-  const [mounted, setMounted] = useState(false);
-  const t = mounted ? tContext : getTranslations("en");
+  // The active-language dictionary comes from context, supplied by the server
+  // layout, so it is identical on server render and client hydration — no
+  // mounted-fallback is needed to keep the two in sync.
+  const t = useTranslations();
   const cp = t.contactPage;
 
   const [state, formAction, pending] = useActionState(
@@ -30,11 +31,6 @@ export function ContactForm() {
   const successRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    const id = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(id);
-  }, []);
 
   useEffect(() => {
     if (state?.status === "success") {

@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useTranslations, getTranslations, type SupportedLanguage } from "@/lib/i18n/use-translations";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 export interface ProductRequestTarget {
   id: string;
@@ -45,8 +45,6 @@ interface ProductRequestFormProps {
   onDone?: () => void;
   /** WhatsApp deep link — rendered as a compact button beside "Ask for Price" below 1024px. */
   whatsappHref?: string | null;
-  /** Initial language for server-side rendering to avoid hydration mismatch. */
-  initialLang?: SupportedLanguage;
   /** Initial quantity value from URL query parameter. */
   initialQuantity?: number;
 }
@@ -71,14 +69,12 @@ export function ProductRequestForm({
   businessSettings,
   onDone,
   whatsappHref,
-  initialLang,
   initialQuantity,
 }: ProductRequestFormProps) {
-  const tContext = useTranslations();
-  const [mounted, setMounted] = useState(false);
-  
-  // Use initialLang for SSR, switch to context after hydration
-  const t = mounted ? tContext : getTranslations(initialLang ?? "en");
+  // The active-language dictionary comes from context, supplied by the server
+  // layout, so it is identical on server render and client hydration — no
+  // mounted-fallback is needed to keep the two in sync.
+  const t = useTranslations();
   const rq = t.requestQuote as typeof t.requestQuote & {
     productSummary: { requestingPriceFor: string; modelLabel: string };
     form: {
@@ -132,12 +128,6 @@ export function ProductRequestForm({
   });
   const successRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    // Set mounted after initial render to avoid hydration mismatch
-    const id = setTimeout(() => setMounted(true), 0);
-    return () => clearTimeout(id);
-  }, []);
 
   useEffect(() => {
     if (state?.status === "success") {

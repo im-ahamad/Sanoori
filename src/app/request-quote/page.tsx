@@ -7,7 +7,6 @@ import { ProductRequestForm } from "@/components/products/product-request-form";
 import { createWhatsAppProductLink } from "@/lib/contact/whatsapp";
 import {
   getPublicProductBySlug,
-  getPublicProductOptions,
   heroImageUrl,
 } from "@/lib/public/catalogue";
 import { generatePageMetadata } from "@/lib/seo";
@@ -71,14 +70,10 @@ export default async function RequestQuotePage({
     redirect("/products");
   }
 
-  const [productOptions, businessSettings] = await Promise.all([
-    getPublicProductOptions(),
+  const [productDetail, businessSettings] = await Promise.all([
+    getPublicProductBySlug(requestedSlug),
     getPublicBusinessSettings(),
   ]);
-
-  const productDetail = productOptions.some((option) => option.slug === requestedSlug)
-    ? await getPublicProductBySlug(requestedSlug)
-    : null;
 
   if (!productDetail) {
     notFound();
@@ -265,7 +260,6 @@ export default async function RequestQuotePage({
                   }}
                   businessSettings={businessSettings}
                   whatsappHref={whatsappHref}
-                  initialLang={lang}
                   initialQuantity={initialQuantity}
                 />
               </div>

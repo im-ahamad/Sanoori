@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         
         <div className="flex-1 flex-col">
-          <Providers initialLanguage={lang}>
+          <Providers initialLanguage={lang} dictionary={t}>
             <SiteChrome footer={<Footer />} settings={businessSettings}>{children}</SiteChrome>
           </Providers>
         </div>

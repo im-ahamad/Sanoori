@@ -1,78 +1,18 @@
 "use client";
 
-import { useLanguage, type SupportedLanguage } from "@/lib/language";
-import { en } from "./dictionaries/en";
-import { bn } from "./dictionaries/bn";
+import { useTranslationsDictionary } from "./translations-context";
+import type { Dictionary } from "./dictionary-types";
 
-// Helper to widen literal string types to string
-type Widen<T> = {
-  [K in keyof T]: T[K] extends object ? Widen<T[K]> : string;
-};
+export type { Dictionary };
 
-type Common = Widen<typeof en.common>;
-type Header = Widen<typeof en.header>;
-type Hero = Widen<typeof en.hero>;
-type CategoryGrid = Widen<typeof en.categoryGrid>;
-type CategoryShowcase = Widen<typeof en.categoryShowcase>;
-type ProductShowcase = Widen<typeof en.productShowcase>;
-type CustomerJourney = Widen<typeof en.customerJourney>;
-type CtaBand = Widen<typeof en.ctaBand>;
-type DiscoveryCta = Widen<typeof en.discoveryCta>;
-type Footer = Widen<typeof en.footer>;
-type CategoryCard = Widen<typeof en.categoryCard>;
-type MobileNav = Widen<typeof en.mobileNav>;
-type LanguageToggle = Widen<typeof en.languageToggle>;
-type Layout = Widen<typeof en.layout>;
-type ThemeToggle = Widen<typeof en.themeToggle>;
-type Products = Widen<typeof en.products>;
-type ProductDetails = Widen<typeof en.productDetails>;
-type PrivacyPolicy = Widen<typeof en.privacyPolicy>;
-type ContactPage = Widen<typeof en.contactPage>;
-type About = Widen<typeof en.about>;
-type Seo = Widen<typeof en.seo>;
-type Categories = Widen<typeof en.categories>;
-type Contact = Widen<typeof en.contact>;
-type RequestQuote = Widen<typeof en.requestQuote>;
-
-type Dictionary = {
-  common: Common;
-  header: Header;
-  hero: Hero;
-  categoryGrid: CategoryGrid;
-  categoryShowcase: CategoryShowcase;
-  productShowcase: ProductShowcase;
-  customerJourney: CustomerJourney;
-  ctaBand: CtaBand;
-  discoveryCta: DiscoveryCta;
-  footer: Footer;
-  categoryCard: CategoryCard;
-  mobileNav: MobileNav;
-  languageToggle: LanguageToggle;
-  layout: Layout;
-  themeToggle: ThemeToggle;
-  products: Products;
-  productDetails: ProductDetails;
-  privacyPolicy: PrivacyPolicy;
-  contactPage: ContactPage;
-  about: About;
-  seo: Seo;
-  categories: Categories;
-  contact: Contact;
-  requestQuote: RequestQuote;
-};
-
-const dictionaries: Record<SupportedLanguage, Dictionary> = {
-  en,
-  bn,
-} as const satisfies Record<SupportedLanguage, Dictionary>;
-
+/**
+ * Active-language dictionary for client components.
+ *
+ * The dictionary is provided by `TranslationsProvider`, which receives it as a
+ * prop from the server layout (selected from the `sanoori-lang` cookie). Because
+ * the value is data — not an import — the inactive language never enters the
+ * client bundle.
+ */
 export function useTranslations(): Dictionary {
-  const { language } = useLanguage();
-  return dictionaries[language];
+  return useTranslationsDictionary();
 }
-
-export function getTranslations(lang: SupportedLanguage): Dictionary {
-  return dictionaries[lang];
-}
-
-export type { Dictionary, SupportedLanguage };

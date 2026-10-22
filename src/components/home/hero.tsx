@@ -140,6 +140,10 @@ function HeroBackdrop({
         {HERO_SLIDES.map((src, index) => {
           const isActive = index === active;
           const isPrevious = index === previous;
+          if (!isActive && !isPrevious) {
+            return null;
+          }
+          const isFirstSlide = index === 0;
           return (
             <Image
               key={src}
@@ -148,8 +152,8 @@ function HeroBackdrop({
               fill
               sizes="100vw"
               quality={60}
-              priority={index === 0}
-              loading={index === 0 ? undefined : "lazy"}
+              priority={isFirstSlide && isActive}
+              loading={isFirstSlide && isActive ? undefined : "lazy"}
               className={cn(
                 "object-contain lg:object-cover",
                 HERO_OBJECT_POSITION,

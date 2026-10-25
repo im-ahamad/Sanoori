@@ -170,7 +170,6 @@ export default async function ProductsPage({
           objectFit="object-cover"
           objectPosition={categorySlug ? "object-center" : "object-[50%_0%]"}
           noZoom={!categorySlug}
-          priority
         />
 
         {/* Hero text block - left 35% of hero from lg up, full width below lg */}

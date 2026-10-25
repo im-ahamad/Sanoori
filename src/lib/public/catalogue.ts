@@ -430,7 +430,6 @@ export const getHomeShowcaseProducts = unstable_cache(
 export interface CategoryProductGroup {
   category: PublicCategory;
   products: PublicProductSummary[];
-  totalCount: number;
 }
 
 export const getHomeShowcaseProductsByCategory = unstable_cache(
@@ -450,10 +449,6 @@ export const getHomeShowcaseProductsByCategory = unstable_cache(
           },
         });
 
-        const totalCount = await db.product.count({
-          where: { isActive: true, showOnHome: true, categoryId: category.id },
-        });
-
         const summaries = products
           .map(toProductSummary)
           .sort((a, b) => (b.image ? 1 : 0) - (a.image ? 1 : 0));
@@ -461,7 +456,6 @@ export const getHomeShowcaseProductsByCategory = unstable_cache(
         return {
           category,
           products: summaries,
-          totalCount,
         };
       })
     );

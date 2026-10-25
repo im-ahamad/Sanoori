@@ -65,6 +65,7 @@ export function ProductCard({
               fill
               sizes="(max-width: 767px) 33vw, 25vw"
               className="block rounded-[8px] object-contain object-center transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              unoptimized
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center rounded-[8px] bg-[oklch(0.97_0.015_250)] dark:bg-muted">

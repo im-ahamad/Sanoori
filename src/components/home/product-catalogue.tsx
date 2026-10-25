@@ -134,6 +134,7 @@ function CatalogueProductCard({ product }: { product: PublicProductSummary }) {
               fill
               sizes="(max-width: 767px) 33vw, 25vw"
               className="object-contain object-center w-full h-full block rounded-[8px] transition-transform duration-500 group-hover:scale-[1.02]"
+              unoptimized
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-[oklch(0.97_0.015_250)] rounded-[8px] dark:bg-muted">

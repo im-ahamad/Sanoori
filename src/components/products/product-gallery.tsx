@@ -259,6 +259,20 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
     activeRef.current = true;
     findAnchors();
     scheduleUpdate();
+
+    // Lazy preload: fetch 2000px zoom image on first interaction only.
+    // Subsequent hovers reuse the cached hiResRef.current.
+    if (!hiResRef.current && zoomImageUrl) {
+      const loader = new window.Image();
+      loader.decoding = "async";
+      loader.onload = () => {
+        if (loader.naturalWidth === 0) return;
+        hiResRef.current = { width: loader.naturalWidth, height: loader.naturalHeight };
+        if (activeRef.current) scheduleUpdate();
+      };
+      loader.src = zoomImageUrl;
+    }
+
     // Fade in only after the first (transparent) panel frame has painted.
     fadeRafRef.current = window.requestAnimationFrame(() => {
       fadeRafRef.current = window.requestAnimationFrame(() => {
@@ -299,25 +313,6 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
       finePointer.removeEventListener("change", sync);
     };
   }, []);
-
-  // Warm up the highest-resolution source so the first hover is instant.
-  // Only preload on devices where zoom is actually usable (desktop with fine pointer).
-  useEffect(() => {
-    if (!canUseZoom) return;
-    hiResRef.current = null;
-    if (!zoomImageUrl) return;
-    const loader = new window.Image();
-    loader.decoding = "async";
-    loader.onload = () => {
-      if (loader.naturalWidth === 0) return;
-      hiResRef.current = { width: loader.naturalWidth, height: loader.naturalHeight };
-      if (activeRef.current) scheduleUpdate();
-    };
-    loader.src = zoomImageUrl;
-    return () => {
-      loader.onload = null;
-    };
-  }, [zoomImageUrl, canUseZoom, scheduleUpdate]);
 
   // Keep the magnifier exact while the page scrolls or the viewport changes.
   useEffect(() => {

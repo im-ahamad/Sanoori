@@ -99,7 +99,7 @@ export async function CategoryCard({
               src={imageSrc!}
               alt=""
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1500px) 50vw, 750px"
+              sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, 20vw"
               priority={featured}
               className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-[1.03]"
             />

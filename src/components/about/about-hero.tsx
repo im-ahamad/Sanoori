@@ -138,6 +138,9 @@ function AboutHeroBackdrop({
         {ABOUT_HERO_SLIDES.map((src, index) => {
           const isActive = index === active;
           const isPrevious = index === previous;
+          if (!isActive && !isPrevious) {
+            return null;
+          }
           return (
             <Image
               key={src}
@@ -146,8 +149,8 @@ function AboutHeroBackdrop({
               fill
               sizes="100vw"
               quality={60}
-              priority={index === 0}
-              loading={index === 0 ? undefined : "lazy"}
+              priority={isActive}
+              loading={isActive ? undefined : "lazy"}
               className={cn(
                 "object-contain lg:object-cover",
                 HERO_OBJECT_POSITION,

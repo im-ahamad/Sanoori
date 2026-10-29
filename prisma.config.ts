@@ -11,6 +11,7 @@ config();
 const prismaConfig = {
   schema: "./prisma/schema.prisma",
   datasource: {
+    // Use DIRECT_URL (Neon) for migrations; DATABASE_URL (local) for app runtime via @prisma/adapter-pg
     url: process.env.DATABASE_URL,
     directUrl: process.env.DIRECT_URL,
   },

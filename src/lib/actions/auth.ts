@@ -2,97 +2,50 @@
 
 import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/lib/auth";
-import { verifyPasswordOnly, verifyLoginOtp, type LoginOtpActionState } from "@/lib/actions/login-otp";
+import { redirect } from "next/navigation";
+import { siteConfig } from "@/config/site";
 
 /**
- * Stage 1: Password verification result
+ * Server action for admin sign-in with email and password.
+ * On success, redirects to /admin.
+ * On failure, returns an error message.
  */
-export type PasswordVerifyState =
-  | { stage: "password"; requiresOtp: true; challengeId: string }
-  | { stage: "password"; error: string }
-  | undefined;
-
-/**
- * Stage 2: OTP verification result
- */
-export type OtpVerifyState =
-  | { stage: "otp"; success: true; challengeId: string }
-  | { stage: "otp"; error: string }
-  | undefined;
-
-/**
- * Server action for Stage 1: Verify password and initiate OTP challenge.
- * Returns { requiresOtp: true, challengeId } on success.
- * Returns { error } on failure.
- */
-export async function authenticate(
-  _prevState: PasswordVerifyState,
+export async function signInAction(
+  _prevState: { error?: string; redirectTo?: string } | undefined,
   formData: FormData
-): Promise<PasswordVerifyState> {
-  const result = await verifyPasswordOnly(undefined, formData);
+): Promise<{ error?: string; redirectTo?: string }> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  if (!result) {
-    return { stage: "password", error: "Something went wrong. Please try again." };
+  if (!email || !password) {
+    return { error: "Email and password are required." };
   }
 
-  if (result.status === "success") {
-    return { stage: "password", requiresOtp: true, challengeId: result.challengeId! };
-  }
-
-  return { stage: "password", error: result.message };
-}
-
-/**
- * Server action for Stage 2: Verify OTP and complete authentication.
- * On success, calls Auth.js signIn with the challengeId to create the session.
- */
-export async function verifyOtpAndSignIn(
-  _prevState: OtpVerifyState,
-  formData: FormData
-): Promise<OtpVerifyState> {
-  const challengeId = formData.get("challengeId") as string;
-  const otp = formData.get("otp") as string;
-
-  if (!challengeId || !otp) {
-    return { stage: "otp", error: "Invalid request." };
-  }
-
-  const result = await verifyLoginOtp(undefined, (() => {
-    const fd = new FormData();
-    fd.append("challengeId", challengeId);
-    fd.append("otp", otp);
-    return fd;
-  })());
-
-  if (!result) {
-    return { stage: "otp", error: "Something went wrong. Please try again." };
-  }
-
-  if (result.status === "error") {
-    return { stage: "otp", error: result.message };
-  }
-
-  // OTP verified successfully - now create the Auth.js session using challengeId
   try {
+    // `redirect: false` prevents Auth.js from using AUTH_URL (env var) to
+    // build the redirect destination. We return the redirect target instead of
+    // calling next/navigation's redirect() directly, because useActionState
+    // intercepts the NEXT_REDIRECT throw and prevents browser navigation.
+    // The client handles navigation via useEffect + useRouter.
     await signIn("credentials", {
-      challengeId,
+      email,
+      password,
       redirectTo: "/admin",
+      redirect: false,
     });
+    return { redirectTo: `${siteConfig.url}/admin` };
   } catch (error) {
     if (error instanceof AuthError) {
-      // If session creation fails, the challenge is already consumed (sessionIssuedAt set)
-      // but the session wasn't created. This is a rare edge case.
-      // We return an error - the user will need to start over.
-      return { stage: "otp", error: "Failed to create session. Please sign in again." };
+      return { error: "Invalid email or password." };
     }
     throw error;
   }
-
-  // signIn throws a redirect on success, so we never reach here
-  return { stage: "otp", success: true, challengeId };
 }
 
 /** Signs the current admin out and returns them to the login page. */
 export async function logoutAction() {
-  await signOut({ redirectTo: "/secure-admin" });
+  // `redirect: false` prevents Auth.js from using AUTH_URL (env var) to
+  // build the redirect destination. Cookies are still cleared by signOut.
+  await signOut({ redirect: false, redirectTo: "/secure-admin" });
+  redirect(`${siteConfig.url}/secure-admin`);
 }

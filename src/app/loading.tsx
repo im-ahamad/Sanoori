@@ -8,7 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation";
  * How long the loading interface stays visible (ms).
  * Long enough to be clearly noticeable, short enough to stay snappy.
  */
-const MIN_VISIBLE_MS = 250;
+const MIN_VISIBLE_MS = 150;
 
 /**
  * Premium loading interface for Sanoori Trading.

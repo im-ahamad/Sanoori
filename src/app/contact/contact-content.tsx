@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -60,44 +59,6 @@ interface ContactDetail {
   href?: string;
   isExternal?: boolean;
 }
-
-/* ------------------------------------------------------------------ *
- * Decorative layers — architectural blueprint motifs
- * ------------------------------------------------------------------ */
-
-const CORNER_GRID: CSSProperties = {
-  backgroundImage:
-    "linear-gradient(to right, rgba(148,163,184,0.20) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.20) 1px, transparent 1px)",
-  backgroundSize: "48px 48px",
-  maskImage: "radial-gradient(65% 65% at 100% 0%, black, transparent)",
-  WebkitMaskImage: "radial-gradient(65% 65% at 100% 0%, black, transparent)",
-};
-
-const DARK_GRID: CSSProperties = {
-  backgroundImage:
-    "linear-gradient(to right, rgba(255,255,255,0.055) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.055) 1px, transparent 1px)",
-  backgroundSize: "44px 44px",
-  maskImage: "radial-gradient(90% 90% at 0% 0%, black 25%, transparent 85%)",
-  WebkitMaskImage:
-    "radial-gradient(90% 90% at 0% 0%, black 25%, transparent 85%)",
-};
-
-const MAP_BLUEPRINT: CSSProperties = {
-  backgroundColor: "var(--muted)",
-  backgroundImage:
-    /* fine grid */
-    "linear-gradient(to right, rgba(120,134,158,0.14) 1px, transparent 1px), " +
-    "linear-gradient(to bottom, rgba(120,134,158,0.14) 1px, transparent 1px), " +
-    /* city blocks */
-    "linear-gradient(to right, rgba(120,134,158,0.26) 1px, transparent 1px), " +
-    "linear-gradient(to bottom, rgba(120,134,158,0.26) 1px, transparent 1px), " +
-    /* arterial roads */
-    "linear-gradient(to bottom, transparent calc(38% - 7px), rgba(120,134,158,0.30) calc(38% - 7px), rgba(120,134,158,0.30) calc(38% + 7px), transparent calc(38% + 7px)), " +
-    "linear-gradient(to right, transparent calc(61% - 6px), rgba(120,134,158,0.30) calc(61% - 6px), rgba(120,134,158,0.30) calc(61% + 6px), transparent calc(61% + 6px)), " +
-    "linear-gradient(118deg, transparent calc(52% - 4px), rgba(120,134,158,0.24) calc(52% - 4px), rgba(120,134,158,0.24) calc(52% + 4px), transparent calc(52% + 4px))",
-  backgroundSize:
-    "28px 28px, 28px 28px, 140px 140px, 140px 140px, 100% 100%, 100% 100%, 100% 100%",
-};
 
 /* ------------------------------------------------------------------ *
  * Button system — one shape, restrained states
@@ -267,8 +228,7 @@ export function ContactPageContent({
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute right-0 top-0 h-72 w-72 sm:h-96 sm:w-96"
-          style={CORNER_GRID}
+          className="pointer-events-none absolute right-0 top-0 h-72 w-72 sm:h-96 sm:w-96 contact-corner-grid"
         />
 
         <Container className="relative">
@@ -445,8 +405,7 @@ function PrimaryChannelPanel({
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={DARK_GRID}
+        className="pointer-events-none absolute inset-0 contact-dark-grid"
       />
       <div
         aria-hidden="true"
@@ -661,8 +620,7 @@ function LocationPanel({
       </div>
 
       <div
-        className="relative min-h-[200px] flex-1 overflow-hidden sm:min-h-[240px] lg:min-h-[300px]"
-        style={MAP_BLUEPRINT}
+        className="relative min-h-[200px] flex-1 overflow-hidden sm:min-h-[240px] lg:min-h-[300px] contact-map-blueprint"
       >
         <div
           aria-hidden="true"
@@ -837,8 +795,7 @@ function WhatsAppBand({
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={DARK_GRID}
+        className="pointer-events-none absolute inset-0 contact-dark-grid"
       />
       <div
         aria-hidden="true"

@@ -20,6 +20,7 @@ export default async function ProjectsPage() {
         description="A selection of completed projects and installations will be showcased here."
         breadcrumbs={[{ label: "Projects", href: "/projects" }]}
         objectFit="object-cover"
+        priorityBackdrop={false}
       />
       <Container>
         <div className="section-spacing">

@@ -3,7 +3,10 @@ export const siteConfig = {
   tagline: "Sanitary Ware, Tiles & Building Materials",
   description:
     "Sanoori Trading supplies sanitary ware, tiles, and building materials in Bangladesh.",
-  url: "https://sanooritrading.com",
+  url:
+    process.env.NODE_ENV === "production"
+      ? "https://sanoori.onrender.com"
+      : "http://localhost:3000",
 } as const;
 
 export const businessConfig = {

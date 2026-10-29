@@ -44,6 +44,7 @@ export default async function PrivacyPolicyPage() {
         objectFit="object-contain"
         objectPosition="object-center"
         noZoom
+        priorityBackdrop={false}
         className="sanoori-privacy-hero"
       />
 

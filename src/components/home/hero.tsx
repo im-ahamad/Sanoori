@@ -152,8 +152,8 @@ function HeroBackdrop({
               fill
               sizes="100vw"
               quality={60}
-              priority={isFirstSlide && isActive}
-              loading={isFirstSlide && isActive ? undefined : "lazy"}
+              priority={isActive}
+              loading={isActive ? undefined : "lazy"}
               className={cn(
                 "object-contain lg:object-cover",
                 HERO_OBJECT_POSITION,

@@ -15,64 +15,59 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        challengeId: { label: "Challenge ID", type: "text" },
       },
       authorize: async (credentials) => {
-        // Path 1: Challenge-based authentication (after OTP verification)
-        if (credentials?.challengeId) {
-          const challengeId = credentials.challengeId as string;
+        const parsed = loginCredentialsSchema.safeParse({
+          email: credentials?.email,
+          password: credentials?.password,
+        });
 
-          // Atomic claim: only succeed if verifiedAt exists AND sessionIssuedAt is null
-          const challenge = await db.loginChallenge.findUnique({
-            where: { id: challengeId },
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  role: true,
-                  isActive: true,
-                  emailVerified: true,
-                },
-              },
-            },
-          });
-
-          if (!challenge) return null;
-          if (!challenge.verifiedAt) return null; // OTP not verified
-          if (challenge.sessionIssuedAt) return null; // Session already issued
-          if (challenge.expiresAt < new Date()) return null; // Expired
-
-          const user = challenge.user;
-          if (!user || !user.isActive) return null;
-          if (!validRoles.includes(user.role)) return null;
-          if (!user.emailVerified) return null;
-
-          // Atomic claim - set sessionIssuedAt only if still null
-          const claimed = await db.loginChallenge.update({
-            where: {
-              id: challengeId,
-              sessionIssuedAt: null, // Only update if not already issued
-            },
-            data: {
-              sessionIssuedAt: new Date(),
-            },
-          });
-
-          if (!claimed) return null; // Race condition - another request claimed it
-
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-          };
+        if (!parsed.success) {
+          return null;
         }
 
-        // Path 2: Password-only authentication - REJECTED for admin login
-        // This prevents direct password-only login bypassing OTP
-        return null;
+        const { email, password } = parsed.data;
+
+        const user = await db.user.findUnique({
+          where: { email },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            passwordHash: true,
+            role: true,
+            isActive: true,
+            emailVerified: true,
+          },
+        });
+
+        if (!user) {
+          return null;
+        }
+
+        if (!user.isActive) {
+          return null;
+        }
+
+        if (!validRoles.includes(user.role)) {
+          return null;
+        }
+
+        if (!user.emailVerified) {
+          return null;
+        }
+
+        const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+        if (!passwordMatches) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        };
       },
     }),
   ],

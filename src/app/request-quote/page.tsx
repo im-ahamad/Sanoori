@@ -102,6 +102,7 @@ export default async function RequestQuotePage({
         backgroundImage="/images/about-hero.png"
         objectFit="object-cover"
         backdropOverlay="bg-gradient-to-b from-navy-dark/48 via-navy-dark/40 to-navy-dark/33"
+        priorityBackdrop={false}
       />
 
       <Container>

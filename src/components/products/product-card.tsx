@@ -63,7 +63,7 @@ export function ProductCard({
               src={cardImage.url}
               alt={cardImage.alt ?? product.name}
               fill
-              sizes="(max-width: 767px) 33vw, 25vw"
+              sizes="(max-width: 1023px) 33vw, 20vw"
               className="block rounded-[8px] object-contain object-center transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
               unoptimized
             />
@@ -143,7 +143,7 @@ export function ProductCard({
             src={cardImage.url}
             alt={cardImage.alt ?? product.name}
             fill
-            sizes="(max-width: 1023px) 50vw, 25vw"
+            sizes="(max-width: 639px) 50vw, (max-width: 1023px) 25vw, 22vw"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (

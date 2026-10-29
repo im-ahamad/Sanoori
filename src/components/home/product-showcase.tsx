@@ -6,6 +6,7 @@ import { getServerTranslations } from "@/lib/i18n/server-translations";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { ProductCard as SharedProductCard } from "@/components/products/product-card";
 import type { Availability } from "@/generated/prisma";
 
@@ -214,12 +215,15 @@ function ProductCard({ product }: ProductCardProps) {
           aria-hidden="true"
         >
           {product.image ? (
-            // eslint-disable-next-line @next/next/no-img-element -- native img retained for responsive object-contain in padded container; Image fill would alter layout
-            <img
+            <Image
               src={product.image.url}
               alt={product.image.alt ?? product.name}
+              width={400}
+              height={300}
+              sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
               className="object-contain object-center w-full h-auto block rounded-[14px] transition-transform duration-500 group-hover:scale-[1.01] md:group-hover:scale-[1.04]"
               loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-navy/5 via-transparent to-navy/5 rounded-[14px]">

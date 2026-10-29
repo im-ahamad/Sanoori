@@ -172,6 +172,7 @@ async function listAccounts(db: PrismaClient): Promise<void> {
       name: true,
       role: true,
       isActive: true,
+      emailVerified: true,
       createdAt: true,
     },
   });
@@ -184,8 +185,9 @@ async function listAccounts(db: PrismaClient): Promise<void> {
   console.log(`Admin accounts (${users.length}):`);
   for (const user of users) {
     const status = user.isActive ? "active" : "INACTIVE";
+    const verified = user.emailVerified ? "verified" : "NOT VERIFIED";
     console.log(
-      `  - ${user.email}  role=${user.role}  ${status}  name=${user.name ?? "(none)"}`
+      `  - ${user.email}  role=${user.role}  ${status}  ${verified}  name=${user.name ?? "(none)"}`
     );
   }
 }

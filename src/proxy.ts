@@ -15,7 +15,7 @@ import { authConfig } from "@/lib/auth.config";
 const { auth } = NextAuth(authConfig);
 
 function isAdminRoute(pathname: string): boolean {
-  return pathname === "/secure-admin" || pathname.startsWith("/admin/");
+  return pathname === "/secure-admin" || pathname === "/admin" || pathname.startsWith("/admin/");
 }
 
 const adminFrameOptions = { "X-Frame-Options": "DENY" };

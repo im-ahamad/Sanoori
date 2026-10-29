@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site";
 import { en } from "./dictionaries/en";
 import { bn } from "./dictionaries/bn";
 import { adminEn } from "./dictionaries/admin/en";
@@ -64,9 +65,9 @@ export function getNavigationConfig(lang: "en" | "bn" = "en") {
 export function getSiteConfig(lang: "en" | "bn" = "en") {
   const t = getServerTranslations(lang);
   return {
-    name: "Sanoori Trading",
+    name: siteConfig.name,
     tagline: t.mobileNav.tagline,
     description: t.footer.description,
-    url: "https://sanooritrading.com",
+    url: siteConfig.url,
   } as const;
 }

@@ -70,10 +70,16 @@ export async function listAdminCustomers(
   const q = filters.q?.trim().slice(0, 100) ?? "";
   const sort = isValidSort(filters.sort) ? filters.sort : "newest";
   const page = parsePositiveInt(filters.page, 1);
+  const pageSize = CUSTOMERS_PAGE_SIZE;
+  const skip = (page - 1) * pageSize;
 
   try {
-    // Get unique customers by grouping inquiries by phone+name
-    // We need to do this in two steps: first get raw data, then aggregate
+    // Get unique customers by grouping inquiries by phone.
+    // Previously this loaded ALL matching inquiries into memory before
+    // grouping and paginating (O(total inquiries)). Now we paginate
+    // distinct phones at the database level first (O(pageSize phones)),
+    // then fetch inquiries only for those phones.
+
     const where: Prisma.InquiryWhereInput = {};
     if (q) {
       where.OR = [
@@ -83,23 +89,67 @@ export async function listAdminCustomers(
       ];
     }
 
-    // Get all matching inquiries to aggregate
-    const inquiries = await db.inquiry.findMany({
+    // Step 1: Paginate distinct customers (by phone) at the database level.
+    const customerGroups = await db.inquiry.groupBy({
+      by: ["phone"],
       where,
-      orderBy: { createdAt: sort === "oldest" ? "asc" : "desc" },
+      orderBy: {
+        _max: {
+          createdAt: sort === "oldest" ? "asc" : "desc",
+        },
+      },
+      _max: {
+        createdAt: true,
+      },
+      _count: {
+        _all: true,
+      },
+      take: pageSize,
+      skip,
+    });
+
+    if (customerGroups.length === 0) {
+      return {
+        ok: true,
+        data: {
+          items: [],
+          page,
+          pageSize,
+          total: 0,
+          totalPages: 0,
+          filters: { q, sort },
+        },
+      };
+    }
+
+    // Step 2: Total count of distinct customers for pagination metadata.
+    const allGroups = await db.inquiry.groupBy({
+      by: ["phone"],
+      where,
+    });
+    const total = allGroups.length;
+
+    const phones = customerGroups.map((g) => g.phone);
+
+    // Step 3: Fetch inquiries only for the paginated phones. Bounded by
+    // pageSize phones instead of every inquiry in the database. Only the
+    // fields needed for the list view are selected (product/quantity/status
+    // are not used in CustomerListItem).
+    const inquiries = await db.inquiry.findMany({
+      where: {
+        ...where,
+        phone: { in: phones },
+      },
       select: {
         customerName: true,
         phone: true,
         email: true,
         createdAt: true,
-        product: { select: { name: true, productCode: true } },
-        quantity: true,
-        status: true,
-        id: true,
       },
+      orderBy: { createdAt: sort === "oldest" ? "asc" : "desc" },
     });
 
-    // Group by phone (primary) and name
+    // Step 4: Group by phone (same logic as before, now on a bounded set).
     const customerMap = new Map<
       string,
       {
@@ -108,29 +158,18 @@ export async function listAdminCustomers(
         email: string | null;
         totalOrders: number;
         lastOrderAt: Date;
-        orders: CustomerDetail["orders"];
       }
     >();
 
     for (const inquiry of inquiries) {
       const key = inquiry.phone;
       const existing = customerMap.get(key);
-      const order = {
-        id: inquiry.id,
-        productName: inquiry.product?.name ?? null,
-        productCode: inquiry.product?.productCode ?? null,
-        quantity: inquiry.quantity,
-        status: inquiry.status,
-        createdAt: inquiry.createdAt,
-      };
 
       if (existing) {
         existing.totalOrders += 1;
         if (inquiry.createdAt > existing.lastOrderAt) {
           existing.lastOrderAt = inquiry.createdAt;
         }
-        existing.orders.push(order);
-        // Use the most recent name/email
         existing.name = inquiry.customerName;
         existing.email = inquiry.email ?? existing.email;
       } else {
@@ -140,12 +179,11 @@ export async function listAdminCustomers(
           email: inquiry.email,
           totalOrders: 1,
           lastOrderAt: inquiry.createdAt,
-          orders: [order],
         });
       }
     }
 
-    // Convert to array and sort
+    // Step 5: Sort and build items.
     const customers = Array.from(customerMap.values());
     customers.sort((a, b) =>
       sort === "oldest"
@@ -153,13 +191,7 @@ export async function listAdminCustomers(
         : b.lastOrderAt.getTime() - a.lastOrderAt.getTime()
     );
 
-    const total = customers.length;
-    const pageSize = CUSTOMERS_PAGE_SIZE;
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    const paginated = customers.slice(start, end);
-
-    const items: CustomerListItem[] = paginated.map((c) => ({
+    const items: CustomerListItem[] = customers.map((c) => ({
       name: c.name,
       phone: c.phone,
       email: c.email,
@@ -179,7 +211,7 @@ export async function listAdminCustomers(
       },
     };
   } catch (error) {
-    console.error("Failed to list customers", error);
+    console.error("Failed to load customers", error);
     return { ok: false, error: "database" };
   }
 }

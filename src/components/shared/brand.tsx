@@ -30,8 +30,8 @@ export function Brand({ size = "md", className, src }: BrandProps) {
     <Image
       src={logoSrc}
       alt={businessConfig.logo.alt}
-      width={1120}
-      height={338}
+      width={160}
+      height={48}
       unoptimized
       priority
       sizes="(max-width: 640px) 112px, 160px"

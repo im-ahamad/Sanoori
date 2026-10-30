@@ -306,8 +306,11 @@ export function ProductGallery({ images, productName, hideThumbnails }: ProductG
       setCanUseZoom(window.innerWidth >= 1024 && finePointer.matches);
     };
     sync();
-    window.addEventListener("resize", sync);
-    finePointer.addEventListener("change", sync);
+    // Only add listeners if zoom is potentially available (1024px+)
+    if (window.innerWidth >= 1024) {
+      window.addEventListener("resize", sync);
+      finePointer.addEventListener("change", sync);
+    }
     return () => {
       window.removeEventListener("resize", sync);
       finePointer.removeEventListener("change", sync);

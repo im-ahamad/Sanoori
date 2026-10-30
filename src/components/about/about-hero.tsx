@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 
 const ABOUT_HERO_SLIDES = [
-  "/images/about-hero.png",
-  "/images/hero-2.png",
-  "/images/hero-3.png",
-  "/images/hero-4.png",
-  "/images/hero-5.png",
+  "/images/about-hero.webp",
+  "/images/hero-2.webp",
+  "/images/hero-3.webp",
+  "/images/hero-4.webp",
+  "/images/hero-5.webp",
 ];
 
 const CROSSFADE_MS = 700;

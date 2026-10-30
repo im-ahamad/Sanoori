@@ -62,9 +62,9 @@ const AVAILABILITY_VALUES = [
 ] as const;
 
 const CATEGORY_HERO_IMAGES: Record<string, string> = {
-  "sanitary-ware": "/images/sanitary-hero.png",
-  tiles: "/images/tiles-hero.png",
-  "building-materials": "/images/building-hero.png",
+  "sanitary-ware": "/images/sanitary-hero.webp",
+  tiles: "/images/tiles-hero.webp",
+  "building-materials": "/images/building-hero.webp",
 };
 
 function firstValue(
@@ -158,8 +158,12 @@ export default async function ProductsPage({
           src={
             categorySlug
               ? CATEGORY_HERO_IMAGES[categorySlug]
-              : "/images/product-hero.png"
+              : "/images/product-hero.webp"
           }
+          // The hero backdrop IS the LCP image on /products and on the
+          // category-filtered URLs, so mark it `priority` so Next.js preloads
+          // it eagerly instead of lazy-loading the largest above-the-fold image.
+          priority
           overlayClassName={
             categorySlug === "sanitary-ware" || categorySlug === "tiles" || categorySlug === "building-materials"
               ? "bg-[radial-gradient(ellipse_115%_95%_at_50%_28%,color-mix(in_oklab,var(--navy-dark)_36%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_21%,transparent)_42%,transparent_88%),linear-gradient(180deg,color-mix(in_oklab,var(--navy-dark)_38%,transparent)_0%,color-mix(in_oklab,var(--navy-dark)_21%,transparent)_45%,color-mix(in_oklab,var(--navy-dark)_4%,transparent)_70%,transparent_82%,transparent_100%)]"

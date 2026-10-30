@@ -44,7 +44,6 @@ export function ProductImage({ url, alt, hasImage }: ProductImageProps) {
           width={1080}
           height={1080}
           sizes="(max-width: 1024px) 100vw, 640px"
-          unoptimized
           className="block w-full h-auto object-contain lg:absolute lg:inset-0 lg:h-full lg:w-full"
           style={{ objectFit: "contain" }}
           loading="eager"

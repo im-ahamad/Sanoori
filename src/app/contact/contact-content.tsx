@@ -201,6 +201,9 @@ export function ContactPageContent({
         noZoom
         textColor="white"
         placement="top-left"
+        // The contact hero backdrop is the LCP image on /contact, so preload it
+        // eagerly instead of lazy-loading the largest above-the-fold image.
+        priorityBackdrop
         // Positioning only: at `lg` (>=1024px) the whole copy block sits in
         // the hero's top-left corner with a small 40px gap, matching the
         // 960–1023px band. Below 1024px the original insets are untouched.

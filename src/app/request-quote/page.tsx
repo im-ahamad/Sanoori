@@ -99,7 +99,7 @@ export default async function RequestQuotePage({
         title={rq.pageTitle}
         description={rq.pageDescription}
         breadcrumbs={[{ label: rq.breadcrumb, href: "/request-quote" }]}
-        backgroundImage="/images/about-hero.png"
+        backgroundImage="/images/about-hero.webp"
         objectFit="object-cover"
         backdropOverlay="bg-gradient-to-b from-navy-dark/48 via-navy-dark/40 to-navy-dark/33"
         priorityBackdrop={false}

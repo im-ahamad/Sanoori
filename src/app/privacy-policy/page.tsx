@@ -44,7 +44,10 @@ export default async function PrivacyPolicyPage() {
         objectFit="object-contain"
         objectPosition="object-center"
         noZoom
-        priorityBackdrop={false}
+        // The privacy hero backdrop is the LCP image on /privacy-policy, so
+        // preload it eagerly instead of lazy-loading the largest above-the-fold
+        // image.
+        priorityBackdrop={true}
         className="sanoori-privacy-hero"
       />
 

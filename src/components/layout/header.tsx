@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Container } from "@/components/layout/container";
 import { Brand } from "@/components/shared/brand";
@@ -111,7 +111,7 @@ export function Header() {
     ] as const,
   } as const;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 8);
     }

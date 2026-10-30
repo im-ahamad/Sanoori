@@ -15,11 +15,11 @@ import { useTranslations } from "@/lib/i18n";
  * Order: main-hero → hero-2 → hero-3 → hero-4 → hero-5 → main-hero …
  */
 const HERO_SLIDES = [
-  "/images/main-hero.png",
-  "/images/hero-2.png",
-  "/images/hero-3.png",
-  "/images/hero-4.png",
-  "/images/hero-5.png",
+  "/images/main-hero.webp",
+  "/images/hero-2.webp",
+  "/images/hero-3.webp",
+  "/images/hero-4.webp",
+  "/images/hero-5.webp",
 ];
 
 /** Milliseconds of the crossfade between two slides. */
@@ -154,6 +154,7 @@ function HeroBackdrop({
               quality={60}
               priority={isActive}
               loading={isActive ? undefined : "lazy"}
+              fetchPriority={isActive ? "high" : "low"}
               className={cn(
                 "object-contain lg:object-cover",
                 HERO_OBJECT_POSITION,

@@ -143,9 +143,11 @@ function isUsableImageUrl(image: string | null | undefined): boolean {
 
 function cardImageUrl(url: string): string {
   // 4:3 crop tuned for catalogue cards — small, auto format/quality.
+  // 480w is sufficient for card displays up to desktop (2x DPR at ~240px);
+  // smaller than 640w to save bandwidth on mobile and slow networks.
   return buildImageUrl(url, {
-    width: 640,
-    height: 480,
+    width: 480,
+    height: 360,
     format: "auto",
     quality: "auto",
   });

@@ -3,6 +3,8 @@ import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { generatePageMetadata } from "@/lib/seo";
 
+export const revalidate = 3600;
+
 export async function generateMetadata(): Promise<ReturnType<typeof generatePageMetadata>> {
   return generatePageMetadata({
     title: "Projects", // Not in translation dict yet

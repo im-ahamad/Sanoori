@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PRODUCTS_CACHE_TAG } from "@/lib/cache";
@@ -176,6 +176,7 @@ async function writeProduct(
   };
 
   let createdId: string | null = null;
+  let oldSlug: string | null = null;
 
   try {
     if (expectedProductId === "create") {
@@ -185,6 +186,11 @@ async function writeProduct(
       });
       createdId = created.id;
     } else {
+      const existing = await db.product.findUnique({
+        where: { id: expectedProductId },
+        select: { slug: true },
+      });
+      oldSlug = existing?.slug ?? null;
       await db.product.update({
         where: { id: expectedProductId },
         data,
@@ -192,7 +198,13 @@ async function writeProduct(
     }
 
     revalidatePath("/admin/products");
-    revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+    updateTag(PRODUCTS_CACHE_TAG);
+    revalidatePath("/");
+    revalidatePath("/products");
+    revalidatePath("/products/" + input.slug);
+    if (oldSlug !== null && oldSlug !== input.slug) {
+      revalidatePath("/products/" + oldSlug);
+    }
   } catch (error) {
     if (isUniqueViolation(error)) {
       return {
@@ -271,7 +283,9 @@ export async function deleteProductAction(
   }
 
   revalidatePath("/admin/products");
-  revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+  updateTag(PRODUCTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/products");
   redirect("/admin/products?deleted=1");
 }
 
@@ -315,6 +329,8 @@ export async function toggleProductFeaturedAction(
   }
 
   revalidatePath("/admin/products");
-  revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+  updateTag(PRODUCTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/products");
   return { ok: true, featured };
 }

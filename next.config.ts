@@ -42,6 +42,16 @@ const nextConfig: NextConfig = {
           { key: "Content-Security-Policy-Report-Only", value: cspReportOnly },
         ],
       },
+      // Long-lived cache for static image assets (hero and category images).
+      // Filenames are NOT versioned (no content hash), so the same URL may serve
+      // different content over time. `immutable` is NOT used; browsers revalidate
+      // via ETag/Last-Modified after max-age expires.
+      {
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400" },
+        ],
+      },
     ];
   },
 };

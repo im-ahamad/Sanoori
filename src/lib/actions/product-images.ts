@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 import type { ZodError } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -137,7 +137,9 @@ export async function attachImageAction(
   if (!result.ok) return { ok: false, error: result.error };
 
   revalidatePath(`/admin/products/${parsed.data.productId}/edit`);
-  revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+  updateTag(PRODUCTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/products");
   return { ok: true, data: result.data };
 }
 
@@ -162,7 +164,9 @@ export async function reorderImagesAction(
   if (!result.ok) return { ok: false, error: result.error };
 
   revalidatePath(`/admin/products/${parsed.data.productId}/edit`);
-  revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+  updateTag(PRODUCTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/products");
   return { ok: true };
 }
 
@@ -187,7 +191,9 @@ export async function updateImageAltAction(
   if (!result.ok) return { ok: false, error: result.error };
 
   revalidatePath(`/admin/products/${result.data.productId}/edit`);
-  revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+  updateTag(PRODUCTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/products");
   return { ok: true };
 }
 
@@ -212,6 +218,8 @@ export async function deleteImageAction(
   if (!result.ok) return { ok: false, error: result.error };
 
   revalidatePath(`/admin/products/${parsed.data.productId}/edit`);
-  revalidateTag(PRODUCTS_CACHE_TAG, 'max');
+  updateTag(PRODUCTS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/products");
   return { ok: true };
 }
